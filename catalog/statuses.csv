@@ -1,0 +1,9 @@
+status_ru,status_uz,status_en,status_code,is_annulled,is_executed,is_partial,is_paid,is_open,sort_order,description_ru,description_uz
+Новый,Yangi,new,new,false,false,false,false,true,1,сделка заключена в последний день выгрузки 30.10.2026,bitim oxirgi kun 30.10.2026 da tuzilgan
+Не подписан,Imzolanmagan,not_signed,not_signed,false,false,false,false,true,2,договор ещё не подписан сторонами,shartnoma hali tomonlar tomonidan imzolanmagan
+Заключен,Imzolangan (forvard/fyuchers),concluded,concluded,false,false,false,false,true,3,"форвард или фьючерс подписан, срок оплаты ещё не истёк","forvard yoki fyuchers imzolangan, to‘lov muddati o‘tmagan"
+Ждёт оплату,To‘lov kutilmoqda,awaiting_payment,awaiting_payment,false,false,false,false,true,4,"спот подписан, срок оплаты ещё не истёк","spot imzolangan, to‘lov muddati o‘tmagan"
+Оплачен,To‘langan,paid,paid,false,false,false,true,true,5,"оплачен, товар ещё не поставлен","to‘langan, tovar hali yetkazilmagan"
+Исполнен,Bajarilgan,executed,executed,false,true,false,true,false,6,оплачен и поставлен полностью,to‘langan va to‘liq yetkazilgan
+Исполнен(Частично),Qisman bajarilgan,partially_executed,partial,false,true,true,true,false,7,"оплачен, поставлена часть","to‘langan, qisman yetkazilgan"
+Аннулирован(Не оплачен),Bekor qilingan (to‘lanmagan),annulled,annulled,true,false,false,false,false,8,"не оплачен в срок и аннулирован, сделка не состоялась","muddatida to‘lanmagan va bekor qilingan, bitim amalga oshmagan"

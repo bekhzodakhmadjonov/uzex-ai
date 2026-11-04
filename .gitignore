@@ -1,0 +1,7 @@
+uzex_spot_data/
+.venv/
+.env
+data/
+__pycache__/
+*.pyc
+analysis/*.pkl

@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UZEX Bitimlar Assistenti</title>
+<meta name="description" content="Birja bitimlari reyestri bo‘yicha savol-javob agenti">
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--text:#111827;--muted:#6b7280;--line:#e5e7eb;--accent:#0f766e;--accent-2:#ccfbf1;--warn:#b45309;--warn-bg:#fef3c7;--bad:#b91c1c;--bad-bg:#fee2e2;--code:#0b1020;--code-text:#e5e7eb}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0b0f14;--card:#121821;--text:#e5e7eb;--muted:#9ca3af;--line:#1f2937;--accent:#2dd4bf;--accent-2:#134e4a;--warn:#fbbf24;--warn-bg:#3a2a07;--bad:#f87171;--bad-bg:#3b0d0d;--code:#05070b;--code-text:#d1d5db}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;align-items:center;gap:12px}
+header h1{font-size:16px;margin:0;flex:1;font-weight:650}
+.lang button{border:1px solid var(--line);background:var(--card);color:var(--text);padding:6px 10px;border-radius:8px;cursor:pointer;font-size:13px}
+.lang button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+main{max-width:860px;margin:0 auto;padding:16px 16px 140px}
+.intro{color:var(--muted);font-size:14px;margin:4px 0 12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--text);padding:7px 11px;border-radius:999px;cursor:pointer;font-size:13px;text-align:left}
+.chip:hover{border-color:var(--accent)}
+.msg{margin:12px 0;display:flex}
+.msg.user{justify-content:flex-end}
+.bubble{max-width:100%;padding:12px 14px;border-radius:14px;background:var(--card);border:1px solid var(--line)}
+.msg.user .bubble{background:var(--accent);color:#fff;border-color:var(--accent);max-width:85%}
+.answer{white-space:pre-wrap;font-size:15.5px}
+.basis{margin-top:10px;padding:8px 10px;border-radius:10px;background:var(--accent-2);font-size:13px}
+.basis b{font-weight:650}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--line);margin:4px 6px 0 0}
+.tag.warn{background:var(--warn-bg);color:var(--warn)}
+.tag.bad{background:var(--bad-bg);color:var(--bad)}
+details{margin-top:10px;font-size:13px}
+summary{cursor:pointer;color:var(--accent);font-weight:600}
+pre{background:var(--code);color:var(--code-text);padding:10px;border-radius:10px;overflow:auto;font-size:12.5px;margin:8px 0 0}
+.tbl{overflow:auto;margin-top:8px;max-height:360px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;font-size:12.5px;min-width:100%}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{position:sticky;top:0;background:var(--card);font-weight:650}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+canvas{max-height:260px;margin-top:10px}
+.foot{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.foot form{max-width:860px;margin:0 auto;display:flex;gap:8px}
+textarea{flex:1;resize:none;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;background:var(--bg);color:var(--text);min-height:44px;max-height:120px}
+button.send{border:0;background:var(--accent);color:#fff;border-radius:12px;padding:0 18px;font-weight:650;cursor:pointer}
+button.send:disabled{opacity:.5}
+.meta{font-size:12px;color:var(--muted);margin-top:6px}
+.thinking{color:var(--muted);font-style:italic}
+.small{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">UZEX bitimlar assistenti</h1>
+  <div class="lang"><button data-l="uz" class="on">O‘z</button><button data-l="ru">Ру</button></div>
+</header>
+<main>
+  <p class="intro" id="intro"></p>
+  <div class="chips" id="chips"></div>
+  <div id="chat"></div>
+</main>
+<div class="foot">
+  <form id="f">
+    <textarea id="q" rows="1" placeholder=""></textarea>
+    <button class="send" id="send" type="submit">➤</button>
+  </form>
+  <div class="meta" id="status"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script>
+const I18N = {
+  uz:{title:"UZEX bitimlar assistenti", intro:"Birja bitimlari reyestri (03.01.2022 – 30.10.2026, 500 000 bitim) bo‘yicha savol bering. Javoblar faqat ma’lumotlardan olinadi; ma’lumot bo‘lmasa, agent buni ochiq aytadi.",
+      ph:"Savolingizni yozing… (o‘zbek yoki rus tilida)", basis:"Asos", rows:"qator", sql:"SQL so‘rovni ko‘rsatish", table:"Jadval", filters:"Filtrlar", assumptions:"Taxminlar", wait:"Hisoblanmoqda…", err:"Xatolik. Qayta urinib ko‘ring.", asof:"holatiga ko‘ra", time:"vaqt", nodata:"Ma’lumot yo‘q", clarify:"Aniqlashtirish kerak", truncated:"faqat birinchi 200 qator ko‘rsatildi"},
+  ru:{title:"Ассистент по сделкам UZEX", intro:"Задайте вопрос по реестру биржевых сделок (03.01.2022 – 30.10.2026, 500 000 сделок). Ответы берутся только из данных; если данных нет — агент честно скажет об этом.",
+      ph:"Введите вопрос… (на русском или узбекском)", basis:"Основание", rows:"строк", sql:"Показать SQL-запрос", table:"Таблица", filters:"Фильтры", assumptions:"Допущения", wait:"Считаю…", err:"Ошибка. Попробуйте ещё раз.", asof:"по состоянию на", time:"время", nodata:"Нет данных", clarify:"Нужно уточнение", truncated:"показаны первые 200 строк"}
+};
+let lang = (()=>{try{return localStorage.getItem('lang')||'uz'}catch(e){return 'uz'}})();
+let sid = (()=>{try{let s=localStorage.getItem('sid'); if(!s){s=crypto.randomUUID(); localStorage.setItem('sid',s)} return s}catch(e){return null}})();
+let examples = {};
+const $ = s=>document.querySelector(s);
+function t(k){return I18N[lang][k]}
+function applyLang(){
+  document.documentElement.lang = lang==='ru'?'ru':'uz';
+  $('#title').textContent=t('title'); $('#intro').textContent=t('intro'); $('#q').placeholder=t('ph');
+  document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('on', b.dataset.l===lang));
+  const c=$('#chips'); c.innerHTML='';
+  (examples[lang]||[]).forEach(x=>{const b=document.createElement('button'); b.className='chip'; b.textContent=x; b.onclick=()=>ask(x); c.appendChild(b)});
+  try{localStorage.setItem('lang',lang)}catch(e){}
+}
+document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>{lang=b.dataset.l; applyLang()});
+fetch('/api/examples').then(r=>r.json()).then(j=>{examples=j; applyLang()}).catch(()=>applyLang());
+
+function fmt(v){
+  if(v===null||v===undefined) return '';
+  if(typeof v==='number'){ if(Number.isInteger(v)) return v.toLocaleString('ru-RU'); return v.toLocaleString('ru-RU',{maximumFractionDigits:2}); }
+  return String(v);
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function add(role, html){const d=document.createElement('div'); d.className='msg '+role; d.innerHTML='<div class="bubble">'+html+'</div>'; $('#chat').appendChild(d); d.scrollIntoView({behavior:'smooth',block:'end'}); return d}
+
+async function ask(q){
+  q=(q||'').trim(); if(!q) return;
+  $('#chips').style.display='none';
+  add('user', esc(q)); $('#q').value='';
+  const w=add('bot','<span class="thinking">'+t('wait')+'</span>');
+  $('#send').disabled=true; const t0=performance.now();
+  try{
+    const r=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,session_id:sid,language:null})});
+    const j=await r.json();
+    if(j.session_id) sid=j.session_id;
+    w.querySelector('.bubble').innerHTML=render(j);
+    drawChart(j, w);
+    $('#status').textContent=`${t('time')}: ${((performance.now()-t0)/1000).toFixed(1)} s · ${j.n_rows} ${t('rows')} · ${j.status}`;
+  }catch(e){ w.querySelector('.bubble').innerHTML='<span class="tag bad">'+t('err')+'</span>'; }
+  $('#send').disabled=false;
+}
+function render(j){
+  let h='<div class="answer">'+esc(j.answer)+'</div>';
+  const tags=[];
+  if(j.status==='unanswerable'||j.status==='no_rows') tags.push('<span class="tag warn">'+t('nodata')+'</span>');
+  if(j.status==='clarify') tags.push('<span class="tag warn">'+t('clarify')+'</span>');
+  if(j.status==='sql_error'||j.status==='llm_error') tags.push('<span class="tag bad">'+t('err')+'</span>');
+  if(tags.length) h+='<div>'+tags.join('')+'</div>';
+  if(j.sql){
+    const b=j.basis||{};
+    h+='<div class="basis"><b>'+t('basis')+':</b> '+j.n_rows+' '+t('rows')+(j.truncated?' ('+t('truncated')+')':'')+' · '+t('asof')+' '+(b.as_of||'')+(b.sql_ms!=null?' · SQL '+b.sql_ms+' ms':'');
+    if(j.filters&&j.filters.length) h+='<br><b>'+t('filters')+':</b> '+j.filters.map(esc).join('; ');
+    if(j.assumptions&&j.assumptions.length) h+='<br><b>'+t('assumptions')+':</b> '+j.assumptions.map(esc).join('; ');
+    h+='</div>';
+    if(j.rows&&j.rows.length){
+      const cols=j.columns.filter(c=>!c.endsWith('_fmt'));
+      h+='<details><summary>'+t('table')+' ('+j.rows.length+')</summary><div class="tbl"><table><thead><tr>'+cols.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>';
+      j.rows.forEach(r=>{h+='<tr>'+cols.map(c=>{const v=r[c]; const num=typeof v==='number'; return '<td class="'+(num?'num':'')+'">'+esc(fmt(v))+'</td>'}).join('')+'</tr>'});
+      h+='</tbody></table></div></details>';
+    }
+    h+='<details><summary>'+t('sql')+'</summary><pre>'+esc(j.sql)+'</pre></details>';
+    h+='<canvas style="display:none"></canvas>';
+  }
+  return h;
+}
+function drawChart(j, node){
+  const c=j.chart||{}; if(!window.Chart||!c.type||c.type==='none'||!j.rows||j.rows.length<2) return;
+  const x=c.x, y=c.y; if(!(x in j.rows[0])||!(y in j.rows[0])) return;
+  const cv=node.querySelector('canvas'); if(!cv) return; cv.style.display='block';
+  const labels=j.rows.map(r=>String(r[x])); const data=j.rows.map(r=>Number(r[y])||0);
+  const accent=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+  new Chart(cv,{type:c.type==='line'?'line':'bar',data:{labels,datasets:[{label:y,data,borderColor:accent,backgroundColor:accent+'88',tension:.25}]},
+    options:{plugins:{legend:{display:false}},scales:{x:{ticks:{maxRotation:45,autoSkip:true}},y:{ticks:{callback:v=>Number(v).toLocaleString('ru-RU')}}}}});
+}
+$('#f').onsubmit=e=>{e.preventDefault(); ask($('#q').value)};
+$('#q').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault(); ask($('#q').value)}});
+</script>
+</body>
+</html>

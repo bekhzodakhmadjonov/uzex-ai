@@ -1,0 +1,162 @@
+[
+ {
+  "q_uz": "2025 yilda paxta jami qancha tonna sotilgan (bekor qilinganlarsiz)?",
+  "q_ru": "Сколько тонн хлопка продано в 2025 (без аннулированных)?",
+  "sql": "SELECT count(*) AS n_deals, round(sum(volume_t),1) AS tonnes FROM deals WHERE family_key='cotton' AND year=2025 AND NOT is_annulled",
+  "expected": {
+   "n_deals": "30894",
+   "tonnes": "1844729.9"
+  }
+ },
+ {
+  "q_uz": "2025 yilda AI-92 benzinning litr uchun o‘rtacha narxi?",
+  "q_ru": "Средняя цена АИ-92 за литр в 2025?",
+  "sql": "SELECT count(*) AS n_deals, count(*) FILTER (WHERE is_annulled) AS n_annulled, round(wavg_price(amount, volume),2) AS price FROM deals WHERE product_key='petrol' AND brand='АИ-92' AND unit='литр' AND year=2025",
+  "expected": {
+   "n_deals": "1402",
+   "n_annulled": "121",
+   "price": "10700.25"
+  }
+ },
+ {
+  "q_uz": "2024 yilda sement bo‘yicha eng katta xaridor (summa bo‘yicha)?",
+  "q_ru": "Крупнейший покупатель цемента в 2024 по сумме?",
+  "sql": "SELECT buyer_name, buyer_inn, count(*) AS n_deals, count(*) FILTER (WHERE is_annulled) AS n_annulled, sum(amount_uzs) AS total_uzs, sum(amount_uzs) FILTER (WHERE NOT is_annulled) AS total_uzs_valid FROM deals WHERE product_key='cement' AND year=2024 GROUP BY ALL ORDER BY total_uzs DESC LIMIT 1",
+  "expected": {
+   "buyer_name": "LO‘HI IMPEKS MCHJ",
+   "buyer_inn": "955082698",
+   "n_deals": "342",
+   "n_annulled": "29",
+   "total_uzs": "44585971247.00",
+   "total_uzs_valid": "41508020420.00"
+  }
+ },
+ {
+  "q_uz": "Jami nechta bitim bekor qilingan?",
+  "q_ru": "Сколько сделок аннулировано?",
+  "sql": "SELECT count(*) AS n_deals FROM deals WHERE is_annulled",
+  "expected": {
+   "n_deals": "33719"
+  }
+ },
+ {
+  "q_uz": "2026 yil oktabrda nechta bitim tuzilgan?",
+  "q_ru": "Сколько сделок заключено в октябре 2026?",
+  "sql": "SELECT count(*) AS n_deals FROM deals WHERE year=2026 AND month=10",
+  "expected": {
+   "n_deals": "18333"
+  }
+ },
+ {
+  "q_uz": "Eksport bitimlarining jami summasi dollarda?",
+  "q_ru": "Общая сумма экспортных сделок в долларах?",
+  "sql": "SELECT count(*) AS n_deals, sum(amount) AS total_usd FROM deals WHERE is_export",
+  "expected": {
+   "n_deals": "6590",
+   "total_usd": "1137509729.39"
+  }
+ },
+ {
+  "q_uz": "Eksport bitimlarining jami summasi so‘mda (bitim kunidagi kurs bilan)?",
+  "q_ru": "Сумма экспортных сделок в сумах по курсу на дату сделки?",
+  "sql": "SELECT count(*) AS n_deals, sum(amount_uzs) AS total_uzs FROM deals WHERE is_export",
+  "expected": {
+   "n_deals": "6590",
+   "total_uzs": "13641937568189.97"
+  }
+ },
+ {
+  "q_uz": "Toshkent shahrida 2023 yilda nechta bitim?",
+  "q_ru": "Сколько сделок в городе Ташкенте в 2023?",
+  "sql": "SELECT count(*) AS n_deals FROM deals WHERE region_id='TAS' AND year=2023",
+  "expected": {
+   "n_deals": "14856"
+  }
+ },
+ {
+  "q_uz": "Eng ko‘p bitim tuzgan sotuvchi broker?",
+  "q_ru": "Брокер продавца с наибольшим числом сделок?",
+  "sql": "SELECT seller_broker, seller_broker_name, count(*) AS n_deals FROM deals GROUP BY ALL ORDER BY n_deals DESC LIMIT 1",
+  "expected": {
+   "seller_broker": "BK111",
+   "seller_broker_name": "\"Gucham Broker\" MChJ",
+   "n_deals": "21471"
+  }
+ },
+ {
+  "q_uz": "Kechikib yetkazilgan bitimlar soni va o‘rtacha kechikish?",
+  "q_ru": "Сколько поставок с опозданием и средняя просрочка?",
+  "sql": "SELECT count(*) AS n_deals, round(avg(delivery_delay_days),1) AS avg_days FROM deals WHERE is_delivery_late",
+  "expected": {
+   "n_deals": "17805",
+   "avg_days": "8.0"
+  }
+ },
+ {
+  "q_uz": "Muddati o‘tgan, to‘lanmagan ochiq bitimlar nechta?",
+  "q_ru": "Сколько открытых сделок с просроченной оплатой?",
+  "sql": "SELECT count(*) AS n_deals FROM deals WHERE is_open AND pay_date IS NULL AND pay_due_date < DATE '2026-10-30'",
+  "expected": {
+   "n_deals": "0"
+  }
+ },
+ {
+  "q_uz": "2025 yilda qayta ishlash korxonalari qancha bug‘doy sotib olgan (tonna)?",
+  "q_ru": "Сколько пшеницы (т) купили перерабатывающие предприятия в 2025?",
+  "sql": "SELECT count(*) AS n_deals, count(*) FILTER (WHERE is_annulled) AS n_annulled, round(sum(volume_t)) AS tonnes, round(sum(volume_t) FILTER (WHERE NOT is_annulled)) AS tonnes_valid FROM deals WHERE product_key='wheat' AND year=2025 AND buyer_activity_ru='Перерабатывающее предприятие'",
+  "expected": {
+   "n_deals": "2890",
+   "n_annulled": "195",
+   "tonnes": "791591.0",
+   "tonnes_valid": "737084.0"
+  }
+ },
+ {
+  "q_uz": "Dizel yoqilg‘isi 2026 yilda tonnada o‘rtacha narxi?",
+  "q_ru": "Средняя цена дизтоплива за тонну в 2026?",
+  "sql": "SELECT count(*) AS n_deals, count(*) FILTER (WHERE is_annulled) AS n_annulled, round(wavg_price(amount, volume)) AS price_per_t FROM deals WHERE product_key='diesel' AND unit='тонна' AND year=2026",
+  "expected": {
+   "n_deals": "5059",
+   "n_annulled": "385",
+   "price_per_t": "14105547.0"
+  }
+ },
+ {
+  "q_uz": "1-nav 2-klass paxta spot bitimlari soni?",
+  "q_ru": "Сколько спот-сделок по хлопку 1 сорт 2 класс?",
+  "sql": "SELECT count(*) AS n_deals FROM deals WHERE product_key='cotton_spot' AND grade_sort='1' AND grade_class=2",
+  "expected": {
+   "n_deals": "24277"
+  }
+ },
+ {
+  "q_uz": "Eng katta bitim (so‘mda) qaysi?",
+  "q_ru": "Самая крупная сделка в сумах?",
+  "sql": "SELECT deal_no, deal_date, product_ru, amount_uzs, currency, seller_name, buyer_name FROM deals ORDER BY amount_uzs DESC LIMIT 1",
+  "expected": {
+   "deal_no": "247890",
+   "deal_date": "2023-10-09",
+   "product_ru": "Пшеница продовольственная",
+   "amount_uzs": "30190376286.00",
+   "currency": "UZS",
+   "seller_name": "CHO‘HE KLASTER MCHJ",
+   "buyer_name": "\"МИКИ БИЗНЕС\" ҚК"
+  }
+ },
+ {
+  "q_uz": "2026 yil noyabrda nechta bitim?",
+  "q_ru": "Сколько сделок в ноябре 2026?",
+  "sql": "SELECT count(*) AS n_deals FROM deals WHERE year=2026 AND month=11",
+  "expected": {
+   "n_deals": "0"
+  }
+ },
+ {
+  "q_uz": "Shakar eksporti qancha?",
+  "q_ru": "Сколько экспортировано сахара?",
+  "sql": "SELECT count(*) AS n_deals FROM deals WHERE family_key='sugar' AND is_export",
+  "expected": {
+   "n_deals": "0"
+  }
+ }
+]

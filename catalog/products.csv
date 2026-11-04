@@ -1,0 +1,45 @@
+product_key,family_key,name_ru,name_uz,name_en,pattern
+cotton_spot,cotton,Хлопок-сырец (спот),Paxta xomashyosi (spot),Raw cotton (spot),^хлопок сырец \(спот\)
+cotton_forward,cotton,Хлопок-сырец (форвард),Paxta xomashyosi (forvard),Raw cotton (forward),^хлопок сырец \(форвард\)
+cotton_futures,cotton,Хлопок-сырец (фьючерс),Paxta xomashyosi (fyuchers),Raw cotton (futures),^хлопок сырец \(фьючерс\)
+wheat,wheat,Пшеница продовольственная,Oziq-ovqat bug‘doyi,Food wheat,^пшеница( продовольственная)?
+flour,flour,Мука пшеничная,Bug‘doy uni,Wheat flour,^мука( пшеничная)?
+cement,cement,Портландцемент,Portlandsement,Portland cement,^(портландцемент|цемент портландский)
+diesel,diesel,Топливо дизельное,Dizel yoqilg‘isi,Diesel fuel,^(топливо дизельное|дизельное топливо)
+petrol,petrol,Бензин автомобильный,Avtomobil benzini,Motor gasoline,^бензин( автомобильный)?
+polyethylene,polyethylene,Полиэтилен,Polietilen,Polyethylene,^полиэтилен( гранулированный)?
+sugar,sugar,Сахар белый,Oq shakar,White sugar,^сахар( белый| песок)?
+lpg,lpg,Сжиженный газ (пропан-бутан),Suyultirilgan gaz (propan-butan),Liquefied petroleum gas,^(сжиженный( углеводородный)? газ|газ сжиженный( пропан бутан)?)
+cottonseed_oil,cottonseed_oil,Масло хлопковое,Paxta yog‘i,Cottonseed oil,^(масло хлопковое|хлопковое масло)
+sunflower_oil,sunflower_oil,Масло подсолнечное,Kungaboqar yog‘i,Sunflower oil,^(масло подсолнечное|подсолнечное масло)
+ammonium_nitrate,ammonium_nitrate,Аммиачная селитра,Ammiakli selitra,Ammonium nitrate,^(аммиачная селитра|селитра аммиачная)
+urea,urea,Карбамид,Karbamid (mochevina),Urea,^(карбамид|мочевина( \(карбамид\))?)
+rebar,rebar,Арматура стальная,Po‘lat armatura,Steel rebar,^арматура( стальная)?
+polypropylene,polypropylene,Полипропилен,Polipropilen,Polypropylene,^полипропилен
+pvc,pvc,Поливинилхлорид,Polivinilxlorid (PVX),PVC,^поливинилхлорид
+cottonseed_meal,cottonseed_meal,Шрот хлопковый,Paxta shroti (kunjara),Cottonseed meal,^шрот( хлопковых семян| хлопковый)?
+bitumen,bitumen,Битум нефтяной,Neft bitumi,Petroleum bitumen,^битум( нефтяной)?
+steel_sheet,steel_sheet,Лист стальной горячекатаный,Issiq prokat po‘lat list,Hot-rolled steel sheet,^лист стальной( горячекатаный)?
+brick,brick,Кирпич керамический,Keramik g‘isht,Ceramic brick,^кирпич( керамический)?
+fuel_oil,fuel_oil,Мазут топочный,Mazut,Fuel oil,^мазут( топочный)?
+sulfuric_acid,sulfuric_acid,Кислота серная,Sulfat kislota,Sulfuric acid,^(кислота серная|серная кислота)
+rice,rice,Рис шлифованный,Guruch (oqlangan),Milled rice,^рис( шлифованный)?
+feed_mix,feed,Кормосмесь,Yem aralashmasi,Feed mix,^кормосмесь
+compound_feed,feed,Комбикорм,Kombikorm (omuxta yem),Compound feed,^комбикорм
+caustic_soda,caustic_soda,Сода каустическая,Kaustik soda,Caustic soda,^сода каустическая
+salt,salt,Соль пищевая,Osh tuzi,Table salt,^соль( поваренная)?( пищевая)?
+aluminium_profile,aluminium_profile,Профиль алюминиевый,Alyuminiy profil,Aluminium profile,^(профиль алюминиевый|алюминиевый профиль)
+lumber,lumber,Пиломатериал обрезной,Taxta (yog‘och materiallar),Sawn timber,^пиломатериал(ы| обрезной)?
+copper_cathode,copper_cathode,Катод медный,Mis katod,Copper cathode,^(катод медный|медный катод)
+cable,cable,Кабель силовой,Kuch kabeli,Power cable,^кабель( силовой)?
+glass,glass,Стекло листовое (флоат),Tekis shisha (float),Float glass,^стекло( флоат| листовое)?
+nitrogen,nitrogen,Азот,Azot,Nitrogen,^азот
+bearing,bearing,Подшипник,Podshipnik,Bearing,^подшипник
+water,water,Вода питьевая,Ichimlik suvi,Drinking water,^(вода питьевая|питьевая вода)
+yarn,yarn,Пряжа хлопчатобумажная,Paxta ip (kalava),Cotton yarn,^пряжа( хлопковая| хлопчатобумажная)?
+lime,lime,Известь,Ohak,Lime,^известь( негашеная| строительная)?
+wire,wire,Проволока арматурная,Armatura simi,Reinforcing wire,^проволока( арматурная)?
+gypsum,gypsum,Гипс строительный,Qurilish gipsi,Gypsum,^гипс( строительный)?
+enamel,enamel,Эмаль,Emal (bo‘yoq),Enamel paint,^эмаль( алкидная)?
+pe_pipe,pe_pipe,Труба полиэтиленовая,Polietilen quvur,Polyethylene pipe,^(труба пэ|трубы полиэтиленовые)
+argon,argon,Аргон газообразный,Argon gazi,Argon gas,^аргон( газообразный)?
