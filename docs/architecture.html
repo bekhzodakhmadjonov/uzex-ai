@@ -1,0 +1,253 @@
+<title>UZEX Agent Architecture</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500&display=swap">
+<style>
+/* Layout: a single reading column of 860px; tables and the diagram scroll inside their own containers.
+   Colour: slate neutrals; teal marks what code guarantees, amber marks what a model proposes. */
+:root {
+  --bg: #f7f8f9; --surface: #ffffff; --fg: #17212b; --muted: #55636f; --line: #d8dee3;
+  --code: #0f766e; --code-tint: #e3f3f0; --model: #a35f00; --model-tint: #fbf0dc; --bad: #b3261e;
+  --display: "IBM Plex Serif", Georgia, serif; --body: "IBM Plex Sans", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11171c; --surface: #182128; --fg: #e6ebef; --muted: #9fadb8; --line: #2d3a44;
+  --code: #4fd1c0; --code-tint: #15332f; --model: #f0b35a; --model-tint: #3a2c14; --bad: #ff8a80; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #11171c; --surface: #182128; --fg: #e6ebef; --muted: #9fadb8; --line: #2d3a44;
+  --code: #4fd1c0; --code-tint: #15332f; --model: #f0b35a; --model-tint: #3a2c14; --bad: #ff8a80; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font: 16px/1.6 var(--body); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 40px 72px }
+main { max-width: 860px; margin: 0 auto; display: grid; gap: 44px }
+main > * { min-width: 0 }
+section { display: grid; gap: 14px; min-width: 0 }
+section > * { min-width: 0 }
+h1 { font: 500 clamp(30px, 5vw, 42px)/1.15 var(--display); margin: 0; text-wrap: balance }
+h2 { font: 500 24px/1.25 var(--display); margin: 0; text-wrap: balance }
+h3 { font: 600 16px/1.4 var(--body); margin: 8px 0 0 }
+p, ul, ol { margin: 0; max-width: 68ch }
+li + li { margin-top: 6px }
+ul, ol { padding-left: 22px }
+.lead { font-size: 18px; color: var(--muted) }
+code { font: 0.88em var(--mono); overflow-wrap: anywhere }
+.meta { font-size: 14px; color: var(--muted) }
+.status { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px }
+.status div { background: var(--surface); border: 1px solid var(--line); padding: 12px 14px }
+.status b { display: block; font: 500 13px var(--mono); margin-bottom: 4px }
+.status .done b { color: var(--code) } .status .open b { color: var(--model) }
+.status span { font-size: 14.5px; line-height: 1.45; display: block }
+.scroll { overflow-x: auto; border: 1px solid var(--line); background: var(--surface) }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; line-height: 1.45 }
+th, td { padding: 9px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line) }
+tr:last-child td { border-bottom: 0 }
+th { font-weight: 600; font-size: 13px; color: var(--muted); white-space: nowrap }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap }
+tr.pick td { background: var(--code-tint) }
+figure { margin: 0; display: grid; gap: 10px; min-width: 0 }
+figcaption { font-size: 14px; color: var(--muted); max-width: 68ch }
+svg.flow { display: block; width: 100%; min-width: 800px; height: auto; color: var(--fg) }
+svg.flow text { font: 12.5px var(--body); fill: currentColor }
+svg.flow .sub { font: 11px var(--mono); fill: var(--muted) }
+svg.flow .lane { font: 600 12.5px var(--body) }
+svg.flow .lane-m { fill: var(--model-tint) } svg.flow .lane-c { fill: var(--code-tint) }
+svg.flow .box { fill: var(--surface); stroke: currentColor; stroke-width: 1 }
+svg.flow .box-m { fill: var(--surface); stroke: var(--model); stroke-width: 1.5 }
+svg.flow .box-c { fill: var(--surface); stroke: var(--code); stroke-width: 1.5 }
+svg.flow .edge { fill: none; stroke: currentColor; stroke-width: 1.2 }
+svg.flow .arrow { fill: currentColor }
+svg.flow .tag-m { fill: var(--model) } svg.flow .tag-c { fill: var(--code) }
+.note { border-left: 3px solid var(--model); padding: 2px 0 2px 14px; max-width: 68ch }
+a { color: var(--code) }
+a:focus-visible { outline: 2px solid var(--code); outline-offset: 2px }
+</style>
+
+<main>
+<header style="display:grid;gap:12px">
+  <h1>UZEX Agent Architecture</h1>
+  <p class="lead">How our selection-stage agent answers questions about 500,000 exchange deals in Uzbek and Russian without being able to invent a figure.</p>
+  <p class="meta">For team review, 5 November 2026. Form deadline 18:00 Tashkent. Inventing a number, company or product eliminates the team.</p>
+</header>
+
+<section aria-label="Current status">
+  <div class="status">
+    <div class="done"><b>Working</b><span>Full pipeline, web UI, data layer, on one laptop.</span></div>
+    <div class="done"><b>Last test run</b><span>85 of 86 hard questions right, about 5 seconds each.</span></div>
+    <div class="open"><b>Not done</b><span>Not deployed. Docker image not built yet. Form not submitted.</span></div>
+    <div class="open"><b>Needs your decision</b><span>Three choices, listed in section 7.</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>1. The idea in one picture</h2>
+  <p>Most teams will let a model read data and write an answer. Ours splits the work. Models only propose text: a SQL query and a sentence with blanks. Code runs the query and fills the blanks, so every number and company name in an answer comes from the database.</p>
+  <figure>
+    <div class="scroll">
+    <svg class="flow" viewBox="0 0 1040 440" role="img" aria-label="A question passes through resolvers to two models that each write SQL. Code validates and runs both queries read-only, compares the results, and asks a model to choose only if they differ. A model then writes a template with placeholders, and code fills in values and rejects any typed digit or company name.">
+      <defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0 0 L8 4 L0 8 z"/></marker></defs>
+      <rect class="lane-m" x="0" y="0" width="1040" height="182"/>
+      <rect class="lane-c" x="0" y="182" width="1040" height="258"/>
+      <text class="lane tag-m" x="16" y="24">MODELS: can only propose text</text>
+      <text class="lane tag-c" x="16" y="426">CODE AND DATABASE: produce every fact</text>
+
+      <!-- model boxes -->
+      <rect class="box-m" x="245" y="44" width="160" height="50"/><text x="325" y="65" text-anchor="middle">Main model writes SQL</text><text class="sub" x="325" y="83" text-anchor="middle">gemini-3.8-flash</text>
+      <rect class="box-m" x="245" y="110" width="160" height="50"/><text x="325" y="131" text-anchor="middle">Second model, same task</text><text class="sub" x="325" y="149" text-anchor="middle">gemini-3.5-flash-lite</text>
+      <rect class="box-m" x="600" y="78" width="170" height="50"/><text x="685" y="99" text-anchor="middle">Picks one query</text><text class="sub" x="685" y="117" text-anchor="middle">only if results differ</text>
+      <rect class="box-m" x="790" y="78" width="150" height="50"/><text x="865" y="99" text-anchor="middle">Writes the sentence</text><text class="sub" x="865" y="117" text-anchor="middle">gemini-3.1-flash-lite</text>
+
+      <!-- code boxes -->
+      <rect class="box" x="24" y="250" width="110" height="56"/><text x="79" y="274" text-anchor="middle">Question</text><text class="sub" x="79" y="292" text-anchor="middle">uz or ru</text>
+      <rect class="box-c" x="168" y="250" width="124" height="56"/><text x="230" y="274" text-anchor="middle">Resolvers</text><text class="sub" x="230" y="292" text-anchor="middle">paxta → cotton</text>
+      <rect class="box-c" x="340" y="250" width="110" height="56"/><text x="395" y="274" text-anchor="middle">SQL guard</text><text class="sub" x="395" y="292" text-anchor="middle">one SELECT only</text>
+      <rect class="box-c" x="486" y="250" width="110" height="56"/><text x="541" y="274" text-anchor="middle">DuckDB</text><text class="sub" x="541" y="292" text-anchor="middle">read-only, 8 s</text>
+      <rect class="box-c" x="630" y="250" width="110" height="56"/><text x="685" y="274" text-anchor="middle">Compare</text><text class="sub" x="685" y="292" text-anchor="middle">two results</text>
+      <rect class="box-c" x="778" y="250" width="174" height="56"/><text x="865" y="274" text-anchor="middle">Fill blanks and check</text><text class="sub" x="865" y="292" text-anchor="middle">no typed digit or name</text>
+      <rect class="box" x="964" y="250" width="66" height="56"/><text x="997" y="282" text-anchor="middle">Answer</text>
+      <rect class="box" x="446" y="358" width="190" height="56"/><text x="541" y="382" text-anchor="middle">uzex.duckdb</text><text class="sub" x="541" y="400" text-anchor="middle">built from CSV + catalog</text>
+
+      <!-- edges -->
+      <path class="edge" marker-end="url(#ah)" d="M134 278 H166"/>
+      <path class="edge" marker-end="url(#ah)" d="M230 250 V69 H243"/>
+      <path class="edge" marker-end="url(#ah)" d="M230 135 H243"/>
+      <text x="222" y="196" text-anchor="end" dy="-30">exact keys</text>
+      <path class="edge" d="M405 69 H425 V135 M405 135 H425"/>
+      <path class="edge" marker-end="url(#ah)" d="M425 135 V248"/>
+      <text x="433" y="196">two queries</text>
+      <path class="edge" marker-end="url(#ah)" d="M450 278 H484"/>
+      <path class="edge" marker-end="url(#ah)" d="M596 278 H628"/>
+      <text x="612" y="268" text-anchor="middle">rows</text>
+      <path class="edge" marker-end="url(#ah)" d="M541 358 V308"/>
+      <path class="edge" marker-end="url(#ah)" d="M662 250 V130"/>
+      <text x="654" y="196" text-anchor="end">both results</text>
+      <path class="edge" marker-end="url(#ah)" d="M708 128 V248"/>
+      <text x="716" y="196">A or B</text>
+      <path class="edge" marker-end="url(#ah)" d="M740 278 H776"/>
+      <text x="758" y="268" text-anchor="middle">rows</text>
+      <path class="edge" marker-end="url(#ah)" d="M842 250 V130"/>
+      <text x="834" y="164" text-anchor="end">rows to read</text>
+      <path class="edge" marker-end="url(#ah)" d="M888 128 V248"/>
+      <text x="896" y="164">{{0.n_deals}}</text>
+      <path class="edge" marker-end="url(#ah)" d="M952 278 H962"/>
+      <text class="sub" x="865" y="326" text-anchor="middle">rejected draft: one retry,</text>
+      <text class="sub" x="865" y="342" text-anchor="middle">then code writes the answer</text>
+      <text class="sub" x="395" y="326" text-anchor="middle">rejected query: one retry</text>
+    </svg>
+    </div>
+    <figcaption>Amber boxes only return text. The only route from a model to the user is a template, and code decides what fills it. Questions the data cannot answer stop after the planning step with a checked refusal.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>2. How each failure is blocked</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>What could go wrong</th><th>What stops it</th><th>How we know</th></tr></thead>
+    <tbody>
+      <tr><td>Model types a wrong number or fake company into the answer</td><td>It writes <code>{{0.n_deals}}</code> style blanks. Any digit or legal-form name it types is rejected, unless the digit came from the question.</td><td>Unit tests. The check rejected real drafts in the last run.</td></tr>
+      <tr><td>Model writes valid SQL that answers the wrong question</td><td>A second model writes its own query. If results differ, the main model reads both and picks.</td><td>Picked the right query in 10 of 10 tests with a planted wrong query.</td></tr>
+      <tr><td>Refusal text contains an invented fact</td><td>Figures, company forms and table names in a refusal trigger a fixed, pre-written refusal.</td><td>Unit tests. Models are also told to describe only what the registry holds.</td></tr>
+      <tr><td>Empty result gets dressed up as an answer</td><td>Zero rows or all-zero totals skip the model and return a fixed "no matching deals" message.</td><td>14 of 14 on held-out refusal and zero-result questions.</td></tr>
+      <tr><td>Messy names undercount a product</td><td>927 raw spellings map to 44 products and 41 families. Queries filter on keys.</td><td>Counts match the raw CSVs, computed separately with pandas.</td></tr>
+      <tr><td>Units or currencies get mixed</td><td>Prices are grouped by unit and currency. Copper shows dollars and sums separately.</td><td>Benchmark cases built to catch exactly this pass.</td></tr>
+      <tr><td>Malicious or runaway SQL</td><td>DuckDB's own parser allows one SELECT. System tables and file readers are blocked. Read-only connection, 8 second limit, 3 GB memory limit.</td><td>Attack queries in the test suite. A cross-join was interrupted at 8 seconds.</td></tr>
+      <tr><td>Someone burns our quota during judging</td><td>20 requests a minute per client, 60 overall, and repeat questions served from cache.</td><td>Implemented. Not load tested.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>3. Which AI model, and what it costs</h2>
+  <p><b>Recommendation:</b> three cheap Gemini Flash models, each doing the job it is good enough for. One question costs about 1.5 US cents, so the 10 judged questions cost about 15 cents. Budget is not the limit here, and accuracy is worth far more than the one cent we could save.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Setup</th><th class="n">Cost per question</th><th class="n">Before prompt fixes</th><th class="n">Held-out, first try</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr class="pick"><td><b>Chosen:</b> 3.8-flash writes SQL, 3.5-flash-lite cross-checks, 3.1-flash-lite writes text</td><td class="n">$0.015</td><td class="n">25 / 25</td><td class="n">43 / 44</td><td>Only setup with no wrong number before prompt tuning. Median about 5 seconds.</td></tr>
+      <tr><td>3.1-flash-lite alone</td><td class="n">about $0.004</td><td class="n">24 / 25</td><td class="n">43 / 44</td><td>Cheapest. No cross-check, so a wrong query goes unnoticed.</td></tr>
+      <tr><td>3.5-flash-lite plus 3.1-flash-lite</td><td class="n">about $0.009</td><td class="n">23 / 25</td><td class="n">42 / 44</td><td>Refused one answerable question and made up a technical reason.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="meta">"Before prompt fixes" counts numeric questions on the first benchmark, run per model, after discounting one scoring artefact on the chosen model and one on 3.1-flash-lite. "Held-out, first try" uses questions written after tuning, and counts two of my own test errors as corrected. Costs are measured token counts at list prices and ignore automatic caching, so they are upper estimates. The listed 3.8-flash price is promotional until 31 December 2026.</p>
+  <h3>What about Claude?</h3>
+  <p>Not as the default. Opus and Sonnet are expensive for this job, but Claude is not expensive across the board. Haiku 5.5 lists at $0.10 per million input tokens, which is cheaper than all the Gemini models above.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Model, for one 12,000-token SQL call</th><th class="n">Estimated cost</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>Claude Opus 5.5</td><td class="n">about $0.07</td><td>Not tested. Too costly for what it would add.</td></tr>
+      <tr><td>Claude Sonnet 5.5</td><td class="n">about $0.034</td><td>Not tested.</td></tr>
+      <tr><td>Claude Haiku 5.5</td><td class="n">about $0.002</td><td>Not tested. Worth trying as the cross-checker, because a different vendor makes different mistakes.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="meta">Estimates assume about 1,000 output tokens, with no caching. We have no Claude key configured, so these were never run. The Claude code path in the project has never run against the real API either.</p>
+</section>
+
+<section>
+  <h2>4. Data layer</h2>
+  <p>A build script turns the raw CSVs and our hand-checked catalog into one DuckDB file in about 10 seconds. The build stops if any product name is unmapped or a known total does not match. Models see one wide table so they rarely need joins.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Table</th><th class="n">Rows</th><th>What it holds</th></tr></thead>
+    <tbody>
+      <tr><td><code>deals</code></td><td class="n">500,000</td><td>One row per deal with everything joined: product family and grade, volume, unit price, amounts in sums and dollars at the deal-date rate, status flags, payment and delivery deadlines, delay days, party and broker names.</td></tr>
+      <tr><td><code>contracts</code></td><td class="n">6,616</td><td>Contract cards: terms, deposit, delivery basis, currency, validity.</td></tr>
+      <tr><td><code>participants</code></td><td class="n">14,392</td><td>Companies: 392 sellers and 14,000 buyers, region, activity, VAT status.</td></tr>
+      <tr><td><code>brokers</code></td><td class="n">120</td><td>Broker offices, BK001 to BK120.</td></tr>
+      <tr><td><code>usd_rates</code></td><td class="n">1,765</td><td>Dollar rate for every calendar day.</td></tr>
+      <tr><td><code>internal.*</code></td><td class="n">hidden</td><td>Raw copies and dictionaries. The SQL guard blocks access.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Exchange rule we chose: deal counts cover the whole registry with annulled deals shown alongside. Money, volume and price lead with the figure excluding annulled deals, because the dataset README says such a deal did not take place, and the all-deals figure is shown next to it.</p>
+</section>
+
+<section>
+  <h2>5. Test evidence</h2>
+  <p>Answers for the 86 benchmark questions were calculated with pandas from the raw CSVs, not from our database, so a build bug cannot hide itself. All results below use the chosen setup.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Test</th><th class="n">Right</th><th>Comment</th></tr></thead>
+    <tbody>
+      <tr><td>Held-out questions, first time seen</td><td class="n">43 / 44</td><td>The most honest number we have. The miss was "most reliable buyer", where the model invented a metric. Now fixed.</td></tr>
+      <tr><td>Final code, held-out questions</td><td class="n">44 / 44</td><td>The set has now been seen, so this shows no regression, not unseen accuracy.</td></tr>
+      <tr><td>Final code, first benchmark in Uzbek</td><td class="n">41 / 42</td><td>"Why were deals annulled?" got an awkward answer from real data. Nothing invented, but it should have been a clean refusal.</td></tr>
+      <tr><td>First benchmark in Russian</td><td class="n">42 / 42</td><td>Run just before the last small prompt edit.</td></tr>
+      <tr><td>Planted wrong SQL against right SQL</td><td class="n">10 / 10</td><td>Difference detected and the right query picked, in both orders.</td></tr>
+      <tr><td>Automated offline tests</td><td class="n">200 / 200</td><td>Data totals, resolvers, guard, template checks.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><p><b>Limits of this evidence.</b> We wrote all these questions ourselves, and the committee's will differ. The scorer checks that the right figures appear in the answer, and I read one full run by hand, not all of them. Answers can vary between runs, as the 41 of 42 shows. A native speaker has not reviewed the Uzbek wording.</p></div>
+</section>
+
+<section>
+  <h2>6. Deployment plan</h2>
+  <p>A judge's phone reaches Caddy over HTTPS on a free DuckDNS name. Caddy forwards to one FastAPI process, which serves the page and the API, opens the database file read-only, and calls the Gemini API. It all runs in Docker Compose on the Oracle free ARM server. An Azure VM using the same files is the standby: if Oracle fails, we point DuckDNS at Azure.</p>
+  <p class="meta">Status: nothing is deployed. The Docker daemon was off on the dev machine, so the image has not been built. A clean install from the pinned requirements did start and answer. ARM and HTTPS are untested until the first real deploy, so do it early.</p>
+  <h3>Project map</h3>
+  <div class="scroll"><table>
+    <tbody>
+      <tr><td><code>catalog/</code></td><td>Hand-checked dictionaries: products, families and aliases, regions, statuses</td></tr>
+      <tr><td><code>pipeline/</code></td><td>Normalisation, database build, schema document for the models</td></tr>
+      <tr><td><code>app/agent.py</code></td><td>The pipeline in the diagram, including template checks and cross-check</td></tr>
+      <tr><td><code>app/guard.py</code>, <code>resolve.py</code>, <code>hints.py</code></td><td>SQL guard and word-to-key matching</td></tr>
+      <tr><td><code>app/llm.py</code>, <code>llm_gemini.py</code>, <code>providers.py</code></td><td>Prompts, model calls, failover</td></tr>
+      <tr><td><code>app/main.py</code>, <code>static/</code></td><td>API, rate limit, cache, web page</td></tr>
+      <tr><td><code>tests/eval_hard.py</code></td><td>The benchmark runner. Re-run it after any prompt change.</td></tr>
+      <tr><td><code>docs/SUBMISSION.md</code></td><td>Two-language solution description for the form. Needs our domain and names.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>7. Decisions for the team</h2>
+  <ol>
+    <li><b>Turn on Gemini billing?</b> I recommend yes. Our key is on the free tier, Google does not publish its limits, and 60 points depend on it during judging. A few dollars of usage covers hundreds of questions at about 1.5 cents each.</li>
+    <li><b>Keep the annulled-deals rule from section 4?</b> I recommend yes. We do not know which figure the committee's answer key uses, and showing both covers either case.</li>
+    <li><b>Replace the Gemini key before deploying?</b> I recommend yes. It appeared in development session logs. Create a new one in AI Studio and update the server's <code>.env</code>.</li>
+  </ol>
+  <h3>Proposed plan to 18:00</h3>
+  <div class="scroll"><table>
+    <thead><tr><th>By</th><th>Who</th><th>What</th></tr></thead>
+    <tbody>
+      <tr><td>12:00</td><td>Team lead</td><td>Create the Oracle VM and DuckDNS name, run <code>./deploy.sh</code>, test from a phone on mobile data. Submit the form once as a safety net.</td></tr>
+      <tr><td>13:00</td><td>Abubakr</td><td>Write 30 new questions of your own, unseen by the system, with answers from the CSVs. Report every wrong answer.</td></tr>
+      <tr><td>13:00</td><td>Azimjon</td><td>Review Uzbek and Russian wording on real phones, and read <code>docs/SUBMISSION.md</code> as a judge would.</td></tr>
+      <tr><td>15:00</td><td>All</td><td>Fix what those turned up. Feature freeze after this.</td></tr>
+      <tr><td>16:00</td><td>Team lead</td><td>Stand up the Azure copy. Final benchmark on the deployed site. Resubmit the form.</td></tr>
+      <tr><td>18:00</td><td>All</td><td>No more changes. Keep the site online and watch the logs through judging on 6 November.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+</main>

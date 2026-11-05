@@ -1,0 +1,8 @@
+unit_ru,unit_uz,unit_en,unit_code,to_tonne_factor,aliases
+тонна,tonna,tonne,t,1,тонн|тонны|т|tonna|tonnada|ton|tons|tonne
+килограмм,kilogramm,kilogram,kg,0.001,кг|килограммов|kg|kilo|kilogramm
+литр,litr,litre,l,,л|литров|литры|litr|litre|liter|l
+штука,dona,piece,pcs,,шт|штук|штуки|dona|ta|pcs|piece|pieces
+куб.метр,kub metr,cubic metre,m3,,м3|куб.м|кубометр|кубических метров|kub metr|kub m|m3|cubic metre
+кв.метр,kvadrat metr,square metre,m2,,м2|кв.м|квадратных метров|kvadrat metr|kv m|m2|square metre
+метр,metr,metre,m,,м|метров|metr|metre|meter|m

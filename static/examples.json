@@ -1,0 +1,44 @@
+{
+ "groups": [
+  {
+   "id": "volume",
+   "title": {"uz": "Hajm va summa", "uz_cyr": "Ҳажм ва сумма", "ru": "Объёмы и суммы"},
+   "q": [
+    {"uz": "2025 yilda paxta jami qancha tonna sotilgan?", "uz_cyr": "2025 йилда пахта жами қанча тонна сотилган?", "ru": "Сколько тонн хлопка продано в 2025 году?"},
+    {"uz": "Eksport bitimlarining jami summasi dollarda va so‘mda?", "uz_cyr": "Экспорт битимларининг жами суммаси долларда ва сўмда?", "ru": "Общая сумма экспортных сделок в долларах и сумах"},
+    {"uz": "Qayta ishlash korxonalari 2025 yilda qancha bug‘doy sotib olgan?", "uz_cyr": "Қайта ишлаш корхоналари 2025 йилда қанча буғдой сотиб олган?", "ru": "Сколько пшеницы купили перерабатывающие предприятия в 2025 году?"}
+   ]
+  },
+  {
+   "id": "price",
+   "title": {"uz": "Narxlar", "uz_cyr": "Нархлар", "ru": "Цены"},
+   "q": [
+    {"uz": "AI-92 benzinning 2025 yildagi o‘rtacha narxi qancha?", "uz_cyr": "АИ-92 бензиннинг 2025 йилдаги ўртача нархи қанча?", "ru": "Средняя цена АИ-92 в 2025 году?"},
+    {"uz": "Dizel yoqilg‘isining 2026 yilda tonna uchun o‘rtacha narxi?", "uz_cyr": "Дизель ёқилғисининг 2026 йилда тонна учун ўртача нархи?", "ru": "Средняя цена дизтоплива за тонну в 2026 году?"}
+   ]
+  },
+  {
+   "id": "parties",
+   "title": {"uz": "Ishtirokchilar va brokerlar", "uz_cyr": "Иштирокчилар ва брокерлар", "ru": "Участники и брокеры"},
+   "q": [
+    {"uz": "2024 yilda sement bo‘yicha eng katta 5 ta xaridor kim?", "uz_cyr": "2024 йилда цемент бўйича энг катта 5 та харидор ким?", "ru": "Топ-5 покупателей цемента в 2024 году по сумме"},
+    {"uz": "Eng ko‘p bekor qilingan bitimlar qaysi brokerda?", "uz_cyr": "Энг кўп бекор қилинган битимлар қайси брокерда?", "ru": "У какого брокера больше всего аннулированных сделок?"}
+   ]
+  },
+  {
+   "id": "dynamics",
+   "title": {"uz": "Dinamika va ijro", "uz_cyr": "Динамика ва ижро", "ru": "Динамика и исполнение"},
+   "q": [
+    {"uz": "Toshkent shahrida 2026 yil oylar bo‘yicha bitimlar soni", "uz_cyr": "Тошкент шаҳрида 2026 йил ойлар бўйича битимлар сони", "ru": "Количество сделок по месяцам 2026 года в городе Ташкенте"},
+    {"uz": "Kechikib yetkazilgan bitimlar nechta va o‘rtacha necha kun kechikkan?", "uz_cyr": "Кечикиб етказилган битимлар нечта ва ўртача неча кун кечиккан?", "ru": "Сколько поставок с опозданием и средняя просрочка?"}
+   ]
+  },
+  {
+   "id": "limits",
+   "title": {"uz": "Reyestr chegarasi", "uz_cyr": "Реестр чегараси", "ru": "Границы реестра"},
+   "q": [
+    {"uz": "2026 yil noyabrda nechta bitim tuzilgan?", "uz_cyr": "2026 йил ноябрда нечта битим тузилган?", "ru": "Сколько сделок заключено в ноябре 2026 года?"}
+   ]
+  }
+ ]
+}

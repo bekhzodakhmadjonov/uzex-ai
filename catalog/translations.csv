@@ -1,0 +1,30 @@
+kind,ru,uz,en
+activity,Торговая компания,Savdo kompaniyasi,Trading company
+activity,Перерабатывающее предприятие,Qayta ishlash korxonasi,Processing enterprise
+activity,Транспортная компания,Transport kompaniyasi,Transport company
+activity,Производственное предприятие,Ishlab chiqarish korxonasi,Manufacturing enterprise
+activity,Строительная компания,Qurilish kompaniyasi,Construction company
+activity,Производитель,Ishlab chiqaruvchi,Producer
+activity,Кластер,Klaster,Cluster
+role,Продавец,Sotuvchi,seller
+role,Покупатель,Xaridor,buyer
+category,Сельскохозяйственная продукция,Qishloq xo‘jaligi mahsulotlari,Agricultural products
+category,Продовольственные товары,Oziq-ovqat tovarlari,Food products
+category,Строительные материалы,Qurilish materiallari,Construction materials
+category,Нефтепродукты,Neft mahsulotlari,Petroleum products
+category,Химическая продукция,Kimyo mahsulotlari,Chemical products
+category,Металлопродукция,Metall mahsulotlari,Metal products
+category,Промышленные товары,Sanoat tovarlari,Industrial goods
+category,Полимерная продукция,Polimer mahsulotlari,Polymer products
+industry,Сельское хозяйство,Qishloq xo‘jaligi,Agriculture
+industry,Пищевая промышленность,Oziq-ovqat sanoati,Food industry
+industry,Строительная индустрия,Qurilish industriyasi,Construction industry
+industry,Нефтегазовая промышленность,Neft-gaz sanoati,Oil and gas industry
+industry,Химическая промышленность,Kimyo sanoati,Chemical industry
+industry,Металлургия,Metallurgiya,Metallurgy
+industry,Лесная промышленность,O‘rmon sanoati,Forestry industry
+industry,Текстильная промышленность,To‘qimachilik sanoati,Textile industry
+industry,Машиностроение,Mashinasozlik,Machine building
+industry,Электротехническая промышленность,Elektrotexnika sanoati,Electrical industry
+group,Высоколиквидные товары,Yuqori likvidli tovarlar,Highly liquid goods
+group,Прочие товары,Boshqa tovarlar,Other goods

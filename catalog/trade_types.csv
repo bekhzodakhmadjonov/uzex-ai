@@ -1,0 +1,9 @@
+kind,value_ru,value_uz,value_en,code,description_ru,description_uz
+trade_type,Английский аукцион,Angliya auksioni,English auction,english,цена растёт от стартовой,narx boshlang‘ichdan oshib boradi
+trade_type,Обратный аукцион,Teskari auksion,Reverse auction,reverse,цена снижается от стартовой,narx boshlang‘ichdan pasayib boradi
+trade_type,Двусторонний аукцион,Ikki tomonlama auksion,Two-sided auction,two_sided,встречные заявки покупателя и продавца,xaridor va sotuvchi qarshi takliflari
+contract_form,Спот,Spot,Spot,spot,немедленная поставка,darhol yetkazib berish
+contract_form,Форвард,Forvard,Forward,forward,поставка в будущем по фиксированной цене,kelajakda belgilangan narxda yetkazib berish
+contract_form,Фьючерс,Fyuchers,Futures,futures,стандартный биржевой контракт на будущее,kelajakka standart birja kontrakti
+contract_type,Внутренний,Ichki,Domestic,domestic,"внутренний рынок, в сумах","ichki bozor, so‘mda"
+contract_type,Экспортный,Eksport,Export,export,"экспорт, в долларах США","eksport, AQSh dollarida"
