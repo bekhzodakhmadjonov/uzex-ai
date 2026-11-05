@@ -135,3 +135,44 @@ def dashboard(date_from: str | None, date_to: str | None, family: str | None, re
         while len(_cache) > 300:
             _cache.popitem(last=False)
     return out
+
+
+_ticker_cache: dict[str, Any] = {}
+
+
+def ticker() -> dict[str, Any]:
+    """Per-family weighted price for the last full month vs the month before (dominant unit/currency), plus turnover."""
+    if _ticker_cache:
+        return _ticker_cache
+    m = db.meta()
+    dmax = _date(m.get("max_deal_date") or m.get("data_asof"), dt.date(2026, 10, 30))
+    last = dmax.replace(day=1)                      # first day of the last month in the data
+    prev = (last - dt.timedelta(days=1)).replace(day=1)
+    rows = _rows("""SELECT family_key AS key, family_uz AS uz, family_ru AS ru, unit, currency, strftime(deal_date, '%Y-%m') AS ym,
+                           sum(amount) AS a, sum(volume) AS v, count(*) AS n, sum(amount_uzs) AS t_uzs
+                    FROM deals WHERE NOT is_annulled AND volume > 0 AND deal_date >= ? GROUP BY ALL""", [prev])
+    fam: dict[str, dict[str, Any]] = {}
+    for r in rows:
+        f = fam.setdefault(r["key"], {"key": r["key"], "uz": r["uz"], "ru": r["ru"], "units": {}})
+        u = f["units"].setdefault((r["unit"], r["currency"]), {"n": 0, "m": {}})
+        u["n"] += r["n"]
+        u["m"][r["ym"]] = r
+    out = []
+    lm, pm = last.strftime("%Y-%m"), prev.strftime("%Y-%m")
+    for f in fam.values():
+        (unit, cur), u = max(f["units"].items(), key=lambda kv: kv[1]["n"])
+        cur_m, prev_m = u["m"].get(lm), u["m"].get(pm)
+        price = (cur_m["a"] / cur_m["v"]) if cur_m and cur_m["v"] else None
+        price_prev = (prev_m["a"] / prev_m["v"]) if prev_m and prev_m["v"] else None
+        pct = ((price - price_prev) / price_prev * 100) if price and price_prev else None
+        n_last = sum(x["m"].get(lm, {}).get("n", 0) for x in f["units"].values())
+        t_last = sum(x["m"].get(lm, {}).get("t_uzs", 0) or 0 for x in f["units"].values())
+        if price is None:
+            continue
+        out.append({"key": f["key"], "uz": f["uz"], "ru": f["ru"], "unit": unit, "currency": cur, "price": round(price, 2),
+                    "price_prev": round(price_prev, 2) if price_prev else None, "pct": round(pct, 2) if pct is not None else None,
+                    "n": n_last, "turnover_uzs": t_last})
+    out.sort(key=lambda x: -x["turnover_uzs"])
+    res = {"month": lm, "prev_month": pm, "items": out}
+    _ticker_cache.update(res)
+    return res

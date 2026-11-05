@@ -26,7 +26,7 @@ load_dotenv()
 
 from . import db  # noqa: E402
 from .agent import answer_question  # noqa: E402
-from .dash import dashboard  # noqa: E402
+from .dash import dashboard, ticker  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC = os.path.join(ROOT, "static")
@@ -155,6 +155,12 @@ async def dash(request: Request):
     except Exception as e:  # noqa: BLE001
         _log({"ts": time.time(), "dash_error": repr(e), "params": dict(q)})
         raise HTTPException(500, "dashboard error") from e
+
+
+@app.get("/api/ticker")
+async def ticker_api():
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(_pool, ticker)
 
 
 @app.get("/")
