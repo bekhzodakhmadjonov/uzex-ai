@@ -92,6 +92,46 @@ def build_product_map(con: duckdb.DuckDBPyConnection) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def enrich_contract_attrs(con: duckdb.DuckDBPyConnection) -> None:
+    """Fill grade, brand, size and type on the contract cards.
+
+    A seller writes an attribute either in its own column or inside the product name, so both
+    are parsed the same way as a deal name. Otherwise a contract with 'Класс товара' = '2 класс'
+    has no grade_class, and a filter on the card silently misses it.
+    """
+    patterns = {r.product_key: r.pattern for r in read_catalog("products.csv").itertuples()}
+    con.execute("ALTER TABLE contracts ADD COLUMN spec VARCHAR")
+    rows = []
+    for no, name, brand, size, sort_raw, ptype, class_raw, pk in con.execute(
+            "SELECT contract_no, product_name, brand, size, sort_raw, ptype, class_raw, product_key FROM contracts").fetchall():
+        labelled = (("Марка", brand), ("Размер", size), ("Сорт", sort_raw), ("Тип", ptype), ("Класс", class_raw))
+        full = " ".join([name] + [f"{label} {value}" for label, value in labelled if value])
+        parsed = parse_deal_name(full)
+        rows.append({"contract_no": no, "brand": parsed["brand"], "size": parsed["size"], "ptype": parsed["type"],
+                     "grade_sort": parse_grade(full), "grade_class": parse_class(full), "spec": spec_of(full, patterns[pk])})
+    con.register("attrs_df", pd.DataFrame(rows))
+    con.execute("""UPDATE contracts SET brand = a.brand, size = a.size, ptype = a.ptype, grade_sort = a.grade_sort,
+                                        grade_class = CAST(a.grade_class AS INTEGER), spec = a.spec
+                   FROM attrs_df a WHERE contracts.contract_no = a.contract_no""")
+    con.unregister("attrs_df")
+
+
+def normalize_attrs(con: duckdb.DuckDBPyConnection, table: str) -> None:
+    """Same attribute rules for deals and contracts, so a filter means the same thing on both."""
+    # names without the 'Марка' label ("Кирпич керамический М-125") carry the brand in spec
+    con.execute(rf"""UPDATE {table} SET
+        size  = COALESCE(size,  CASE WHEN spec IS NOT NULL AND regexp_matches(spec, '(?i)(мм|\d,\d+\s*л)$') THEN spec END),
+        brand = COALESCE(brand, CASE WHEN spec IS NOT NULL AND size IS NULL AND ptype IS NULL
+                                      AND NOT regexp_matches(spec, '(?i)(мм|\d,\d+\s*л)$') THEN spec END)""")
+    # in these families the unlabelled text is a product type, never a brand
+    con.execute(f"""UPDATE {table} SET ptype = COALESCE(ptype, brand), brand = NULL
+                    WHERE brand IS NOT NULL AND family_key IN ('flour','sunflower_oil','cottonseed_oil','cottonseed_meal','lumber')""")
+    # 'БНД 90/130 дорожный' is brand 'БНД 90/130' of type 'дорожный', the same as the labelled spelling
+    con.execute(rf"""UPDATE {table} SET ptype = COALESCE(ptype, 'дорожный'), brand = regexp_replace(brand, '(?i)\s*дорожный$', '')
+                     WHERE family_key = 'bitumen' AND regexp_matches(brand, '(?i)дорожный$')""")
+    con.execute(f"UPDATE {table} SET ptype = lower(ptype) WHERE ptype IS NOT NULL")
+
+
 # ---------------------------------------------------------------------------
 # comments (ru | uz) for the LLM-facing tables
 # ---------------------------------------------------------------------------
@@ -100,7 +140,7 @@ DEALS_COMMENTS = {
     "deal_date": ("Дата сделки", "Bitim sanasi"),
     "deal_time": ("Время сделки (Ташкент)", "Bitim vaqti (Toshkent)"),
     "year": ("Год сделки", "Bitim yili"), "quarter": ("Квартал 1-4", "Chorak 1-4"), "month": ("Месяц 1-12", "Oy 1-12"),
-    "week": ("ISO-неделя года", "ISO hafta raqami"), "dow": ("День недели 1=пн..7=вс", "Hafta kuni 1=du..7=ya"), "hour": ("Час сделки 10-16", "Bitim soati 10-16"),
+    "week": ("Год и ISO-неделя числом YYYYWW, например 202512", "Yil va ISO hafta YYYYWW ko‘rinishida, masalan 202512"), "dow": ("День недели 1=пн..7=вс", "Hafta kuni 1=du..7=ya"), "hour": ("Час сделки 10-16", "Bitim soati 10-16"),
     "trade_type": ("Тип торгов: Английский аукцион / Обратный аукцион / Двусторонний аукцион", "Savdo turi (ruscha qiymatlar)"),
     "trade_type_uz": ("Тип торгов по-узбекски", "Savdo turi: Angliya auksioni / Teskari auksion / Ikki tomonlama auksion"),
     "contract_no": ("Номер контракта → contracts.contract_no", "Shartnoma raqami → contracts.contract_no"),
@@ -131,13 +171,25 @@ DEALS_COMMENTS = {
     "currency": ("UZS или USD", "UZS yoki USD"),
     "start_price": ("Стартовая цена за единицу измерения, в валюте контракта", "Boshlang‘ich narx 1 birlik uchun, shartnoma valyutasida"),
     "unit_price": ("Цена за единицу = amount / volume, в валюте контракта", "Birlik narxi = amount / volume, shartnoma valyutasida"),
-    "price_vs_start_pct": ("Изменение цены к стартовой, % (+ выше старта)", "Narxning boshlang‘ichga nisbatan o‘zgarishi, %"),
+    "is_at_start_price": ("TRUE = цена сделки ровно равна стартовой (точное сравнение сумм)", "TRUE = bitim narxi boshlang‘ich narxga aynan teng"),
+    "price_vs_start_pct": ("Изменение цены к стартовой, %, округлено до 3 знаков (+ выше старта); для равенства цены брать is_at_start_price", "Narxning boshlang‘ichga nisbatan o‘zgarishi, %"),
     "usd_rate": ("Курс USD на дату сделки, сум", "Bitim kunidagi USD kursi, so‘m"),
     "amount_uzs": ("Сумма в сумах (экспорт пересчитан по курсу даты сделки)", "Summa so‘mda (eksport bitim kunidagi kurs bilan)"),
     "amount_usd": ("Сумма в долларах (внутренние пересчитаны по курсу даты сделки)", "Summa dollarda (ichki bitimlar bitim kunidagi kurs bilan)"),
     "region_id": ("Код региона склада продавца", "Sotuvchi ombori hududi kodi"),
     "region_uz": ("Регион по-узбекски (Toshkent shahri, Farg‘ona viloyati ...)", "Hudud o‘zbekcha"),
     "region_ru": ("Регион по-русски (г. Ташкент, Ферганская область ...)", "Hudud ruscha"),
+    "buyer_region_id": ("Код региона покупателя (не склада продавца)", "Xaridor hududi kodi"),
+    "buyer_region_uz": ("Регион покупателя по-узбекски", "Xaridor hududi o‘zbekcha"),
+    "buyer_region_ru": ("Регион покупателя по-русски", "Xaridor hududi ruscha"),
+    "seller_activity_ru": ("Вид деятельности продавца", "Sotuvchi faoliyat turi (ruscha)"),
+    "seller_activity_uz": ("Вид деятельности продавца по-узбекски", "Sotuvchi faoliyat turi"),
+    "seller_is_vat": ("Продавец — плательщик НДС", "Sotuvchi QQS to‘lovchi"),
+    "group_ru": ("Группа товара", "Tovar guruhi (ruscha)"), "group_uz": ("Группа товара по-узбекски", "Tovar guruhi"),
+    "deposit_pct": ("Залог по контракту, % от суммы сделки; сумма залога = amount * deposit_pct / 100", "Garov, bitim summasidan %"),
+    "basis_price": ("Базисная цена контракта за единицу (не стартовая цена сделки)", "Shartnoma bazis narxi 1 birlik uchun"),
+    "delivery_basis": ("Базис поставки EXW/FCA/DAP/CPT", "Yetkazish bazisi"),
+    "packaging": ("Упаковка", "Qadoq"),
     "seller_inn": ("ИНН продавца → participants.inn", "Sotuvchi STIR → participants.inn"),
     "seller_name": ("Наименование продавца", "Sotuvchi nomi"),
     "buyer_inn": ("ИНН покупателя → participants.inn", "Xaridor STIR"), "buyer_name": ("Наименование покупателя", "Xaridor nomi"),
@@ -181,10 +233,13 @@ TABLE_COMMENTS = {
 def main() -> None:
     t0 = time.time()
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-    for p in (DB_PATH, DB_PATH + ".wal"):
+    # build beside the live file and swap at the end: a running server keeps its open file,
+    # and a failed golden check leaves the previous database in place
+    build_path = DB_PATH + ".building"
+    for p in (build_path, build_path + ".wal"):
         if os.path.exists(p):
             os.remove(p)
-    con = duckdb.connect(DB_PATH)
+    con = duckdb.connect(build_path)
     con.execute("CREATE SCHEMA internal")
 
     # ---- raw ---------------------------------------------------------------
@@ -291,13 +346,7 @@ def main() -> None:
         LEFT JOIN internal.dim_translation tc ON tc.kind='category' AND tc.ru = c."Категория товара"
         LEFT JOIN internal.dim_translation ti ON ti.kind='industry' AND ti.ru = c."Отрасль промышленности"
         ORDER BY contract_no""")
-    # contract grade: prefer explicit columns when the name had none
-    con.execute("""UPDATE contracts SET grade_sort = COALESCE(grade_sort,
-                      CASE WHEN lower(sort_raw) LIKE '%высш%' OR lower(sort_raw) LIKE 'в/с%' THEN 'highest'
-                           WHEN regexp_matches(lower(sort_raw), '(^|[^0-9])1|перв|^i ') THEN '1'
-                           WHEN regexp_matches(lower(sort_raw), '2|втор|^ii ') THEN '2'
-                           WHEN regexp_matches(lower(sort_raw), '3|трет|^iii ') THEN '3' END)
-                   WHERE sort_raw IS NOT NULL""")
+    enrich_contract_attrs(con)
 
     # ---- deals -------------------------------------------------------------
     log("deals (wide fact table)")
@@ -327,18 +376,22 @@ def main() -> None:
                d.product_raw, m.product_key, dp.name_ru AS product_ru, dp.name_uz AS product_uz,
                m.family_key, df.name_ru AS family_ru, df.name_uz AS family_uz,
                m.grade_sort, m.grade_class, m.brand, m.size, m.ptype, m.spec,
-               c.category_ru, c.category_uz, c.industry_ru, c.industry_uz, c.tnved,
+               c.group_ru, c.group_uz, c.category_ru, c.category_uz, c.industry_ru, c.industry_uz, c.tnved,
+               c.deposit_pct, c.basis_price, c.delivery_basis, c.packaging,
                d.unit, du.unit_uz, d.lot_size, d.qty_lots,
                CAST(d.qty_lots AS BIGINT) * d.lot_size AS volume,
                CASE d.unit WHEN 'тонна' THEN (d.qty_lots*d.lot_size)::DOUBLE WHEN 'килограмм' THEN (d.qty_lots*d.lot_size)/1000.0 END AS volume_t,
                d.amount, c.currency, d.start_price,
                (d.amount / (d.qty_lots*d.lot_size))::DOUBLE AS unit_price,
+               abs(d.amount - d.start_price * d.qty_lots * d.lot_size) < 0.005 AS is_at_start_price,
                round(((d.amount / (d.qty_lots*d.lot_size)) / d.start_price - 1) * 100, 3)::DOUBLE AS price_vs_start_pct,
                u.rate AS usd_rate,
                CASE WHEN c.currency='USD' THEN round(d.amount * u.rate, 2) ELSE d.amount END::DECIMAL(22,2) AS amount_uzs,
                CASE WHEN c.currency='USD' THEN d.amount ELSE round(d.amount / u.rate, 2) END::DECIMAL(18,2) AS amount_usd,
                r.region_id, d.region_uz, r.name_ru AS region_ru,
                d.seller_inn, ps.name AS seller_name, d.buyer_inn, pb.name AS buyer_name,
+               pb.region_id AS buyer_region_id, pb.region_uz AS buyer_region_uz, pb.region_ru AS buyer_region_ru,
+               ps.activity_ru AS seller_activity_ru, ps.activity_uz AS seller_activity_uz, ps.is_vat AS seller_is_vat,
                pb.activity_ru AS buyer_activity_ru, pb.activity_uz AS buyer_activity_uz, pb.is_vat AS buyer_is_vat,
                d.seller_broker, bs.name AS seller_broker_name, d.buyer_broker, bb.name AS buyer_broker_name,
                d.status_ru, st.status_uz, st.status_code, st.is_annulled, st.is_executed, st.is_partial, st.is_paid, st.is_open,
@@ -346,8 +399,8 @@ def main() -> None:
                CAST(d.delivered_lots AS BIGINT) * d.lot_size AS delivered_volume,
                (d.delivered_lots::DOUBLE / d.qty_lots) AS delivered_share,
                c.pay_term_days, c.delivery_term_days,
-               d.deal_date + to_days(c.pay_term_days) AS pay_due_date,
-               d.pay_date + to_days(c.delivery_term_days) AS delivery_due_date,
+               (d.deal_date + to_days(c.pay_term_days))::DATE AS pay_due_date,
+               (d.pay_date + to_days(c.delivery_term_days))::DATE AS delivery_due_date,
                date_diff('day', d.deal_date, d.pay_date) AS days_to_pay,
                date_diff('day', d.pay_date + to_days(c.delivery_term_days), d.delivery_date) AS delivery_delay_days,
                CASE WHEN d.delivery_date IS NULL THEN NULL ELSE date_diff('day', d.pay_date + to_days(c.delivery_term_days), d.delivery_date) > 0 END AS is_delivery_late
@@ -368,11 +421,8 @@ def main() -> None:
         ORDER BY d.deal_no""")
 
     # ---- brand / size fallbacks and canonical brand spelling ---------------
-    # names without the 'Марка' label ("Кирпич керамический М-125") carry the brand in spec
-    con.execute(r"""UPDATE deals SET
-        size  = COALESCE(size,  CASE WHEN spec IS NOT NULL AND regexp_matches(spec, '(мм|\d,\d+\s*л)$') THEN spec END),
-        brand = COALESCE(brand, CASE WHEN spec IS NOT NULL AND size IS NULL AND ptype IS NULL
-                                      AND NOT regexp_matches(spec, '(мм|\d,\d+\s*л)$') THEN spec END)""")
+    normalize_attrs(con, "deals")
+    normalize_attrs(con, "contracts")
     con.execute(r"""CREATE TEMP TABLE bmap AS
         SELECT brand_norm, arg_max(brand, n) AS brand_canon
         FROM (SELECT upper(regexp_replace(brand, '\s+', '', 'g')) AS brand_norm, brand, count(*) AS n
@@ -387,6 +437,8 @@ def main() -> None:
               FROM deals WHERE size IS NOT NULL GROUP BY ALL) GROUP BY 1""")
     con.execute(r"""UPDATE deals SET size = smap.size_canon FROM smap
                     WHERE upper(regexp_replace(deals.size, '\s+', '', 'g')) = smap.size_norm""")
+    con.execute(r"""UPDATE contracts SET size = smap.size_canon FROM smap
+                    WHERE upper(regexp_replace(contracts.size, '\s+', '', 'g')) = smap.size_norm""")
 
     # ---- macros ------------------------------------------------------------
     log("macros, comments, meta")
@@ -405,6 +457,10 @@ def main() -> None:
                       "deposit_pct": ("Залог, % от суммы сделки", "Garov, bitim summasidan %"), "delivery_basis": ("Базис поставки EXW/FCA/DAP/CPT", "Yetkazish bazisi"),
                       "warehouse_address": ("Адрес склада продавца", "Sotuvchi ombori manzili"), "packaging": ("Упаковка", "Qadoq"),
                       "reg_date": ("Дата регистрации контракта", "Shartnoma ro‘yxat sanasi"), "valid_to": ("Действует до", "Amal qilish muddati"),
+                      "brand": ("Марка: из колонки карточки или из наименования, как в deals", "Tovar markasi"),
+                      "grade_sort": ("Сорт: highest / 1 / 2 / 3 или NULL, как в deals", "Nav"), "grade_class": ("Класс 1-4 или NULL, как в deals", "Klass"),
+                      "ptype": ("Тип товара в нижнем регистре, как в deals", "Tovar tipi"), "size": ("Размер, как в deals", "O‘lcham"),
+                      "sort_raw": ("Сорт как заполнил продавец (для фильтра брать grade_sort)", "Nav, sotuvchi yozgani"), "class_raw": ("Класс как заполнил продавец (для фильтра брать grade_class)", "Klass, sotuvchi yozgani"),
                       "seller_inn": ("ИНН продавца", "Sotuvchi STIR")},
         "participants": {"inn": ("ИНН, 9 цифр, уникален", "STIR, 9 raqam"), "name": ("Наименование как в реестре", "Nomi reyestrdagi kabi"),
                          "name_norm": ("Нормализованное имя для поиска (латиница, без кавычек)", "Qidiruv uchun normallashgan nom"),
@@ -460,6 +516,16 @@ def main() -> None:
         ("SELECT count(*) FROM deals WHERE family_key='cotton'", 136208),
         ("SELECT round(wavg_price(amount, volume)) FROM deals WHERE product_key='petrol' AND brand='АИ-92' AND year=2025 AND unit='литр'", 10700.0),
         ("SELECT count(*) FROM deals WHERE family_key='cotton' AND grade_sort='1' AND grade_class=2", None),
+        # a filter must mean the same on a contract card and on its deals
+        ("SELECT count(*) FROM deals d JOIN contracts k USING(contract_no) WHERE d.grade_class IS DISTINCT FROM k.grade_class", 0),
+        ("SELECT count(*) FROM deals d JOIN contracts k USING(contract_no) WHERE d.grade_sort IS DISTINCT FROM k.grade_sort", 0),
+        ("SELECT count(*) FROM deals d JOIN contracts k USING(contract_no) WHERE d.brand IS DISTINCT FROM k.brand", 0),
+        ("SELECT count(*) FROM deals d JOIN contracts k USING(contract_no) WHERE d.ptype IS DISTINCT FROM k.ptype", 0),
+        ("SELECT count(*) FROM deals d JOIN contracts k USING(contract_no) WHERE d.size IS DISTINCT FROM k.size", 0),
+        ("SELECT count(*) FROM deals WHERE buyer_region_id IS NULL OR seller_activity_ru IS NULL", 0),
+        # attributes must not be lost to a column filter
+        ("SELECT count(*) FILTER (WHERE product_raw ILIKE '%БНД 90/130%') - count(*) FILTER (WHERE brand='БНД 90/130') FROM deals", 0),
+        ("SELECT count(*) FILTER (WHERE product_raw ILIKE '%хлебопекарн%') - count(*) FILTER (WHERE ptype='хлебопекарная') FROM deals", 0),
     ]
     failed = 0
     for sql, exp in checks:
@@ -473,6 +539,7 @@ def main() -> None:
 
     con.execute("CHECKPOINT")
     con.close()
+    os.replace(build_path, DB_PATH)
     log(f"done in {time.time()-t0:.1f}s → {DB_PATH} ({os.path.getsize(DB_PATH)/1e6:.1f} MB)")
 
 

@@ -1,0 +1,9 @@
+.git
+.venv
+uzex_spot_data
+analysis
+data/logs
+tests
+__pycache__
+*.pyc
+.env

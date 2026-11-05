@@ -24,6 +24,7 @@ from normalize import norm_company, norm_text, strip_apostrophe, translit_cyr_to
 from .db import run_sql  # noqa: E402
 
 CONFIDENT = 0.92   # >= this and a clear gap to #2 -> auto-pick
+EXACT_NAME = 0.97  # >= this the name itself matched (at worst apostrophes differ); below it the names are only similar
 MIN_SHOW = 0.70    # below this candidates are not shown at all
 
 
@@ -61,6 +62,12 @@ def _variants(text: str) -> list[str]:
 def _sim(a: str, b: str) -> float:
     """Jaro-Winkler similarity 0..1 (rapidfuzz, pure in-process)."""
     return JaroWinkler.similarity(a, b)
+
+
+def _typo_sim(a: str, b: str) -> float:
+    """Similarity for catching typos in short dictionary words. A different first letter is a
+    different word here: without this rule 'fargona' matched 'argon'."""
+    return _sim(a, b) if a and b and a[0] == b[0] else 0.0
 
 
 # ---------------------------------------------------------------------------
@@ -103,7 +110,7 @@ def resolve_family(text: str, limit: int = 5) -> list[Match]:
             elif len(v) >= 3 and (v in alias.split() or alias in v.split()):
                 score = 0.85  # partial word match ('paxta' inside 'paxta yog‘i'): shown as candidate, never auto-picked
             else:
-                score = _sim(v, alias)
+                score = _typo_sim(v, alias)
             if score >= MIN_SHOW and (fk not in best or best[fk].score < score):
                 best[fk] = Match("family", fk, ru, uz, score, alias)
     return sorted(best.values(), key=lambda m: -m.score)[:limit]
@@ -177,6 +184,23 @@ def resolve_company(text: str, limit: int = 5, role: str | None = None) -> list[
             for r in rows if r[5] >= MIN_SHOW]
 
 
+@lru_cache(maxsize=1)
+def _company_index() -> dict[str, list[tuple]]:
+    """Exact-name lookup: both the full name and the name without its legal form, apostrophes stripped."""
+    idx: dict[str, list[tuple]] = {}
+    for inn, name, region, role, activity, norm, core in run_sql(
+            "SELECT inn, name, region_uz, role, activity_ru, name_norm, name_core FROM participants", max_rows=20000).rows:
+        for key in {strip_apostrophe(norm), strip_apostrophe(core)}:
+            idx.setdefault(key, []).append((inn, name, region, role, activity))
+    return idx
+
+
+def resolve_company_exact(text: str) -> list[Match]:
+    """Whole-name match in any script and letter case; never fuzzy, so safe to run on any phrase."""
+    rows = _company_index().get(strip_apostrophe(norm_company(text)), [])
+    return [Match("company", r[0], r[1], "", 1.0, "exact", {"inn": r[0], "region": r[2], "role": r[3], "activity": r[4]}) for r in rows]
+
+
 def resolve_broker(text: str, limit: int = 5) -> list[Match]:
     t = text.strip()
     if t.upper().startswith("BK") and t[2:].isdigit():
@@ -211,7 +235,7 @@ def _region_index() -> list[tuple[str, str, str, str]]:
 def resolve_region(text: str, limit: int = 3) -> list[Match]:
     best: dict[str, Match] = {}
     for v in _variants(text):
-        v_short = v.replace(" viloyati", "").replace(" vil", "").replace(" область", "").replace(" обл", "").strip()
+        v_short = v.replace(" viloyati", "").replace(" vil", "").replace(" область", "").replace(" области", "").replace(" обл", "").strip()
         for alias, rid, uz, ru in _region_index():
             a_short = alias.replace(" viloyati", "").replace(" область", "").strip()
             if v == alias or v_short == a_short:
@@ -219,7 +243,7 @@ def resolve_region(text: str, limit: int = 3) -> list[Match]:
             elif len(v_short) >= 4 and v_short in alias:
                 score = 0.93
             else:
-                score = _sim(v_short, a_short)
+                score = _typo_sim(v_short, a_short)
             if score >= MIN_SHOW and (rid not in best or best[rid].score < score):
                 best[rid] = Match("region", rid, ru, uz, score, alias)
     out = sorted(best.values(), key=lambda m: -m.score)[:limit]

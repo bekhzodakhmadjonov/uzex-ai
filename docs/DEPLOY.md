@@ -2,7 +2,7 @@
 
 ## 0. Lokal tayyorgarlik
 ```bash
-cp .env.example .env            # ANTHROPIC_API_KEY va DOMAIN ni to'ldiring
+cp .env.example .env            # GEMINI_API_KEY va DOMAIN ni to'ldiring
 .venv/bin/python -I pipeline/build_db.py   # data/uzex.duckdb (80 MB)
 .venv/bin/python -I -m pytest tests -q
 ```

@@ -1,0 +1,650 @@
+{
+ "cases": [
+  {
+   "id": "share_cotton",
+   "lang": "ru",
+   "q": "Какая доля хлопка в обороте 2025 года без аннулированных сделок, в процентах?",
+   "expect": [
+    {
+     "near": 32.57,
+     "tol": 0.06
+    }
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "share_export_cnt",
+   "lang": "uz",
+   "q": "2024 yilda eksport bitimlari barcha bitimlarning necha foizini tashkil qilgan?",
+   "expect": [
+    {
+     "near": 1.24,
+     "tol": 0.06
+    }
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "cmp_ai",
+   "lang": "ru",
+   "q": "Сравни среднюю цену АИ-92 и АИ-95 за литр в 2025 году.",
+   "expect": [
+    10697.4,
+    11910.9
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "cmp_years",
+   "lang": "uz",
+   "q": "2023 va 2024 yillarda shakar bo‘yicha nechtadan bitim bo‘lgan?",
+   "expect": [
+    2396,
+    2631
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "cmp_regions",
+   "lang": "ru",
+   "q": "Где больше сделок в 2025 году: в Самаркандской или Бухарской области? Назови обе цифры.",
+   "expect": [
+    9105,
+    10011
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "ts_quarters",
+   "lang": "uz",
+   "q": "2024 yilda choraklar bo‘yicha bitimlar soni qancha?",
+   "expect": [
+    16964,
+    19334,
+    30846,
+    39503
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "ts_years",
+   "lang": "ru",
+   "q": "Сколько сделок было по годам?",
+   "expect": [
+    84299,
+    93985,
+    106647,
+    115763,
+    99306
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "peak_hour",
+   "lang": "uz",
+   "q": "Kunning qaysi soatida eng ko‘p bitim tuziladi va nechta?",
+   "expect": [
+    71692
+   ],
+   "kind": "num",
+   "note": "hour 13"
+  },
+  {
+   "id": "peak_dow",
+   "lang": "ru",
+   "q": "В какой день недели в 2025 году было больше всего сделок и сколько?",
+   "expect": [
+    24673
+   ],
+   "kind": "num",
+   "note": "dow 3"
+  },
+  {
+   "id": "peak_month_money",
+   "lang": "uz",
+   "q": "2022 yilda aylanma eng kam bo‘lgan oy qaysi va qancha?",
+   "expect": [
+    1242943328249.2
+   ],
+   "kind": "num",
+   "note": "month 2"
+  },
+  {
+   "id": "top_sugar_seller",
+   "lang": "ru",
+   "q": "Какой продавец продал больше всего сахара в 2025 году в тоннах?",
+   "expect": [
+    "\"ЙЕТИК ФООД\" МЧЖ"
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "top3_wheat_buyers",
+   "lang": "uz",
+   "q": "2024 yilda bug‘doyni eng ko‘p sotib olgan 3 ta xaridor kim (tonna bo‘yicha)?",
+   "expect": [
+    "\"Zoket Invest\" OK",
+    "\"Fo‘sor Qurilish\" MChJ",
+    "HO‘CHAL GROUP MCHJ"
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "top3_regions",
+   "lang": "uz_cyr",
+   "q": "2026 йилда битимлар сони бўйича энг катта 3 та ҳудуд қайси?",
+   "expect": [
+    23852,
+    9992,
+    8380
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "top_broker_money",
+   "lang": "ru",
+   "q": "Какой брокер продавца дал наибольший оборот за всё время?",
+   "expect": [
+    "\"Gucham Broker\" MChJ"
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "top_seller_contracts",
+   "lang": "uz",
+   "q": "Eng ko‘p kontrakt ro‘yxatdan o‘tkazgan sotuvchi kim va nechta?",
+   "expect": [
+    "VISAQE SERVIS MAS’ULIYATI CHEKLANGAN JAMIYATI",
+    60
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "top_broker_region",
+   "lang": "ru",
+   "q": "В каком регионе больше всего брокеров и сколько?",
+   "expect": [
+    25
+   ],
+   "kind": "num",
+   "note": "Toshkent shahri"
+  },
+  {
+   "id": "seller_activity",
+   "lang": "uz",
+   "q": "2025 yilda savdo kompaniyalari sotgan bitimlar nechta?",
+   "expect": [
+    20869
+   ],
+   "kind": "num",
+   "note": "seller's activity"
+  },
+  {
+   "id": "seller_nonvat",
+   "lang": "ru",
+   "q": "Сколько сделок заключили продавцы, не являющиеся плательщиками НДС?",
+   "expect": [
+    53028
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "buyer_acts",
+   "lang": "uz",
+   "q": "Faoliyat turi bo‘yicha nechta xaridor bor? Ishlab chiqarish korxonalari nechta?",
+   "expect": [
+    1874
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "idle_names",
+   "lang": "ru",
+   "q": "Какие участники не заключили ни одной сделки? Назови их.",
+   "expect": [
+    "MAFUZ INVEST MAS’ULIYATI CHEKLANGAN JAMIYATI",
+    "\"РИЧАМ ҚУРИЛИШ\" МЧЖ",
+    "YENEM SERVIS MCHJ"
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "same_region",
+   "lang": "uz",
+   "q": "2025 yilda xaridor va sotuvchi bir hududda bo‘lgan bitimlar nechta?",
+   "expect": [
+    10768
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "pay_same_day",
+   "lang": "ru",
+   "q": "Сколько сделок оплачено в день заключения?",
+   "expect": [
+    37935
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "pay_fast",
+   "lang": "uz",
+   "q": "Bitim kunidan keyin 3 kun ichida to‘langan bitimlar nechta (3 kun ham kiradi)?",
+   "expect": [
+    240121
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "wait_sum",
+   "lang": "ru",
+   "q": "Какая сумма сделок, ожидающих оплату, в сумах?",
+   "expect": [
+    943157232261.47
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "new_sum",
+   "lang": "uz",
+   "q": "Yangi holatdagi bitimlarning jami summasi so‘mda qancha?",
+   "expect": [
+    598201858441.84
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "unsigned_first",
+   "lang": "ru",
+   "q": "Когда была заключена самая ранняя неподписанная сделка?",
+   "expect": [
+    "29.10.2026"
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "fut_concluded",
+   "lang": "uz",
+   "q": "Fyuchers bitimlaridan nechtasi hali to‘lanmagan va holati Imzolangan?",
+   "expect": [
+    801
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "deliv_share_cotton",
+   "lang": "ru",
+   "q": "Сколько тонн хлопка фактически поставлено в 2025 году?",
+   "expect": [
+    1809368.98
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "lot12",
+   "lang": "uz",
+   "q": "Lot hajmi 12 dona bo‘lgan bitimlar nechta?",
+   "expect": [
+    1908
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "max_lots",
+   "lang": "ru",
+   "q": "Какое наибольшее количество лотов в одной сделке?",
+   "expect": [
+    1724262
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "lots_cement",
+   "lang": "uz",
+   "q": "2023 yilda sement bo‘yicha jami necha lot sotilgan, bekor qilinganlar bilan birga?",
+   "expect": [
+    1162693
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "price_brick",
+   "lang": "uz",
+   "q": "G‘ishtning bir dona uchun o‘rtacha narxi 2025 yilda qancha?",
+   "expect": [
+    1030.84,
+    1031.18
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "price_water",
+   "lang": "ru",
+   "q": "Какая средняя цена за штуку питьевой воды в 2024 году?",
+   "expect": [
+    2092.26,
+    2093.43
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "price_lumber",
+   "lang": "uz",
+   "q": "Taxtaning kub metri o‘rtacha necha pul turadi 2023 yilda?",
+   "expect": [
+    3682297.51,
+    3688827.6
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "price_cotton_t",
+   "lang": "ru",
+   "q": "Какая средняя цена хлопка за тонну в 2025 году?",
+   "expect": [
+    {
+     "any": [
+      9192174.54,
+      9194507.5
+     ]
+    }
+   ],
+   "kind": "num",
+   "note": "data is per kg"
+  },
+  {
+   "id": "gr_cyr",
+   "lang": "uz_cyr",
+   "q": "2-нав 2-класс пахта бўйича нечта битим бор?",
+   "expect": [
+    22941
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "gr_spot_roman",
+   "lang": "ru",
+   "q": "Сколько спотовых сделок по хлопку I сорта II класса в 2025 году?",
+   "expect": [
+    5824
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "gr_wheat_3_ru",
+   "lang": "ru",
+   "q": "Какой объём пшеницы 3 класса продан в 2024 году?",
+   "expect": [
+    809304.0,
+    868623.0
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "deal_usd",
+   "lang": "ru",
+   "q": "Сколько в долларах составила сделка № 436716 по курсу на дату сделки?",
+   "expect": [
+    {
+     "near": 9079.58,
+     "tol": 0.02
+    }
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "deal_rate",
+   "lang": "uz",
+   "q": "436716-raqamli bitim kunidagi dollar kursi qancha edi?",
+   "expect": [
+    12321.97
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "rate_change",
+   "lang": "ru",
+   "q": "На сколько сумов вырос курс доллара с 1 января 2022 года по 31 октября 2026 года?",
+   "expect": [
+    2528.74
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "rate_avg_oct",
+   "lang": "uz",
+   "q": "2025 yil oktabr oyida dollar kursining o‘rtacha qiymati qancha?",
+   "expect": [
+    {
+     "near": 12329.85,
+     "tol": 0.02
+    }
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "c_region",
+   "lang": "ru",
+   "q": "Сколько контрактов зарегистрировано в Навоийской области?",
+   "expect": [
+    346
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "c_forward_cotton",
+   "lang": "uz",
+   "q": "Forvard paxta kontraktlari nechta?",
+   "expect": [
+    243
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "c_maxdep",
+   "lang": "ru",
+   "q": "Какой самый большой залог в контрактах в процентах?",
+   "expect": [
+    20
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "c_reverse",
+   "lang": "uz",
+   "q": "Teskari auksion turidagi kontraktlar nechta?",
+   "expect": [
+    110
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "c_liquid",
+   "lang": "ru",
+   "q": "Сколько контрактов в группе «Высоколиквидные товары»?",
+   "expect": [
+    4311
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "noise_mixed",
+   "lang": "uz",
+   "q": "Skolko bitim 2024 yilda paxta boyicha?",
+   "expect": [
+    30037
+   ],
+   "kind": "num",
+   "note": "mixed languages"
+  },
+  {
+   "id": "noise_short",
+   "lang": "ru",
+   "q": "шрот 2025 сколько",
+   "expect": [
+    1753
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "noise_polite",
+   "lang": "uz",
+   "q": "Assalomu alaykum! Iltimos, 2023 yilda guruch bo‘yicha nechta bitim bo‘lganini ayta olasizmi?",
+   "expect": [
+    785
+   ],
+   "kind": "num",
+   "note": ""
+  },
+  {
+   "id": "noise_cyr_nolet",
+   "lang": "uz_cyr",
+   "q": "2025 йилда шакар нархи канча",
+   "expect": [
+    14196048.31,
+    14206112.84
+   ],
+   "kind": "num",
+   "note": "no ў қ ғ ҳ"
+  },
+  {
+   "id": "r_gas_price",
+   "lang": "uz",
+   "q": "Hozir tabiiy gaz narxi qancha?",
+   "expect": [],
+   "kind": "refuse",
+   "note": ""
+  },
+  {
+   "id": "r_buyer_age",
+   "lang": "ru",
+   "q": "Сколько лет работает компания Zoket Invest?",
+   "expect": [],
+   "kind": "refuse",
+   "note": ""
+  },
+  {
+   "id": "r_employees",
+   "lang": "uz",
+   "q": "Gucham Broker kompaniyasida nechta xodim ishlaydi?",
+   "expect": [],
+   "kind": "refuse",
+   "note": ""
+  },
+  {
+   "id": "r_profit",
+   "lang": "ru",
+   "q": "Какая прибыль у компании Mo‘jotat Klaster?",
+   "expect": [],
+   "kind": "refuse",
+   "note": ""
+  },
+  {
+   "id": "r_compare_world",
+   "lang": "ru",
+   "q": "Цена хлопка на бирже ICE выше, чем на UZEX?",
+   "expect": [],
+   "kind": "refuse",
+   "note": ""
+  },
+  {
+   "id": "r_next_year",
+   "lang": "uz",
+   "q": "2027 yilda nechta bitim bo‘ladi?",
+   "expect": [],
+   "kind": "refuse",
+   "note": ""
+  },
+  {
+   "id": "r_tax",
+   "lang": "ru",
+   "q": "Какой размер комиссии биржи со сделки?",
+   "expect": [],
+   "kind": "refuse",
+   "note": ""
+  },
+  {
+   "id": "r_fake_broker",
+   "lang": "uz",
+   "q": "Golden Broker MChJ nechta bitim tuzgan?",
+   "expect": [],
+   "kind": "refuse",
+   "note": ""
+  },
+  {
+   "id": "r_reason_late",
+   "lang": "ru",
+   "q": "Почему поставки опаздывают?",
+   "expect": [],
+   "kind": "refuse",
+   "note": ""
+  },
+  {
+   "id": "z_export_cement",
+   "lang": "uz",
+   "q": "Sement eksporti qancha?",
+   "expect": [],
+   "kind": "zero",
+   "note": ""
+  },
+  {
+   "id": "z_futures_sugar",
+   "lang": "ru",
+   "q": "Сколько фьючерсов по сахару?",
+   "expect": [],
+   "kind": "zero",
+   "note": ""
+  },
+  {
+   "id": "z_sunday_rate_deal",
+   "lang": "uz",
+   "q": "Yakshanba kuni tuzilgan bitimlar nechta?",
+   "expect": [],
+   "kind": "zero",
+   "note": ""
+  }
+ ],
+ "sessions": []
+}

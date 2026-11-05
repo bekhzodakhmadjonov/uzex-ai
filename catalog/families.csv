@@ -4,18 +4,18 @@ wheat,Пшеница,Bug‘doy,Wheat,bug‘doy|bug'doy|bugdoy|буғдой|бу�
 flour,Мука,Un,Flour,un|ун|bug‘doy uni|bug'doy uni|мука|мука пшеничная|flour|wheat flour
 cement,Цемент,Sement,Cement,sement|цемент|портландцемент|portlandsement|cement|portland cement|sement portland
 diesel,Дизельное топливо,Dizel yoqilg‘isi,Diesel,dizel|дизель|дизтопливо|дт|солярка|solyarka|dizel yoqilg‘isi|dizel yoqilg'isi|дизельное топливо|топливо дизельное|diesel|diesel fuel
-petrol,Бензин,Benzin,Gasoline,benzin|бензин|аи-80|аи-92|аи-95|ai-80|ai-92|ai-95|petrol|gasoline|yoqilg‘i|yoqilg'i
+petrol,Бензин,Benzin,Gasoline,benzin|бензин|аи-80|аи-92|аи-95|ai-80|ai-92|ai-95|petrol|gasoline
 polyethylene,Полиэтилен,Polietilen,Polyethylene,polietilen|полиэтилен|пэ|polyethylene|pe|hd-6018|ll-0218|pe-3015
 sugar,Сахар,Shakar,Sugar,shakar|шакар|сахар|сахар-песок|qand|sugar|white sugar
 lpg,Сжиженный газ,Suyultirilgan gaz,LPG,gaz|газ|suyultirilgan gaz|сжиженный газ|пропан|бутан|пропан-бутан|propan|butan|lpg|суг|pba|pbt|пба|пбт
-cottonseed_oil,Хлопковое масло,Paxta yog‘i,Cottonseed oil,paxta yog‘i|paxta yogi|paxta yog'i|пахта ёғи|хлопковое масло|масло хлопковое|cottonseed oil|yog‘|yog'|ёғ|масло
+cottonseed_oil,Хлопковое масло,Paxta yog‘i,Cottonseed oil,paxta yog‘i|paxta yogi|paxta yog'i|пахта ёғи|хлопковое масло|масло хлопковое|cottonseed oil
 sunflower_oil,Подсолнечное масло,Kungaboqar yog‘i,Sunflower oil,kungaboqar yog‘i|kungaboqar yogi|kungaboqar yog'i|кунгабоқар ёғи|подсолнечное масло|масло подсолнечное|sunflower oil
-ammonium_nitrate,Аммиачная селитра,Ammiakli selitra,Ammonium nitrate,selitra|селитра|ammiakli selitra|аммиачная селитра|ammoniy nitrat|ammonium nitrate|o‘g‘it|o'g'it|ўғит|удобрение|удобрения
+ammonium_nitrate,Аммиачная селитра,Ammiakli selitra,Ammonium nitrate,selitra|селитра|ammiakli selitra|аммиачная селитра|ammoniy nitrat|ammonium nitrate
 urea,Карбамид,Karbamid,Urea,karbamid|карбамид|мочевина|mochevina|urea|azotli o‘g‘it
 rebar,Арматура,Armatura,Rebar,armatura|арматура|rebar|а500с|a500c
 polypropylene,Полипропилен,Polipropilen,Polypropylene,polipropilen|полипропилен|пп|polypropylene|pp
 pvc,Поливинилхлорид,Polivinilxlorid,PVC,pvx|пвх|pvc|polivinilxlorid|поливинилхлорид|sg-5
-cottonseed_meal,Шрот хлопковый,Paxta shroti,Cottonseed meal,shrot|шрот|kunjara|кунжара|paxta shroti|шрот хлопковый|шрот хлопковых семян|cottonseed meal|yem
+cottonseed_meal,Шрот хлопковый,Paxta shroti,Cottonseed meal,shrot|шрот|kunjara|кунжара|paxta shroti|шрот хлопковый|шрот хлопковых семян|cottonseed meal
 bitumen,Битум,Bitum,Bitumen,bitum|битум|neft bitumi|битум нефтяной|bitumen|бнд
 steel_sheet,Лист стальной,Po‘lat list,Steel sheet,po‘lat list|po'lat list|list|лист стальной|лист|металлопрокат|steel sheet|прокат
 brick,Кирпич,G‘isht,Brick,g‘isht|g'isht|gisht|ғишт|кирпич|brick|keramik g‘isht
@@ -33,7 +33,7 @@ glass,Стекло,Shisha,Glass,shisha|шиша|стекло|oyna|стекло �
 nitrogen,Азот,Azot,Nitrogen,azot|азот|nitrogen
 bearing,Подшипник,Podshipnik,Bearing,podshipnik|подшипник|bearing
 water,Питьевая вода,Ichimlik suvi,Drinking water,suv|сув|ichimlik suvi|вода|питьевая вода|вода питьевая|water
-yarn,Пряжа,Ip,Yarn,ip|ип|kalava|калава|пряжа|пряжа хлопковая|пряжа хлопчатобумажная|yarn|cotton yarn|ne 20/1|ne 24/1
+yarn,Пряжа,Ip,Yarn,ip|ип|kalava|калава|пряжа|пряжа хлопковая|пряжа хлопчатобумажная|yarn|cotton yarn|ne 20/1|ne 24/1|paxta ipi|paxta ip|хлопковая пряжа
 lime,Известь,Ohak,Lime,ohak|оҳак|известь|lime|известь негашеная
 wire,Проволока,Sim,Wire,sim|сим|проволока|armatura simi|проволока арматурная|wire|вр-1
 gypsum,Гипс,Gips,Gypsum,gips|гипс|qurilish gipsi|gypsum|alebastr|алебастр

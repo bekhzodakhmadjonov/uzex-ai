@@ -1,7 +1,7 @@
 uzex_spot_data/
 .venv/
 .env
-data/
+data/logs/
 __pycache__/
 *.pyc
 analysis/*.pkl

@@ -9,13 +9,15 @@ Tables visible to you: `deals` (use this for almost everything — all lookups a
 - Only SELECT. One statement. Always add `count(*) AS n_deals` (or an equivalent row count) so the answer can show its basis.
 - Never do arithmetic yourself — compute everything in SQL and read the numbers from the result.
 - Text filters: use ILIKE or exact equality on the normalized keys (`product_key`, `family_key`, `region_id`, `status_code`). Never LIKE (case-sensitive) and never regex `\b` (does not work on Cyrillic).
-- Average price = `wavg_price(amount, volume)` (= sum(amount)/sum(volume)), ALWAYS grouped by `unit` and `currency`. Never avg(unit_price), never mix litres with tonnes or USD with UZS.
-- Population: the whole registry by default (all statuses). Always add `count(*) FILTER (WHERE is_annulled) AS n_annulled`; for money/volume also add the valid-only figure (`... FILTER (WHERE NOT is_annulled) AS *_valid`). Exclude annulled deals from the main figure only when the user asks for executed/actual deals or says 'without annulled'.
+- Average price = sum(amount)/sum(volume), ALWAYS grouped by `unit` and `currency`. `wavg_price(amount, volume)` is that formula as a macro. Never avg(unit_price), never mix litres with tonnes or USD with UZS.
+- Population: deal counts cover every registry row, with n_annulled next to them. Money, volume and average price lead with the figure excluding annulled deals (the README says such a deal did not take place) and always also return the all-status figure.
 - Export deals are in USD (`currency='USD'`, only copper cathode and cotton yarn). `amount_uzs` already converts them at the deal-date rate; `amount_usd` converts domestic deals to USD at the deal-date rate.
 - Physical volume = `volume` (in `unit`) or `volume_t` (tonnes, only for тонна/килограмм rows). Delivered volume = `delivered_volume`.
 - Status is as of 2026-10-30. There are NO overdue unpaid deals: anything unpaid past its term is already `is_annulled`. Late deliveries exist: `is_delivery_late`.
 - Status spelling in Russian uses ё: 'Ждёт оплату'. Prefer `status_code` in filters.
 - 'Toshkent shahri' (city) and 'Toshkent viloyati' (region) are different regions.
+- `region_*` is the seller's warehouse region. `buyer_region_*` is the buyer's region. They differ in most deals.
+- `brand`, `ptype`, `size`, `grade_sort` and `grade_class` mean the same on `deals` and `contracts`. `ptype` is lower case.
 - When the question is about a family ('paxta', 'un', 'sement'), filter `family_key`; when about a specific product/grade, add `product_key`, `grade_sort`, `grade_class`, `brand`.
 - If a filter returns 0 rows, do NOT invent a number — report that the data has no such records and name the filter that failed.
 
@@ -31,7 +33,7 @@ Tables visible to you: `deals` (use this for almost everything — all lookups a
 | `year` | BIGINT | Год сделки | Bitim yili |
 | `quarter` | BIGINT | Квартал 1-4 | Chorak 1-4 |
 | `month` | BIGINT | Месяц 1-12 | Oy 1-12 |
-| `week` | BIGINT | ISO-неделя года | ISO hafta raqami |
+| `week` | BIGINT | Год и ISO-неделя числом YYYYWW, например 202512 | Yil va ISO hafta YYYYWW ko‘rinishida, masalan 202512 |
 | `dow` | BIGINT | День недели 1=пн..7=вс | Hafta kuni 1=du..7=ya |
 | `hour` | BIGINT | Час сделки 10-16 | Bitim soati 10-16 |
 | `trade_type` | VARCHAR | Тип торгов: Английский аукцион / Обратный аукцион / Двусторонний аукцион | Savdo turi (ruscha qiymatlar) |
@@ -53,11 +55,17 @@ Tables visible to you: `deals` (use this for almost everything — all lookups a
 | `size` | VARCHAR | Размер товара | Tovar o‘lchami |
 | `ptype` | VARCHAR | Тип товара (хлебопекарная, рафинированное ...) | Tovar tipi |
 | `spec` | VARCHAR | Спецификация после названия товара (марка/размер/тип одной строкой) | Tovar nomidan keyingi spetsifikatsiya |
+| `group_ru` | VARCHAR | Группа товара | Tovar guruhi (ruscha) |
+| `group_uz` | VARCHAR | Группа товара по-узбекски | Tovar guruhi |
 | `category_ru` | VARCHAR | Категория товара | Tovar kategoriyasi (ruscha) |
 | `category_uz` | VARCHAR | Категория по-узбекски | Tovar kategoriyasi |
 | `industry_ru` | VARCHAR | Отрасль промышленности | Sanoat tarmog‘i (ruscha) |
 | `industry_uz` | VARCHAR | Отрасль по-узбекски | Sanoat tarmog‘i |
 | `tnved` | VARCHAR | Код ТН ВЭД (6 знаков) | TN VED kodi (6 raqam) |
+| `deposit_pct` | INTEGER | Залог по контракту, % от суммы сделки; сумма залога = amount * deposit_pct / 100 | Garov, bitim summasidan % |
+| `basis_price` | DECIMAL(18,2) | Базисная цена контракта за единицу (не стартовая цена сделки) | Shartnoma bazis narxi 1 birlik uchun |
+| `delivery_basis` | VARCHAR | Базис поставки EXW/FCA/DAP/CPT | Yetkazish bazisi |
+| `packaging` | VARCHAR | Упаковка | Qadoq |
 | `unit` | VARCHAR | Единица измерения: тонна/килограмм/литр/штука/куб.метр/кв.метр/метр | O‘lchov birligi (ruscha qiymat) |
 | `unit_uz` | VARCHAR | Единица по-узбекски | O‘lchov birligi: tonna/kilogramm/litr/dona/kub metr/kvadrat metr/metr |
 | `lot_size` | INTEGER | Единиц измерения в одном лоте (1, 12, 100, 1000) | Bir lotdagi birliklar soni |
@@ -68,7 +76,8 @@ Tables visible to you: `deals` (use this for almost everything — all lookups a
 | `currency` | VARCHAR | UZS или USD | UZS yoki USD |
 | `start_price` | DECIMAL(18,2) | Стартовая цена за единицу измерения, в валюте контракта | Boshlang‘ich narx 1 birlik uchun, shartnoma valyutasida |
 | `unit_price` | DOUBLE | Цена за единицу = amount / volume, в валюте контракта | Birlik narxi = amount / volume, shartnoma valyutasida |
-| `price_vs_start_pct` | DOUBLE | Изменение цены к стартовой, % (+ выше старта) | Narxning boshlang‘ichga nisbatan o‘zgarishi, % |
+| `is_at_start_price` | BOOLEAN | TRUE = цена сделки ровно равна стартовой (точное сравнение сумм) | TRUE = bitim narxi boshlang‘ich narxga aynan teng |
+| `price_vs_start_pct` | DOUBLE | Изменение цены к стартовой, %, округлено до 3 знаков (+ выше старта); для равенства цены брать is_at_start_price | Narxning boshlang‘ichga nisbatan o‘zgarishi, % |
 | `usd_rate` | DECIMAL(12,2) | Курс USD на дату сделки, сум | Bitim kunidagi USD kursi, so‘m |
 | `amount_uzs` | DECIMAL(22,2) | Сумма в сумах (экспорт пересчитан по курсу даты сделки) | Summa so‘mda (eksport bitim kunidagi kurs bilan) |
 | `amount_usd` | DECIMAL(18,2) | Сумма в долларах (внутренние пересчитаны по курсу даты сделки) | Summa dollarda (ichki bitimlar bitim kunidagi kurs bilan) |
@@ -79,6 +88,12 @@ Tables visible to you: `deals` (use this for almost everything — all lookups a
 | `seller_name` | VARCHAR | Наименование продавца | Sotuvchi nomi |
 | `buyer_inn` | VARCHAR | ИНН покупателя → participants.inn | Xaridor STIR |
 | `buyer_name` | VARCHAR | Наименование покупателя | Xaridor nomi |
+| `buyer_region_id` | VARCHAR | Код региона покупателя (не склада продавца) | Xaridor hududi kodi |
+| `buyer_region_uz` | VARCHAR | Регион покупателя по-узбекски | Xaridor hududi o‘zbekcha |
+| `buyer_region_ru` | VARCHAR | Регион покупателя по-русски | Xaridor hududi ruscha |
+| `seller_activity_ru` | VARCHAR | Вид деятельности продавца | Sotuvchi faoliyat turi (ruscha) |
+| `seller_activity_uz` | VARCHAR | Вид деятельности продавца по-узбекски | Sotuvchi faoliyat turi |
+| `seller_is_vat` | BOOLEAN | Продавец — плательщик НДС | Sotuvchi QQS to‘lovchi |
 | `buyer_activity_ru` | VARCHAR | Вид деятельности покупателя | Xaridor faoliyat turi (ruscha) |
 | `buyer_activity_uz` | VARCHAR | Вид деятельности по-узбекски | Xaridor faoliyat turi |
 | `buyer_is_vat` | BOOLEAN | Покупатель — плательщик НДС | Xaridor QQS to‘lovchi |
@@ -101,8 +116,8 @@ Tables visible to you: `deals` (use this for almost everything — all lookups a
 | `delivered_share` | DOUBLE | Доля поставки 0..1 | Yetkazilgan ulush 0..1 |
 | `pay_term_days` | INTEGER | Срок оплаты по контракту, календарных дней от даты сделки | To‘lov muddati, bitim sanasidan kalendar kun |
 | `delivery_term_days` | INTEGER | Срок поставки по контракту, календарных дней от даты оплаты | Yetkazish muddati, to‘lov sanasidan kalendar kun |
-| `pay_due_date` | TIMESTAMP | Крайний срок оплаты = deal_date + pay_term_days | To‘lov muddati sanasi = deal_date + pay_term_days |
-| `delivery_due_date` | TIMESTAMP | Крайний срок поставки = pay_date + delivery_term_days | Yetkazish muddati sanasi = pay_date + delivery_term_days |
+| `pay_due_date` | DATE | Крайний срок оплаты = deal_date + pay_term_days | To‘lov muddati sanasi = deal_date + pay_term_days |
+| `delivery_due_date` | DATE | Крайний срок поставки = pay_date + delivery_term_days | Yetkazish muddati sanasi = pay_date + delivery_term_days |
 | `days_to_pay` | BIGINT | Фактически дней от сделки до оплаты | Bitimdan to‘lovgacha o‘tgan kunlar |
 | `delivery_delay_days` | BIGINT | Просрочка поставки в днях (>0 = с опозданием), NULL если не поставлено | Yetkazish kechikishi kunlarda (>0 kech) |
 | `is_delivery_late` | BOOLEAN | TRUE = поставлено позже срока | TRUE = muddatidan kech yetkazilgan |
@@ -121,13 +136,13 @@ Tables visible to you: `deals` (use this for almost everything — all lookups a
 | `family_key` | VARCHAR |  |
 | `family_ru` | VARCHAR |  |
 | `family_uz` | VARCHAR |  |
-| `brand` | VARCHAR |  |
-| `size` | VARCHAR |  |
-| `sort_raw` | VARCHAR |  |
-| `ptype` | VARCHAR |  |
-| `class_raw` | VARCHAR |  |
-| `grade_sort` | VARCHAR |  |
-| `grade_class` | INTEGER |  |
+| `brand` | VARCHAR | Марка: из колонки карточки или из наименования, как в deals | Tovar markasi |
+| `size` | VARCHAR | Размер, как в deals | O‘lcham |
+| `sort_raw` | VARCHAR | Сорт как заполнил продавец (для фильтра брать grade_sort) | Nav, sotuvchi yozgani |
+| `ptype` | VARCHAR | Тип товара в нижнем регистре, как в deals | Tovar tipi |
+| `class_raw` | VARCHAR | Класс как заполнил продавец (для фильтра брать grade_class) | Klass, sotuvchi yozgani |
+| `grade_sort` | VARCHAR | Сорт: highest / 1 / 2 / 3 или NULL, как в deals | Nav |
+| `grade_class` | INTEGER | Класс 1-4 или NULL, как в deals | Klass |
 | `tnved` | VARCHAR |  |
 | `group_ru` | VARCHAR |  |
 | `group_uz` | VARCHAR |  |
@@ -156,6 +171,7 @@ Tables visible to you: `deals` (use this for almost everything — all lookups a
 | `seller_inn` | VARCHAR | ИНН продавца | Sotuvchi STIR |
 | `reg_date` | DATE | Дата регистрации контракта | Shartnoma ro‘yxat sanasi |
 | `valid_to` | DATE | Действует до | Amal qilish muddati |
+| `spec` | VARCHAR |  |
 
 ## `participants`
 
@@ -221,6 +237,12 @@ Tables visible to you: `deals` (use this for almost everything — all lookups a
 
 **buyer_activity_ru | buyer_activity_uz**: Торговая компания | Savdo kompaniyasi  (249,742); Транспортная компания | Transport kompaniyasi  (87,210); Перерабатывающее предприятие | Qayta ishlash korxonasi  (80,747); Производственное предприятие | Ishlab chiqarish korxonasi  (69,540); Строительная компания | Qurilish kompaniyasi  (12,761)
 
+**group_ru | group_uz**: Высоколиквидные товары | Yuqori likvidli tovarlar  (415,817); Прочие товары | Boshqa tovarlar  (84,183)
+
+**packaging (ru only; deals and contracts)**: навалом  (323,297); в мешках по 50 кг  (89,055); в мешках  (28,940); в цистернах  (11,767); в мешках по 25 кг  (11,554); в бутылках  (5,588); в коробках  (5,185); на поддонах  (4,892); в пакетах  (3,914); в ящиках  (3,877); в мотках  (2,528); на барабанах  (2,005); в банках  (1,978); в сосудах Дьюара  (1,917); в упаковках по 12 шт  (1,908); в баллонах  (1,595)
+
+**delivery_basis**: EXW  (390,091); FCA  (52,115); CPT  (30,985); DAP  (26,809)
+
 **grade_sort**: 1  (77,310); 2  (61,426); 3  (34,162); NULL  (306,049); highest  (21,053)
 
 **grade_class**: 1  (68,079); 2  (68,129); 3  (17,152); 4  (21,471); NULL  (325,169)
@@ -232,28 +254,28 @@ Tables visible to you: `deals` (use this for almost everything — all lookups a
 | cotton | Хлопок-сырец | Paxta xomashyosi | cotton_spot | Хлопок-сырец (спот) | Paxta xomashyosi (spot) | килограмм | 103912 |  |
 | cement | Цемент | Sement | cement | Портландцемент | Portlandsement | тонна | 39146 | ЦЕМ I 42,5 Н, ЦЕМ II/А-Ш 32,5Н, ЦЕМ II/В-К 32,5 Н |
 | wheat | Пшеница | Bug‘doy | wheat | Пшеница продовольственная | Oziq-ovqat bug‘doyi | тонна | 38623 |  |
-| flour | Мука | Un | flour | Мука пшеничная | Bug‘doy uni | килограмм | 31906 | ХЛЕБОПЕКАРНАЯ, обогащенная витаминно-минеральной смесью |
-| diesel | Дизельное топливо | Dizel yoqilg‘isi | diesel | Топливо дизельное | Dizel yoqilg‘isi | килограмм, тонна | 28747 | ДТ-Е-К5, ДТ-З-К5, ДТ-Л-К5 |
+| flour | Мука | Un | flour | Мука пшеничная | Bug‘doy uni | килограмм | 31906 |  |
+| diesel | Дизельное топливо | Dizel yoqilg‘isi | diesel | Топливо дизельное | Dizel yoqilg‘isi | тонна, килограмм | 28747 | ДТ-Е-К5, ДТ-З-К5, ДТ-Л-К5 |
 | petrol | Бензин | Benzin | petrol | Бензин автомобильный | Avtomobil benzini | тонна, литр | 25523 | АИ-80, АИ-92, АИ-95 |
 | cotton | Хлопок-сырец | Paxta xomashyosi | cotton_forward | Хлопок-сырец (форвард) | Paxta xomashyosi (forvard) | килограмм | 25451 |  |
 | polyethylene | Полиэтилен | Polietilen | polyethylene | Полиэтилен | Polietilen | тонна | 19480 | LL-0218, HD-6018, HD-5502, PE-3015, LD-1825 |
 | lpg | Сжиженный газ | Suyultirilgan gaz | lpg | Сжиженный газ (пропан-бутан) | Suyultirilgan gaz (propan-butan) | тонна | 16059 | ПБА, ПБТ |
 | rebar | Арматура | Armatura | rebar | Арматура стальная | Po‘lat armatura | тонна | 13073 |  |
 | sugar | Сахар | Shakar | sugar | Сахар белый | Oq shakar | тонна | 12926 |  |
-| cottonseed_oil | Хлопковое масло | Paxta yog‘i | cottonseed_oil | Масло хлопковое | Paxta yog‘i | тонна | 12492 | рафинированное дезодорированное |
+| cottonseed_oil | Хлопковое масло | Paxta yog‘i | cottonseed_oil | Масло хлопковое | Paxta yog‘i | тонна | 12492 |  |
 | urea | Карбамид | Karbamid | urea | Карбамид | Karbamid (mochevina) | тонна | 11285 | Б |
 | polypropylene | Полипропилен | Polipropilen | polypropylene | Полипропилен | Polipropilen | тонна | 9648 | PP-2310, PP-1102, PP-0350 |
 | ammonium_nitrate | Аммиачная селитра | Ammiakli selitra | ammonium_nitrate | Аммиачная селитра | Ammiakli selitra | тонна | 9623 | Б |
-| cottonseed_meal | Шрот хлопковый | Paxta shroti | cottonseed_meal | Шрот хлопковый | Paxta shroti (kunjara) | килограмм | 7840 | тостированный |
+| cottonseed_meal | Шрот хлопковый | Paxta shroti | cottonseed_meal | Шрот хлопковый | Paxta shroti (kunjara) | килограмм | 7840 |  |
 | cotton | Хлопок-сырец | Paxta xomashyosi | cotton_futures | Хлопок-сырец (фьючерс) | Paxta xomashyosi (fyuchers) | килограмм | 6845 |  |
-| bitumen | Битум | Bitum | bitumen | Битум нефтяной | Neft bitumi | тонна | 6602 | БНД 60/90, БНД 90/130, БНД 70/100, БНД 90/130 дорожный, БНД 70/100 дорожный |
+| bitumen | Битум | Bitum | bitumen | Битум нефтяной | Neft bitumi | тонна | 6602 | БНД 90/130, БНД 60/90, БНД 70/100 |
 | pvc | Поливинилхлорид | Polivinilxlorid | pvc | Поливинилхлорид | Polivinilxlorid (PVX) | тонна | 6328 | SG-5, SG-7 |
 | brick | Кирпич | G‘isht | brick | Кирпич керамический | Keramik g‘isht | штука | 4892 | М-100, М-125, М-150 |
 | sulfuric_acid | Серная кислота | Sulfat kislota | sulfuric_acid | Кислота серная | Sulfat kislota | тонна | 4863 |  |
-| sunflower_oil | Подсолнечное масло | Kungaboqar yog‘i | sunflower_oil | Масло подсолнечное | Kungaboqar yog‘i | тонна | 4827 | рафинированное |
+| sunflower_oil | Подсолнечное масло | Kungaboqar yog‘i | sunflower_oil | Масло подсолнечное | Kungaboqar yog‘i | тонна | 4827 |  |
 | fuel_oil | Мазут | Mazut | fuel_oil | Мазут топочный | Mazut | тонна | 4775 | М-40, М-100 |
 | copper_cathode | Медный катод | Mis katod | copper_cathode | Катод медный | Mis katod | тонна | 4750 | М0К, М00к |
-| lumber | Пиломатериалы | Yog‘och materiallar | lumber | Пиломатериал обрезной | Taxta (yog‘och materiallar) | куб.метр | 3914 | обрезные хвойных пород |
+| lumber | Пиломатериалы | Yog‘och materiallar | lumber | Пиломатериал обрезной | Taxta (yog‘och materiallar) | куб.метр | 3914 |  |
 | rice | Рис | Guruch | rice | Рис шлифованный | Guruch (oqlangan) | тонна | 3910 |  |
 | glass | Стекло | Shisha | glass | Стекло листовое (флоат) | Tekis shisha (float) | кв.метр | 3877 |  |
 | steel_sheet | Лист стальной | Po‘lat list | steel_sheet | Лист стальной горячекатаный | Issiq prokat po‘lat list | килограмм | 3815 | Ст3сп |
@@ -277,7 +299,7 @@ Tables visible to you: `deals` (use this for almost everything — all lookups a
 ## Family aliases (user words → family_key)
 
 - `aluminium_profile`: alyuminiy profil, алюминиевый профиль, профиль алюминиевый, профиль, profil, aluminium profile, aluminum profile
-- `ammonium_nitrate`: selitra, селитра, ammiakli selitra, аммиачная селитра, ammoniy nitrat, ammonium nitrate, o‘g‘it, o'g'it, ўғит, удобрение, удобрения
+- `ammonium_nitrate`: selitra, селитра, ammiakli selitra, аммиачная селитра, ammoniy nitrat, ammonium nitrate
 - `argon`: argon, аргон
 - `bearing`: podshipnik, подшипник, bearing
 - `bitumen`: bitum, битум, neft bitumi, битум нефтяной, bitumen, бнд
@@ -287,8 +309,8 @@ Tables visible to you: `deals` (use this for almost everything — all lookups a
 - `cement`: sement, цемент, портландцемент, portlandsement, cement, portland cement, sement portland
 - `copper_cathode`: mis, мис, mis katod, медь, медный катод, катод медный, copper, copper cathode, м00к, м0к
 - `cotton`: paxta, пахта, paxta xomashyosi, paxta xom ashyosi, хлопок, хлопок-сырец, хлопок сырец, cotton, raw cotton, chigitli paxta
-- `cottonseed_meal`: shrot, шрот, kunjara, кунжара, paxta shroti, шрот хлопковый, шрот хлопковых семян, cottonseed meal, yem
-- `cottonseed_oil`: paxta yog‘i, paxta yogi, paxta yog'i, пахта ёғи, хлопковое масло, масло хлопковое, cottonseed oil, yog‘, yog', ёғ, масло
+- `cottonseed_meal`: shrot, шрот, kunjara, кунжара, paxta shroti, шрот хлопковый, шрот хлопковых семян, cottonseed meal
+- `cottonseed_oil`: paxta yog‘i, paxta yogi, paxta yog'i, пахта ёғи, хлопковое масло, масло хлопковое, cottonseed oil
 - `diesel`: dizel, дизель, дизтопливо, дт, солярка, solyarka, dizel yoqilg‘isi, dizel yoqilg'isi, дизельное топливо, топливо дизельное, diesel, diesel fuel
 - `enamel`: emal, эмаль, bo‘yoq, bo'yoq, бўёқ, краска, пф-115, enamel, paint
 - `feed`: yem, ем, kormosmes, кормосмесь, комбикорм, kombikorm, omuxta yem, feed, корма
@@ -301,7 +323,7 @@ Tables visible to you: `deals` (use this for almost everything — all lookups a
 - `lumber`: taxta, тахта, yog‘och, yog'och, yogoch, ёғоч, пиломатериал, пиломатериалы, доска, lumber, timber, sawn timber
 - `nitrogen`: azot, азот, nitrogen
 - `pe_pipe`: quvur, қувур, труба, трубы, polietilen quvur, труба пэ, трубы полиэтиленовые, pipe, pe pipe
-- `petrol`: benzin, бензин, аи-80, аи-92, аи-95, ai-80, ai-92, ai-95, petrol, gasoline, yoqilg‘i, yoqilg'i
+- `petrol`: benzin, бензин, аи-80, аи-92, аи-95, ai-80, ai-92, ai-95, petrol, gasoline
 - `polyethylene`: polietilen, полиэтилен, пэ, polyethylene, pe, hd-6018, ll-0218, pe-3015
 - `polypropylene`: polipropilen, полипропилен, пп, polypropylene, pp
 - `pvc`: pvx, пвх, pvc, polivinilxlorid, поливинилхлорид, sg-5
@@ -316,7 +338,7 @@ Tables visible to you: `deals` (use this for almost everything — all lookups a
 - `water`: suv, сув, ichimlik suvi, вода, питьевая вода, вода питьевая, water
 - `wheat`: bug‘doy, bug'doy, bugdoy, буғдой, бугдой, пшеница, wheat, don, galla, g‘alla, ғалла
 - `wire`: sim, сим, проволока, armatura simi, проволока арматурная, wire, вр-1
-- `yarn`: ip, ип, kalava, калава, пряжа, пряжа хлопковая, пряжа хлопчатобумажная, yarn, cotton yarn, ne 20/1, ne 24/1
+- `yarn`: ip, ип, kalava, калава, пряжа, пряжа хлопковая, пряжа хлопчатобумажная, yarn, cotton yarn, ne 20/1, ne 24/1, paxta ipi, paxta ip, хлопковая пряжа
 
 ## Macros
 
@@ -329,19 +351,29 @@ Tables visible to you: `deals` (use this for almost everything — all lookups a
 ```sql
 SELECT count(*) AS n_deals, count(*) FILTER (WHERE is_annulled) AS n_annulled,
        sum(volume_t) AS tonnes, sum(volume_t) FILTER (WHERE NOT is_annulled) AS tonnes_valid,
-       wavg_price(amount, volume) AS price_per_kg_uzs, min(deal_date) AS from_date, max(deal_date) AS to_date
+       sum(amount) FILTER (WHERE NOT is_annulled) / sum(volume) FILTER (WHERE NOT is_annulled) AS price_per_kg_valid,
+       wavg_price(amount, volume) AS price_per_kg_all, min(deal_date) AS from_date, max(deal_date) AS to_date
 FROM deals WHERE family_key='cotton' AND year=2025
 ```
 **Средняя цена АИ-92 в 2025 по единицам**
 ```sql
-SELECT unit, currency, count(*) AS n_deals, count(*) FILTER (WHERE is_annulled) AS n_annulled, wavg_price(amount, volume) AS avg_price
+SELECT unit, currency, count(*) AS n_deals, count(*) FILTER (WHERE is_annulled) AS n_annulled,
+       sum(amount) FILTER (WHERE NOT is_annulled) / sum(volume) FILTER (WHERE NOT is_annulled) AS avg_price_valid, wavg_price(amount, volume) AS avg_price_all
 FROM deals WHERE product_key='petrol' AND brand='АИ-92' AND year=2025 GROUP BY ALL
 ```
 **Топ-5 покупателей цемента по сумме, 2024**
 ```sql
 SELECT buyer_name, buyer_inn, count(*) AS n_deals, count(*) FILTER (WHERE is_annulled) AS n_annulled,
-       sum(amount_uzs) AS total_uzs, sum(amount_uzs) FILTER (WHERE NOT is_annulled) AS total_uzs_valid
-FROM deals WHERE product_key='cement' AND year=2024 GROUP BY ALL ORDER BY total_uzs DESC LIMIT 5
+       sum(amount_uzs) FILTER (WHERE NOT is_annulled) AS total_uzs_valid, sum(amount_uzs) AS total_uzs_all
+FROM deals WHERE product_key='cement' AND year=2024 GROUP BY ALL ORDER BY total_uzs_valid DESC LIMIT 5
+```
+**Dollardagi kontraktlar soni (contracts jadvali, deals emas)**
+```sql
+SELECT count(*) AS n_contracts FROM contracts WHERE currency='USD'
+```
+**Сколько участников платят НДС (таблица participants)**
+```sql
+SELECT count(*) AS n_participants, count(*) FILTER (WHERE is_vat) AS n_vat FROM participants
 ```
 **Eng ko‘p bekor qilingan bitimlar qaysi brokerda (sotuvchi tomoni)**
 ```sql

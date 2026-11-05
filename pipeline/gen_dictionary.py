@@ -31,13 +31,15 @@ def main() -> None:
         "Only SELECT. One statement. Always add `count(*) AS n_deals` (or an equivalent row count) so the answer can show its basis.",
         "Never do arithmetic yourself — compute everything in SQL and read the numbers from the result.",
         "Text filters: use ILIKE or exact equality on the normalized keys (`product_key`, `family_key`, `region_id`, `status_code`). Never LIKE (case-sensitive) and never regex `\\b` (does not work on Cyrillic).",
-        "Average price = `wavg_price(amount, volume)` (= sum(amount)/sum(volume)), ALWAYS grouped by `unit` and `currency`. Never avg(unit_price), never mix litres with tonnes or USD with UZS.",
-        "Population: the whole registry by default (all statuses). Always add `count(*) FILTER (WHERE is_annulled) AS n_annulled`; for money/volume also add the valid-only figure (`... FILTER (WHERE NOT is_annulled) AS *_valid`). Exclude annulled deals from the main figure only when the user asks for executed/actual deals or says 'without annulled'.",
+        "Average price = sum(amount)/sum(volume), ALWAYS grouped by `unit` and `currency`. `wavg_price(amount, volume)` is that formula as a macro. Never avg(unit_price), never mix litres with tonnes or USD with UZS.",
+        "Population: deal counts cover every registry row, with n_annulled next to them. Money, volume and average price lead with the figure excluding annulled deals (the README says such a deal did not take place) and always also return the all-status figure.",
         "Export deals are in USD (`currency='USD'`, only copper cathode and cotton yarn). `amount_uzs` already converts them at the deal-date rate; `amount_usd` converts domestic deals to USD at the deal-date rate.",
         "Physical volume = `volume` (in `unit`) or `volume_t` (tonnes, only for тонна/килограмм rows). Delivered volume = `delivered_volume`.",
         "Status is as of 2026-10-30. There are NO overdue unpaid deals: anything unpaid past its term is already `is_annulled`. Late deliveries exist: `is_delivery_late`.",
         "Status spelling in Russian uses ё: 'Ждёт оплату'. Prefer `status_code` in filters.",
         "'Toshkent shahri' (city) and 'Toshkent viloyati' (region) are different regions.",
+        "`region_*` is the seller's warehouse region. `buyer_region_*` is the buyer's region. They differ in most deals.",
+        "`brand`, `ptype`, `size`, `grade_sort` and `grade_class` mean the same on `deals` and `contracts`. `ptype` is lower case.",
         "When the question is about a family ('paxta', 'un', 'sement'), filter `family_key`; when about a specific product/grade, add `product_key`, `grade_sort`, `grade_class`, `brand`.",
         "If a filter returns 0 rows, do NOT invent a number — report that the data has no such records and name the filter that failed.",
     ]
@@ -70,6 +72,9 @@ def main() -> None:
     vlist("region_id | region_uz | region_ru", "region_id, region_uz, region_ru")
     vlist("category_ru | category_uz", "category_ru, category_uz")
     vlist("buyer_activity_ru | buyer_activity_uz", "buyer_activity_ru, buyer_activity_uz")
+    vlist("group_ru | group_uz", "group_ru, group_uz")
+    vlist("packaging (ru only; deals and contracts)", "packaging")
+    vlist("delivery_basis", "delivery_basis")
     vlist("grade_sort", "coalesce(grade_sort,'NULL')", "v")
     vlist("grade_class", "coalesce(grade_class::VARCHAR,'NULL')", "v")
 
@@ -96,11 +101,15 @@ def main() -> None:
     w("## Example SQL\n")
     ex = [
         ("Paxta 2025: bitimlar soni, hajm tonnada, o‘rtacha narx (butun reyestr + bekor qilinganlar alohida)",
-         "SELECT count(*) AS n_deals, count(*) FILTER (WHERE is_annulled) AS n_annulled,\n       sum(volume_t) AS tonnes, sum(volume_t) FILTER (WHERE NOT is_annulled) AS tonnes_valid,\n       wavg_price(amount, volume) AS price_per_kg_uzs, min(deal_date) AS from_date, max(deal_date) AS to_date\nFROM deals WHERE family_key='cotton' AND year=2025"),
+         "SELECT count(*) AS n_deals, count(*) FILTER (WHERE is_annulled) AS n_annulled,\n       sum(volume_t) AS tonnes, sum(volume_t) FILTER (WHERE NOT is_annulled) AS tonnes_valid,\n       sum(amount) FILTER (WHERE NOT is_annulled) / sum(volume) FILTER (WHERE NOT is_annulled) AS price_per_kg_valid,\n       wavg_price(amount, volume) AS price_per_kg_all, min(deal_date) AS from_date, max(deal_date) AS to_date\nFROM deals WHERE family_key='cotton' AND year=2025"),
         ("Средняя цена АИ-92 в 2025 по единицам",
-         "SELECT unit, currency, count(*) AS n_deals, count(*) FILTER (WHERE is_annulled) AS n_annulled, wavg_price(amount, volume) AS avg_price\nFROM deals WHERE product_key='petrol' AND brand='АИ-92' AND year=2025 GROUP BY ALL"),
+         "SELECT unit, currency, count(*) AS n_deals, count(*) FILTER (WHERE is_annulled) AS n_annulled,\n       sum(amount) FILTER (WHERE NOT is_annulled) / sum(volume) FILTER (WHERE NOT is_annulled) AS avg_price_valid, wavg_price(amount, volume) AS avg_price_all\nFROM deals WHERE product_key='petrol' AND brand='АИ-92' AND year=2025 GROUP BY ALL"),
         ("Топ-5 покупателей цемента по сумме, 2024",
-         "SELECT buyer_name, buyer_inn, count(*) AS n_deals, count(*) FILTER (WHERE is_annulled) AS n_annulled,\n       sum(amount_uzs) AS total_uzs, sum(amount_uzs) FILTER (WHERE NOT is_annulled) AS total_uzs_valid\nFROM deals WHERE product_key='cement' AND year=2024 GROUP BY ALL ORDER BY total_uzs DESC LIMIT 5"),
+         "SELECT buyer_name, buyer_inn, count(*) AS n_deals, count(*) FILTER (WHERE is_annulled) AS n_annulled,\n       sum(amount_uzs) FILTER (WHERE NOT is_annulled) AS total_uzs_valid, sum(amount_uzs) AS total_uzs_all\nFROM deals WHERE product_key='cement' AND year=2024 GROUP BY ALL ORDER BY total_uzs_valid DESC LIMIT 5"),
+        ("Dollardagi kontraktlar soni (contracts jadvali, deals emas)",
+         "SELECT count(*) AS n_contracts FROM contracts WHERE currency='USD'"),
+        ("Сколько участников платят НДС (таблица participants)",
+         "SELECT count(*) AS n_participants, count(*) FILTER (WHERE is_vat) AS n_vat FROM participants"),
         ("Eng ko‘p bekor qilingan bitimlar qaysi brokerda (sotuvchi tomoni)",
          "SELECT seller_broker, seller_broker_name, count(*) AS n_deals\nFROM deals WHERE is_annulled GROUP BY ALL ORDER BY n_deals DESC LIMIT 5"),
         ("Kechikkan yetkazishlar 2026 yil bo‘yicha oylarda",

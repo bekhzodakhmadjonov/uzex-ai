@@ -1,153 +1,858 @@
 <!doctype html>
-<html lang="uz">
+<html lang="uz" data-theme="light">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>UZEX Bitimlar Assistenti</title>
-<meta name="description" content="Birja bitimlari reyestri bo‘yicha savol-javob agenti">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bitimlar reyestri · savol-javob</title>
+<meta name="description" content="UZEX birja bitimlari reyestri: savol-javob va bozor paneli. Har javobda raqam, kontekst, asos jadvali, CSV va SQL.">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23283f78'/%3E%3Cpath d='M8 9h16v3H8zM8 15h11v3H8zM8 21h16v3H8z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-:root{--bg:#f6f7f9;--card:#fff;--text:#111827;--muted:#6b7280;--line:#e5e7eb;--accent:#0f766e;--accent-2:#ccfbf1;--warn:#b45309;--warn-bg:#fef3c7;--bad:#b91c1c;--bad-bg:#fee2e2;--code:#0b1020;--code-text:#e5e7eb}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0b0f14;--card:#121821;--text:#e5e7eb;--muted:#9ca3af;--line:#1f2937;--accent:#2dd4bf;--accent-2:#134e4a;--warn:#fbbf24;--warn-bg:#3a2a07;--bad:#f87171;--bad-bg:#3b0d0d;--code:#05070b;--code-text:#d1d5db}}
+/* Tokens. Navy = UZEX portal ink; teal = what code guarantees; gold = model assumptions / no data; red = annulled, errors.
+   Categorical pair (validated): domestic #3f5fb8 / export #10a08a. Seasonal ramp (validated, ordinal): --ramp1..5. */
+:root{
+  --paper:#fbfbfc; --surface:#ffffff; --surface-2:#f7f8fa;
+  --ink:#171f33; --ink-2:#4e5869; --ink-3:#7c8597;
+  --line:#dde1e8; --line-2:#edf0f4;
+  --navy:#283f78; --navy-ink:#283f78; --navy-tint:#eaeef7; --navy-2:#6f85bf;
+  --teal:#0a7a6d; --teal-tint:#dff1ee;
+  --gold:#8f6412; --gold-tint:#faf0d9; --gold-mark:#d9a441;
+  --red:#b3261e; --red-tint:#f9e4e2; --red-mark:#d26a63;
+  --c-dom:#3f5fb8; --c-exp:#10a08a;
+  --ramp1:#9aacde; --ramp2:#7f95d0; --ramp3:#647fc0; --ramp4:#4566aa; --ramp5:#283f78;
+  --code-bg:#f7f8fa; --focus:#283f78;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --shadow:0 1px 0 rgba(23,31,51,.04), 0 1px 2px rgba(23,31,51,.06);
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-header{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;align-items:center;gap:12px}
-header h1{font-size:16px;margin:0;flex:1;font-weight:650}
-.lang button{border:1px solid var(--line);background:var(--card);color:var(--text);padding:6px 10px;border-radius:8px;cursor:pointer;font-size:13px}
-.lang button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
-main{max-width:860px;margin:0 auto;padding:16px 16px 140px}
-.intro{color:var(--muted);font-size:14px;margin:4px 0 12px}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-.chip{border:1px solid var(--line);background:var(--card);color:var(--text);padding:7px 11px;border-radius:999px;cursor:pointer;font-size:13px;text-align:left}
-.chip:hover{border-color:var(--accent)}
-.msg{margin:12px 0;display:flex}
-.msg.user{justify-content:flex-end}
-.bubble{max-width:100%;padding:12px 14px;border-radius:14px;background:var(--card);border:1px solid var(--line)}
-.msg.user .bubble{background:var(--accent);color:#fff;border-color:var(--accent);max-width:85%}
-.answer{white-space:pre-wrap;font-size:15.5px}
-.basis{margin-top:10px;padding:8px 10px;border-radius:10px;background:var(--accent-2);font-size:13px}
-.basis b{font-weight:650}
-.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--line);margin:4px 6px 0 0}
-.tag.warn{background:var(--warn-bg);color:var(--warn)}
-.tag.bad{background:var(--bad-bg);color:var(--bad)}
-details{margin-top:10px;font-size:13px}
-summary{cursor:pointer;color:var(--accent);font-weight:600}
-pre{background:var(--code);color:var(--code-text);padding:10px;border-radius:10px;overflow:auto;font-size:12.5px;margin:8px 0 0}
-.tbl{overflow:auto;margin-top:8px;max-height:360px;border:1px solid var(--line);border-radius:10px}
-table{border-collapse:collapse;font-size:12.5px;min-width:100%}
-th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
-th{position:sticky;top:0;background:var(--card);font-weight:650}
-td.num{text-align:right;font-variant-numeric:tabular-nums}
-canvas{max-height:260px;margin-top:10px}
-.foot{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
-.foot form{max-width:860px;margin:0 auto;display:flex;gap:8px}
-textarea{flex:1;resize:none;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;background:var(--bg);color:var(--text);min-height:44px;max-height:120px}
-button.send{border:0;background:var(--accent);color:#fff;border-radius:12px;padding:0 18px;font-weight:650;cursor:pointer}
-button.send:disabled{opacity:.5}
-.meta{font-size:12px;color:var(--muted);margin-top:6px}
-.thinking{color:var(--muted);font-style:italic}
-.small{font-size:12px;color:var(--muted)}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 var(--sans);min-height:100vh}
+button,textarea,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.up{color:var(--teal)} .down{color:var(--red)}
+.wrap{max-width:1320px;margin:0 auto;padding:0 clamp(14px,2.5vw,32px)}
+
+/* ---------- Top bar ---------- */
+.top{position:sticky;top:0;z-index:6;background:var(--surface);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:14px;min-height:50px;flex-wrap:wrap;padding-top:6px;padding-bottom:6px}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.brand i{display:inline-block;width:16px;height:16px;background:var(--navy);position:relative;flex:none}
+.brand i::before{content:"";position:absolute;left:3px;right:3px;top:3px;height:2px;background:var(--surface);box-shadow:0 3px 0 var(--surface),0 6px 0 var(--surface)}
+.brand .org{font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+.brand h1{margin:0;font:600 15px/1.2 var(--sans)}
+.brand h1 small{font:400 13px var(--sans);color:var(--ink-2);margin-left:6px}
+.topnav{display:flex;gap:2px}
+.topnav button{border:0;background:none;padding:6px 10px;border-radius:3px;font-size:13px;color:var(--ink-2)}
+.topnav button:hover{background:var(--navy-tint);color:var(--navy-ink)}
+.topnav button small{font:500 11px var(--mono);color:var(--ink-3);margin-left:4px}
+.langs{display:flex;gap:3px}
+.langs button{border:1px solid var(--line);background:transparent;padding:4px 9px;font-size:12.5px;border-radius:3px;color:var(--ink-2)}
+.langs button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.top .meta{font:400 11.5px var(--mono);color:var(--ink-3);white-space:nowrap}
+.newsess{border:1px solid var(--line);background:transparent;border-radius:3px;padding:4px 9px;font-size:12.5px;color:var(--ink-2)}
+
+/* ---------- Ask bar ---------- */
+.askbar{position:sticky;top:50px;z-index:5;background:var(--paper);padding:14px 0 8px}
+.askbar::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--line)}
+.ask{display:grid;grid-template-columns:1fr auto;border:1px solid var(--line);background:var(--surface);border-radius:4px;box-shadow:var(--shadow)}
+.ask:focus-within{border-color:var(--navy);box-shadow:0 0 0 3px var(--navy-tint)}
+.ask textarea{border:0;background:transparent;resize:none;padding:12px 14px;min-height:46px;max-height:160px;line-height:1.45;font-size:15.5px;outline:none}
+.ask textarea::placeholder{color:var(--ink-3)}
+.ask button{border:0;border-left:1px solid var(--line-2);background:transparent;padding:0 16px;font-weight:500;color:var(--navy-ink);white-space:nowrap}
+.ask button:hover{background:var(--navy-tint)}
+.ask button:disabled{color:var(--ink-3);background:transparent;cursor:default}
+.ask button kbd{font:500 11px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 4px;color:var(--ink-2);margin-left:8px}
+.hint{display:flex;justify-content:space-between;gap:12px;font-size:12px;color:var(--ink-3);margin-top:6px}
+.hint .live{font-family:var(--mono)}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:24px 0 10px}
+.sec-h h2{margin:0;font:600 19px/1.25 var(--sans);letter-spacing:-.01em}
+.sec-h .sub{font-size:12.5px;color:var(--ink-2)}
+.sec-h .sub b{font:500 12.5px var(--mono);color:var(--ink)}
+
+/* ---------- Answer cards ---------- */
+.cards{display:grid;gap:18px}
+.cards>*{min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--navy);box-shadow:var(--shadow);scroll-margin-top:130px;min-width:0;overflow:hidden}
+.card[data-kind="nodata"]{border-top-color:var(--gold)}
+.card[data-kind="error"]{border-top-color:var(--red)}
+.card[data-kind="pending"]{border-top-color:var(--line)}
+.card-h{display:grid;grid-template-columns:auto 1fr auto;gap:10px 14px;align-items:start;padding:14px 18px 0}
+.card-h .no{font:500 12px/1.9 var(--mono);color:var(--ink-3);letter-spacing:.04em;white-space:nowrap}
+.card-h h3{margin:0;font:600 18px/1.35 var(--sans);letter-spacing:-.005em;min-width:0;overflow-wrap:anywhere}
+.card-h .meta{text-align:right;font:400 12px/1.9 var(--mono);color:var(--ink-3);white-space:nowrap}
+.stamps{display:flex;flex-wrap:wrap;gap:6px;padding:10px 18px 0;grid-column:1/-1}
+.stamp{display:inline-flex;align-items:center;gap:6px;border:1px solid currentColor;border-radius:2px;padding:2px 8px;font:500 11px/1.6 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.stamp.teal{color:var(--teal);background:var(--teal-tint)}
+.stamp.gold{color:var(--gold);background:var(--gold-tint)}
+.stamp.red{color:var(--red);background:var(--red-tint)}
+.stamp.grey{color:var(--ink-2);background:var(--surface-2)}
+.hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--line-2);border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2);margin:14px 0 0}
+.tile{background:var(--surface);padding:12px 18px}
+.tile .l{font-size:12px;color:var(--ink-2);line-height:1.3}
+.tile .v{font:600 28px/1.15 var(--sans);letter-spacing:-.02em;margin-top:4px;overflow-wrap:anywhere}
+.tile .v small{font:400 13px/1.2 var(--sans);color:var(--ink-2);margin-left:4px}
+.tile .f{font:400 12px/1.4 var(--mono);color:var(--ink-3);margin-top:2px;overflow-wrap:anywhere}
+.tile .d{font-size:12.5px;margin-top:4px;color:var(--ink-2)}
+.tile .d b{font-weight:500}
+.answer{padding:14px 18px 0;font-size:15.5px;line-height:1.6;white-space:pre-wrap;max-width:80ch}
+.card[data-kind="nodata"] .answer::before{content:"";display:block;width:36px;height:2px;background:var(--gold);margin-bottom:10px}
+.fig{padding:14px 18px 0}
+.fig .cap{font-size:12px;color:var(--ink-2);margin-bottom:6px}
+.fig .cap b{font-weight:500;color:var(--ink)}
+.fig .plot{position:relative;width:100%}
+.tblwrap{border:1px solid var(--line);overflow:auto;max-height:420px}
+table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.4}
+th,td{padding:7px 10px;border-bottom:1px solid var(--line-2);text-align:left;white-space:nowrap;vertical-align:top}
+th{position:sticky;top:0;background:var(--surface-2);font-weight:500;color:var(--ink-2);font-size:12px;z-index:1}
+tbody tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+td.code{font-family:var(--mono);font-size:12.5px}
+tbody tr:hover td{background:var(--surface-2)}
+.tblnote{padding:6px 0 0;font-size:12px;color:var(--ink-3)}
+.notes{margin:14px 18px 0;padding:0;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:13px}
+.notes dt{color:var(--ink-2);white-space:nowrap}
+.notes dt::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px;background:var(--teal)}
+.notes dt.model::before{background:var(--gold)}
+.notes dd{margin:0}
+.coverage{margin:16px 18px 0}
+.coverage .lbl{display:flex;justify-content:space-between;font:400 11.5px/1.4 var(--mono);color:var(--ink-3);margin-bottom:4px}
+.coverage .track{position:relative;height:8px;background:var(--line-2);border-radius:2px}
+.coverage .fill{position:absolute;top:0;bottom:0;background:var(--navy);border-radius:2px;min-width:3px}
+.coverage .ticks{position:relative;height:16px;font:400 11px/16px var(--mono);color:var(--ink-3)}
+.coverage .ticks span{position:absolute;transform:translateX(-50%)}
+.coverage .ticks span:first-child{transform:none}
+.tools{display:flex;flex-wrap:wrap;border-top:1px solid var(--line-2);margin-top:14px;align-items:stretch}
+.tools button{border:0;border-right:1px solid var(--line-2);background:transparent;padding:9px 14px;font-size:13px;color:var(--ink-2)}
+.tools button:hover{color:var(--navy-ink);background:var(--navy-tint)}
+.tools button[aria-expanded="true"]{color:var(--navy-ink);box-shadow:inset 0 -2px 0 var(--navy)}
+.tools button.primary{color:var(--navy-ink);font-weight:500}
+.tools .sp{flex:1;border:0}
+.panel-x{border-top:1px solid var(--line-2)}
+.panel-x[hidden]{display:none}
+.basis-p{padding:12px 18px 14px;display:grid;gap:10px;background:var(--surface-2)}
+.basis-p .line{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:12.5px;color:var(--ink-2);align-items:center}
+.basis-p .k{font:500 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-right:-10px}
+.basis-p .k.gold{color:var(--gold)}
+.basis-p .line b{font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.basis-p .t{font-family:var(--mono);color:var(--ink-3)}
+.basis-p .tblwrap{background:var(--surface)}
+.basis-p .acts{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:3px;padding:6px 12px;font-size:12.5px;color:var(--navy-ink)}
+.btn:hover{background:var(--navy-tint)}
+.btn.solid{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.solid:hover{background:#1f3263}
+pre.sql{margin:0;padding:12px 14px;background:var(--surface);border:1px solid var(--line);font:12.5px/1.55 var(--mono);white-space:pre-wrap;word-break:break-word}
+pre.sql b{font-weight:500;color:var(--navy-ink)}
+pre.sql i{font-style:normal;color:var(--teal)}
+.followups{padding:12px 18px 16px;border-top:1px solid var(--line-2)}
+.followups .l{font:500 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px}
+.followups .fu{display:flex;flex-wrap:wrap;gap:6px}
+.fu button{border:1px solid var(--line);background:var(--surface);border-radius:3px;padding:5px 10px;font-size:13px;color:var(--ink);text-align:left}
+.fu button:hover{border-color:var(--navy);color:var(--navy-ink);background:var(--navy-tint)}
+.fu button::before{content:"→ ";color:var(--ink-3)}
+.pending .wait{padding:16px 18px 18px;display:grid;gap:8px}
+.pending .wait .line{font-size:13.5px;color:var(--ink-2)}
+.pending .bar{height:2px;background:var(--line-2);position:relative;overflow:hidden}
+.pending .bar::after{content:"";position:absolute;left:-40%;width:40%;top:0;bottom:0;background:var(--navy);animation:slide 1.4s ease-in-out infinite}
+@keyframes slide{to{left:100%}}
+.pending .timer{font:500 13px var(--mono);color:var(--ink)}
+@media (prefers-reduced-motion: reduce){.pending .bar::after{animation:none;left:0;width:100%;opacity:.4}}
+
+/* ---------- Context block inside a card ---------- */
+.ctx{margin:16px 18px 0;border-top:1px solid var(--line-2);padding-top:12px}
+.ctx-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-bottom:10px}
+.ctx-h .k{font:500 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--navy-ink)}
+.ctx-h .f{font-size:13px;color:var(--ink-2)}
+.ctx-h .f b{font-weight:500;color:var(--ink)}
+.ctx .kpis{margin-top:0}
+.ctx .kpis .tile{padding:10px 14px}
+.ctx .kpis .tile .v{font-size:22px}
+.cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.cgrid .blk .plot{height:170px}
+.cgrid .blk .body{padding:4px 14px 10px}
+.ctx .skel{height:120px;background:linear-gradient(90deg,var(--surface-2),var(--line-2),var(--surface-2));background-size:200% 100%;animation:sk 1.2s linear infinite;border-radius:3px;margin-top:10px}
+@keyframes sk{to{background-position:-200% 0}}
+
+/* ---------- Market panel & shared blocks ---------- */
+#panel{scroll-margin-top:120px}
+.filters{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;background:var(--surface);border:1px solid var(--line);padding:10px 12px;box-shadow:var(--shadow)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.seg button{border:0;border-right:1px solid var(--line);background:transparent;padding:5px 10px;font-size:12.5px;color:var(--ink-2)}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--navy);color:#fff}
+.filters select,.filters input[type=month]{border:1px solid var(--line);background:var(--surface);border-radius:3px;padding:5px 8px;font-size:12.5px;color:var(--ink);max-width:220px}
+.filters label.chk{display:inline-flex;gap:6px;align-items:center;font-size:12.5px;color:var(--ink-2)}
+.filters .sp{flex:1}
+.filters .csv{border:1px solid var(--line);background:transparent;border-radius:3px;padding:5px 10px;font-size:12.5px;color:var(--navy-ink)}
+.filters .csv:hover{background:var(--navy-tint)}
+.filters .lbl{font:500 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-left:4px}
+.filters .fg{display:inline-flex;align-items:center;gap:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chips:empty{display:none}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--navy);background:var(--navy-tint);color:var(--navy-ink);border-radius:3px;padding:2px 8px;font-size:12.5px}
+.chip button{border:0;background:none;color:inherit;padding:0 0 0 2px;font-size:14px;line-height:1}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:14px;box-shadow:var(--shadow)}
+.kpis .tile{padding:12px 16px}
+.kpis .tile .v{font-size:26px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+.blk{background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);min-width:0;display:flex;flex-direction:column}
+.blk-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:12px 16px 6px}
+.blk-h h4{margin:0;font:600 14px/1.3 var(--sans)}
+.blk-h small{font-size:12px;color:var(--ink-3);text-align:right}
+.blk-h button{border:0;background:none;color:var(--navy-ink);font-size:12px;padding:0}
+.blk .plot{position:relative;height:220px;padding:0 10px 10px}
+.blk .body{padding:4px 16px 12px}
+.blk .foot{padding:8px 16px 10px;font-size:12px;color:var(--ink-3);border-top:1px solid var(--line-2);margin-top:auto}
+.blk .mtbl{margin:0 16px 12px;max-height:300px}
+.bl{display:grid;gap:5px}
+.bl .row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto;gap:10px;align-items:center;font-size:12.5px;padding:2px 0;border:0;background:none;text-align:left;width:100%;color:var(--ink);border-radius:2px}
+.bl .row.act:hover{background:var(--navy-tint);color:var(--navy-ink)}
+.bl .row.on{background:var(--navy-tint)}
+.bl .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bl .nm small{color:var(--ink-3);font-family:var(--mono);font-size:11px;margin-left:6px}
+.bl .bar{height:10px;background:var(--line-2);border-radius:2px;position:relative}
+.bl .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--navy);border-radius:2px;min-width:2px}
+.bl .val{font:500 12.5px var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.bl .val small{display:block;font-weight:400;color:var(--ink-3);font-size:11px}
+.segbar{display:flex;height:28px;gap:2px;margin:6px 0 10px}
+.segbar div{position:relative;display:flex;align-items:center;padding:0 8px;font:500 12px var(--sans);color:#fff;border-radius:4px;overflow:hidden;min-width:0}
+.segbar div span{white-space:nowrap}
+.s-executed{background:var(--teal)} .s-partial{background:var(--gold-mark)} .s-annulled{background:var(--red-mark)} .s-other{background:var(--navy-2)}
+.s-dom{background:var(--c-dom)} .s-exp{background:var(--c-exp)}
+.legend{display:grid;gap:4px;font-size:12.5px}
+.legend .row{display:grid;grid-template-columns:12px 1fr auto auto;gap:8px;align-items:center}
+.legend .sw{width:10px;height:10px;border-radius:2px}
+.legend .v{font:500 12.5px var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.legend .p{font:400 12px var(--mono);color:var(--ink-3);text-align:right;min-width:48px}
+.late{margin-top:10px;padding-top:10px;border-top:1px solid var(--line-2);font-size:12.5px;color:var(--ink-2)}
+.late b{font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.meter{height:6px;background:var(--line-2);border-radius:2px;margin-top:6px;position:relative}
+.meter i{position:absolute;left:0;top:0;bottom:0;background:var(--gold-mark);border-radius:2px}
+.defs{margin-top:14px;font-size:12px;color:var(--ink-3);line-height:1.5}
+.defs b{font-weight:500;color:var(--ink-2)}
+.empty-b{padding:20px 16px;font-size:13px;color:var(--ink-3)}
+#panel[aria-busy="true"] .kpis,#panel[aria-busy="true"] .grid2,#panel[aria-busy="true"] .grid3{opacity:.5;transition:opacity .2s}
+.mtbl[hidden]{display:none}
+footer.site{margin:40px 0 30px;font-size:11.5px;color:var(--ink-3);line-height:1.5}
+footer.site b{font:500 11.5px var(--mono);color:var(--ink-2)}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1180px){ .grid3,.cgrid{grid-template-columns:1fr 1fr} }
+@media (max-width: 760px){
+  .top .wrap{gap:8px}
+  .brand h1 small{display:none}
+  .topnav button{padding:6px 8px;font-size:12.5px}
+  .top .meta{display:none}
+  .askbar{top:0;position:static}
+  .card{scroll-margin-top:16px}
+  .card-h{padding:12px 14px 0;gap:8px 10px}
+  .card-h h3{font-size:16px}
+  .stamps,.answer,.fig,.coverage{padding-left:14px;padding-right:14px}
+  .notes,.ctx{margin-left:14px;margin-right:14px}
+  .tile{padding:10px 14px} .tile .v{font-size:24px}
+  .basis-p,.followups{padding-left:14px;padding-right:14px}
+  .hint .keys{display:none}
+  .ask button span{display:none}
+  th,td{white-space:normal;padding:6px 8px;font-size:12.5px}
+  td.n,th.n,td.code{white-space:nowrap}
+  .grid2,.grid3,.cgrid{grid-template-columns:1fr}
+  .kpis{grid-template-columns:1fr 1fr}
+  .kpis .tile:last-child:nth-child(odd){grid-column:1/-1}
+  .hero{grid-template-columns:1fr 1fr}
+  .hero .tile:last-child:nth-child(odd){grid-column:1/-1}
+  .kpis .tile .v{font-size:22px}
+  .filters select{max-width:100%;flex:1}
+  #panel{scroll-margin-top:16px}
+}
+@media print{
+  .top,.askbar,.tools,.hint,.filters,.followups{display:none !important}
+  .card,.blk{break-inside:avoid;box-shadow:none}
+  .panel-x[hidden]{display:block}
+}
 </style>
 </head>
 <body>
-<header>
-  <h1 id="title">UZEX bitimlar assistenti</h1>
-  <div class="lang"><button data-l="uz" class="on">O‘z</button><button data-l="ru">Ру</button></div>
-</header>
-<main>
-  <p class="intro" id="intro"></p>
-  <div class="chips" id="chips"></div>
-  <div id="chat"></div>
+<header class="top"><div class="wrap">
+  <div class="brand"><i aria-hidden="true"></i><span class="org">UZEX</span><h1 id="title">Bitimlar reyestri<small id="subtitle">savol-javob</small></h1></div>
+  <span class="meta" id="facts"></span>
+  <nav class="topnav" id="nav"></nav>
+  <div class="langs" role="group" aria-label="Til"><button data-l="uz">O‘z</button><button data-l="uz_cyr">Ўз</button><button data-l="ru">Ру</button></div>
+  <button class="newsess" id="newsess" type="button">Yangi sessiya</button>
+</div></header>
+<main class="wrap">
+  <div class="askbar">
+    <form class="ask" id="f">
+      <label class="sr" for="q">Savol</label>
+      <textarea id="q" rows="1" placeholder="" autocomplete="off" spellcheck="false"></textarea>
+      <button id="send" type="submit"><span id="sendt">Yuborish</span><kbd>↵</kbd></button>
+    </form>
+    <div class="hint"><span class="keys" id="keys"></span><span class="live" id="status" aria-live="polite"></span></div>
+  </div>
+  <section id="answers" hidden>
+    <div class="sec-h"><h2 id="h-answers">Javoblar</h2></div>
+    <div class="cards" id="cards" aria-live="polite"></div>
+  </section>
+  <section id="panel" aria-busy="true">
+    <div class="sec-h"><h2 id="h-panel">Bozor paneli</h2><span class="sub" id="panel-sub"></span></div>
+    <div class="filters" id="filters"></div>
+    <div class="chips" id="chips"></div>
+    <div class="kpis" id="kpis"></div>
+    <div class="grid2" id="row-months"></div>
+    <div class="grid3" id="row-tops"></div>
+    <div class="grid3" id="row-split"></div>
+    <div class="defs" id="defs"></div>
+  </section>
+  <footer class="site" id="sidef"></footer>
 </main>
-<div class="foot">
-  <form id="f">
-    <textarea id="q" rows="1" placeholder=""></textarea>
-    <button class="send" id="send" type="submit">➤</button>
-  </form>
-  <div class="meta" id="status"></div>
-</div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="/static/chart.umd.min.js"></script>
 <script>
+'use strict';
+/* ------------------------------------------------------------------ i18n */
 const I18N = {
-  uz:{title:"UZEX bitimlar assistenti", intro:"Birja bitimlari reyestri (03.01.2022 – 30.10.2026, 500 000 bitim) bo‘yicha savol bering. Javoblar faqat ma’lumotlardan olinadi; ma’lumot bo‘lmasa, agent buni ochiq aytadi.",
-      ph:"Savolingizni yozing… (o‘zbek yoki rus tilida)", basis:"Asos", rows:"qator", sql:"SQL so‘rovni ko‘rsatish", table:"Jadval", filters:"Filtrlar", assumptions:"Taxminlar", wait:"Hisoblanmoqda…", err:"Xatolik. Qayta urinib ko‘ring.", asof:"holatiga ko‘ra", time:"vaqt", nodata:"Ma’lumot yo‘q", clarify:"Aniqlashtirish kerak", truncated:"faqat birinchi 200 qator ko‘rsatildi"},
-  ru:{title:"Ассистент по сделкам UZEX", intro:"Задайте вопрос по реестру биржевых сделок (03.01.2022 – 30.10.2026, 500 000 сделок). Ответы берутся только из данных; если данных нет — агент честно скажет об этом.",
-      ph:"Введите вопрос… (на русском или узбекском)", basis:"Основание", rows:"строк", sql:"Показать SQL-запрос", table:"Таблица", filters:"Фильтры", assumptions:"Допущения", wait:"Считаю…", err:"Ошибка. Попробуйте ещё раз.", asof:"по состоянию на", time:"время", nodata:"Нет данных", clarify:"Нужно уточнение", truncated:"показаны первые 200 строк"}
+  uz: {title:"Bitimlar reyestri", subtitle:"savol-javob",
+    ph:"Savol yozing: tovar, davr, hudud, ishtirokchi, broker…", send:"Yuborish",
+    keys:"Enter — yuborish · Shift+Enter — yangi qator · / — maydonga o‘tish · ↑ — oldingi savol",
+    newsess:"Yangi sessiya", range:"Reyestr", deals:"bitim", models:"Model", verify:"tekshiruv", nav_panel:"Bozor paneli", nav_answers:"Javoblar",
+    footer:"UZEX AI Hackathon 2026 · saralash bosqichi prototipi. Ma’lumotlar o‘quv maqsadida tuzilgan, 30.10.2026 holatiga.",
+    answers:"Javoblar", panel:"Bozor paneli", asof:"holatiga ko‘ra",
+    wait:"Hisoblanmoqda", waitd:"SQL tuzilmoqda · bazada bajarilmoqda · ikkinchi model tekshirmoqda",
+    basis:"Asos", b_deals:"bitim", b_asof:"holatiga ko‘ra", b_rows:"qator", basis_btn:"Asosni ko‘rish", basis_sql:"Bajarilgan SQL",
+    table:"Jadval", copy:"Nusxa", copied:"Nusxalandi", copysql:"SQL nusxa", csvrows:"CSV yuklab olish", chart:"Grafik", openpanel:"Panelda ko‘rish",
+    filters:"Filtrlar", assumptions:"Taxminlar", truncated:"Faqat birinchi 200 qator ko‘rsatildi.", coverage:"Reyestrdagi qamrov",
+    s_nodata:"Ma’lumot yo‘q", s_norows:"Mos bitim yo‘q", s_clarify:"Aniqlashtiring", s_err:"Xatolik", s_busy:"Navbat", s_template:"To‘g‘ridan-to‘g‘ri natijadan",
+    s_agreed:"Ikki model mos keldi", s_adjudicated:"Modellar farq qildi · tekshirildi",
+    err:"Server javob bermadi. Qayta urinib ko‘ring.", t_ms:"s",
+    ctx:"Kontekst", ctx_all:"butun reyestr", ctx_note:"javobdagi tovar / hudud / davr bo‘yicha, LLM siz hisoblangan", followups:"Qo‘shimcha savollar",
+    f_period:"Davr", p3:"3 oy", p6:"6 oy", p12:"12 oy", pytd:"2026", pall:"Hammasi", f_family:"Tovar", f_region:"Hudud", f_all:"Barchasi",
+    f_excl:"bekor qilinganlarsiz", csv:"CSV yuklab olish", prev:"oldingi davrga nisbatan",
+    k_turn:"Aylanma", k_deals:"Bitimlar", k_ann:"bekor qilingan", k_tonnes:"Hajm, tonna", k_avg:"O‘rtacha bitim", k_parties:"Xaridor / sotuvchi", k_products:"Tovar turlari", k_export:"Eksport ulushi", k_late:"Kechikkan yetkazish",
+    m_turn:"Aylanma, oylar bo‘yicha", m_deals:"Bitimlar soni, oylar bo‘yicha", m_ann:"shundan bekor qilingan",
+    season:"Mavsumiylik", season_sub:"yiliga o‘rtacha bitimlar soni, oy bo‘yicha", season_peak:"eng faol oy",
+    price:"Narx dinamikasi", price_sub:"tortilgan o‘rtacha", per:"uchun",
+    exp:"Eksport / ichki bozor", exp_dom:"Ichki", exp_exp:"Eksport", tt:"Savdo turi",
+    products:"Mahsulot turlari", products_sub:"aylanma bo‘yicha", small:"kichik bozor",
+    t_buyers:"Top xaridorlar", t_sellers:"Top sotuvchilar", t_brokers:"Top brokerlar", by_turn:"aylanma bo‘yicha", by_n:"bitimlar soni bo‘yicha", askabout:"bosing — savol tayyorlanadi",
+    r_regions:"Hududlar", r_families:"Tovarlar", r_status:"Bitim holatlari", r_status_sub:"barcha bitimlar", click_filter:"bosing — filtr",
+    st_executed:"Bajarilgan", st_partial:"Qisman bajarilgan", st_annulled:"Bekor qilingan", st_other:"Boshqa (yangi, to‘langan, imzolangan)",
+    late:"Kechikib yetkazilgan", late_of:"bajarilganlardan", avgdelay:"o‘rtacha kechikish", days:"kun",
+    month:"Oy", nodeals:"Bu filtrlar bo‘yicha bitim yo‘q.",
+    defs:"<b>Aylanma</b> — bitim summalari yig‘indisi; <b>USD</b> — har bitim o‘z kunidagi kurs bilan; <b>o‘zgarish</b> — xuddi shu uzunlikdagi oldingi davrga nisbatan; <b>bekor qilinganlarsiz</b> — bekor qilingan bitimlar summa va hajmga kirmaydi, holatlar blokida esa hammasi ko‘rsatiladi. Hisoblar LLM siz, to‘g‘ridan-to‘g‘ri reyestr bazasidan.",
+    q_company:"«{n}» kompaniyasi nechta bitim tuzgan va jami summasi qancha?", q_broker:"{c} brokeri nechta bitim tuzgan va qaysi tovarlar bo‘yicha?",
+    fu_price:"{F} {Y} yilda oylar bo‘yicha o‘rtacha narxi qanday o‘zgargan?", fu_buyers:"{F} bo‘yicha {Y} yilda eng katta 5 ta xaridor kim?", fu_regions:"{F} {Y} yilda hududlar bo‘yicha qancha sotilgan?", fu_ann:"{F} bo‘yicha {Y} yilda nechta bitim bekor qilingan?", fu_prev:"Va {Y} yilda-chi?", fu_export:"{F} eksport bitimlari qancha?",
+    fu_rtop:"{R}da {Y} yilda eng ko‘p sotilgan tovarlar qaysi?", fu_rbuy:"{R}da {Y} yilda eng katta xaridorlar kim?", fu_rmonth:"{R}da {Y} yil oylar bo‘yicha bitimlar soni?",
+    fu_g1:"2026 yilda eng ko‘p sotilgan tovarlar qaysi?", fu_g2:"Eksport bitimlari qaysi tovarlar bo‘yicha?", fu_g3:"Kechikib yetkazilgan bitimlar nechta va o‘rtacha necha kun?"},
+  uz_cyr: {title:"Битимлар реестри", subtitle:"савол-жавоб",
+    ph:"Савол ёзинг: товар, давр, ҳудуд, иштирокчи, брокер…", send:"Юбориш",
+    keys:"Enter — юбориш · Shift+Enter — янги қатор · / — майдонга ўтиш · ↑ — олдинги савол",
+    newsess:"Янги сессия", range:"Реестр", deals:"битим", models:"Модел", verify:"текшириш", nav_panel:"Бозор панели", nav_answers:"Жавоблар",
+    footer:"UZEX AI Hackathon 2026 · саралаш босқичи прототипи. Маълумотлар ўқув мақсадида тузилган, 30.10.2026 ҳолатига.",
+    answers:"Жавоблар", panel:"Бозор панели", asof:"ҳолатига кўра",
+    wait:"Ҳисобланмоқда", waitd:"SQL тузилмоқда · базада бажарилмоқда · иккинчи модел текширмоқда",
+    basis:"Асос", b_deals:"битим", b_asof:"ҳолатига кўра", b_rows:"қатор", basis_btn:"Асосни кўриш", basis_sql:"Бажарилган SQL",
+    table:"Жадвал", copy:"Нусха", copied:"Нусхаланди", copysql:"SQL нусха", csvrows:"CSV юклаб олиш", chart:"График", openpanel:"Панелда кўриш",
+    filters:"Филтрлар", assumptions:"Тахминлар", truncated:"Фақат биринчи 200 қатор кўрсатилди.", coverage:"Реестрдаги қамров",
+    s_nodata:"Маълумот йўқ", s_norows:"Мос битим йўқ", s_clarify:"Аниқлаштиринг", s_err:"Хатолик", s_busy:"Навбат", s_template:"Тўғридан-тўғри натижадан",
+    s_agreed:"Икки модел мос келди", s_adjudicated:"Моделлар фарқ қилди · текширилди",
+    err:"Сервер жавоб бермади. Қайта уриниб кўринг.", t_ms:"с",
+    ctx:"Контекст", ctx_all:"бутун реестр", ctx_note:"жавобдаги товар / ҳудуд / давр бўйича, LLM сиз ҳисобланган", followups:"Қўшимча саволлар",
+    f_period:"Давр", p3:"3 ой", p6:"6 ой", p12:"12 ой", pytd:"2026", pall:"Ҳаммаси", f_family:"Товар", f_region:"Ҳудуд", f_all:"Барчаси",
+    f_excl:"бекор қилинганларсиз", csv:"CSV юклаб олиш", prev:"олдинги даврга нисбатан",
+    k_turn:"Айланма", k_deals:"Битимлар", k_ann:"бекор қилинган", k_tonnes:"Ҳажм, тонна", k_avg:"Ўртача битим", k_parties:"Харидор / сотувчи", k_products:"Товар турлари", k_export:"Экспорт улуши", k_late:"Кечиккан етказиш",
+    m_turn:"Айланма, ойлар бўйича", m_deals:"Битимлар сони, ойлар бўйича", m_ann:"шундан бекор қилинган",
+    season:"Мавсумийлик", season_sub:"йилига ўртача битимлар сони, ой бўйича", season_peak:"энг фаол ой",
+    price:"Нарх динамикаси", price_sub:"тортилган ўртача", per:"учун",
+    exp:"Экспорт / ички бозор", exp_dom:"Ички", exp_exp:"Экспорт", tt:"Савдо тури",
+    products:"Маҳсулот турлари", products_sub:"айланма бўйича", small:"кичик бозор",
+    t_buyers:"Топ харидорлар", t_sellers:"Топ сотувчилар", t_brokers:"Топ брокерлар", by_turn:"айланма бўйича", by_n:"битимлар сони бўйича", askabout:"босинг — савол тайёрланади",
+    r_regions:"Ҳудудлар", r_families:"Товарлар", r_status:"Битим ҳолатлари", r_status_sub:"барча битимлар", click_filter:"босинг — филтр",
+    st_executed:"Бажарилган", st_partial:"Қисман бажарилган", st_annulled:"Бекор қилинган", st_other:"Бошқа (янги, тўланган, имзоланган)",
+    late:"Кечикиб етказилган", late_of:"бажарилганлардан", avgdelay:"ўртача кечикиш", days:"кун",
+    month:"Ой", nodeals:"Бу филтрлар бўйича битим йўқ.",
+    defs:"<b>Айланма</b> — битим суммалари йиғиндиси; <b>USD</b> — ҳар битим ўз кунидаги курс билан; <b>ўзгариш</b> — худди шу узунликдаги олдинги даврга нисбатан; <b>бекор қилинганларсиз</b> — бекор қилинган битимлар сумма ва ҳажмга кирмайди, ҳолатлар блокида эса ҳаммаси кўрсатилади. Ҳисоблар LLM сиз, тўғридан-тўғри реестр базасидан.",
+    q_company:"«{n}» компанияси нечта битим тузган ва жами суммаси қанча?", q_broker:"{c} брокери нечта битим тузган ва қайси товарлар бўйича?",
+    fu_price:"{F} {Y} йилда ойлар бўйича ўртача нархи қандай ўзгарган?", fu_buyers:"{F} бўйича {Y} йилда энг катта 5 та харидор ким?", fu_regions:"{F} {Y} йилда ҳудудлар бўйича қанча сотилган?", fu_ann:"{F} бўйича {Y} йилда нечта битим бекор қилинган?", fu_prev:"Ва {Y} йилда-чи?", fu_export:"{F} экспорт битимлари қанча?",
+    fu_rtop:"{R}да {Y} йилда энг кўп сотилган товарлар қайси?", fu_rbuy:"{R}да {Y} йилда энг катта харидорлар ким?", fu_rmonth:"{R}да {Y} йил ойлар бўйича битимлар сони?",
+    fu_g1:"2026 йилда энг кўп сотилган товарлар қайси?", fu_g2:"Экспорт битимлари қайси товарлар бўйича?", fu_g3:"Кечикиб етказилган битимлар нечта ва ўртача неча кун?"},
+  ru: {title:"Реестр сделок", subtitle:"вопрос-ответ",
+    ph:"Введите вопрос: товар, период, регион, участник, брокер…", send:"Отправить",
+    keys:"Enter — отправить · Shift+Enter — новая строка · / — к полю ввода · ↑ — предыдущий вопрос",
+    newsess:"Новая сессия", range:"Реестр", deals:"сделок", models:"Модель", verify:"проверка", nav_panel:"Панель рынка", nav_answers:"Ответы",
+    footer:"UZEX AI Hackathon 2026 · прототип отборочного этапа. Данные учебные, по состоянию на 30.10.2026.",
+    answers:"Ответы", panel:"Панель рынка", asof:"по состоянию на",
+    wait:"Считаю", waitd:"составляется SQL · выполняется в базе · проверяет вторая модель",
+    basis:"Основание", b_deals:"сделок", b_asof:"по состоянию на", b_rows:"строк", basis_btn:"Показать основание", basis_sql:"Выполненный SQL",
+    table:"Таблица", copy:"Копировать", copied:"Скопировано", copysql:"Копировать SQL", csvrows:"Скачать CSV", chart:"График", openpanel:"Открыть в панели",
+    filters:"Фильтры", assumptions:"Допущения", truncated:"Показаны первые 200 строк.", coverage:"Охват реестра",
+    s_nodata:"Нет данных", s_norows:"Нет подходящих сделок", s_clarify:"Нужно уточнение", s_err:"Ошибка", s_busy:"Очередь", s_template:"Прямо из результата",
+    s_agreed:"Две модели сошлись", s_adjudicated:"Модели разошлись · проверено",
+    err:"Сервер не ответил. Попробуйте ещё раз.", t_ms:"с",
+    ctx:"Контекст", ctx_all:"весь реестр", ctx_note:"по товару / региону / периоду из ответа, рассчитано без LLM", followups:"Дополнительные вопросы",
+    f_period:"Период", p3:"3 мес", p6:"6 мес", p12:"12 мес", pytd:"2026", pall:"Всё", f_family:"Товар", f_region:"Регион", f_all:"Все",
+    f_excl:"без аннулированных", csv:"Скачать CSV", prev:"к предыдущему периоду",
+    k_turn:"Оборот", k_deals:"Сделок", k_ann:"аннулировано", k_tonnes:"Объём, тонн", k_avg:"Средняя сделка", k_parties:"Покупателей / продавцов", k_products:"Видов товаров", k_export:"Доля экспорта", k_late:"Поставки с опозданием",
+    m_turn:"Оборот по месяцам", m_deals:"Число сделок по месяцам", m_ann:"из них аннулировано",
+    season:"Сезонность", season_sub:"среднее число сделок в год, по месяцам", season_peak:"пик",
+    price:"Динамика цены", price_sub:"средневзвешенная", per:"за",
+    exp:"Экспорт / внутренний рынок", exp_dom:"Внутренний", exp_exp:"Экспорт", tt:"Тип торгов",
+    products:"Виды продукции", products_sub:"по обороту", small:"малый рынок",
+    t_buyers:"Топ покупателей", t_sellers:"Топ продавцов", t_brokers:"Топ брокеров", by_turn:"по обороту", by_n:"по числу сделок", askabout:"клик — подготовить вопрос",
+    r_regions:"Регионы", r_families:"Товары", r_status:"Состояния сделок", r_status_sub:"все сделки", click_filter:"клик — фильтр",
+    st_executed:"Исполнено", st_partial:"Исполнено частично", st_annulled:"Аннулировано", st_other:"Прочие (новые, оплаченные, заключённые)",
+    late:"Поставлено с опозданием", late_of:"от исполненных", avgdelay:"средняя просрочка", days:"дн.",
+    month:"Месяц", nodeals:"По этим фильтрам сделок нет.",
+    defs:"<b>Оборот</b> — сумма сделок; <b>USD</b> — каждая сделка по курсу на свою дату; <b>изменение</b> — к предыдущему периоду той же длины; <b>без аннулированных</b> — аннулированные сделки не входят в суммы и объёмы, в блоке состояний показаны все. Расчёты без LLM, напрямую из базы реестра.",
+    q_company:"Сколько сделок у компании «{n}» и на какую сумму?", q_broker:"Сколько сделок у брокера {c} и по каким товарам?",
+    fu_price:"Как менялась средняя цена на {F} по месяцам {Y} года?", fu_buyers:"Топ-5 покупателей {F} в {Y} году по сумме", fu_regions:"Сколько {F} продано по регионам в {Y} году?", fu_ann:"Сколько сделок по {F} аннулировано в {Y} году?", fu_prev:"А в {Y} году?", fu_export:"Сколько экспортных сделок по {F}?",
+    fu_rtop:"Какие товары больше всего продавались в {R} в {Y} году?", fu_rbuy:"Крупнейшие покупатели в {R} в {Y} году?", fu_rmonth:"Число сделок по месяцам {Y} года в {R}?",
+    fu_g1:"Какие товары больше всего продавались в 2026 году?", fu_g2:"По каким товарам есть экспортные сделки?", fu_g3:"Сколько поставок с опозданием и средняя просрочка?"}
 };
-let lang = (()=>{try{return localStorage.getItem('lang')||'uz'}catch(e){return 'uz'}})();
-let sid = (()=>{try{let s=localStorage.getItem('sid'); if(!s){s=crypto.randomUUID(); localStorage.setItem('sid',s)} return s}catch(e){return null}})();
-let examples = {};
+I18N.en = I18N.ru;
+const UNITS = {uz:["ming","mln","mlrd","trln"], uz_cyr:["минг","млн","млрд","трлн"], ru:["тыс.","млн","млрд","трлн"]};
+const CUR = {UZS:{uz:"so‘m",uz_cyr:"сўм",ru:"сум"}, USD:{uz:"USD",uz_cyr:"USD",ru:"USD"}};
+const MON = {uz:["yan","fev","mar","apr","may","iyn","iyl","avg","sen","okt","noy","dek"], uz_cyr:["янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"], ru:["янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"]};
+const MONF = {uz:["yanvar","fevral","mart","aprel","may","iyun","iyul","avgust","sentabr","oktabr","noyabr","dekabr"], uz_cyr:["январ","феврал","март","апрел","май","июн","июл","август","сентябр","октябр","ноябр","декабр"], ru:["январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"]};
+const UNIT_L = {"тонна":{uz:"tonna",uz_cyr:"тонна",ru:"тонна"},"килограмм":{uz:"kg",uz_cyr:"кг",ru:"кг"},"литр":{uz:"litr",uz_cyr:"литр",ru:"литр"},"штука":{uz:"dona",uz_cyr:"дона",ru:"шт."},"куб.метр":{uz:"m³",uz_cyr:"м³",ru:"м³"},"кв.метр":{uz:"m²",uz_cyr:"м²",ru:"м²"},"метр":{uz:"metr",uz_cyr:"метр",ru:"м"}};
+
+/* ------------------------------------------------------------------ state & utils */
 const $ = s=>document.querySelector(s);
-function t(k){return I18N[lang][k]}
+const store = {get(k){try{return localStorage.getItem(k)}catch(e){return null}}, set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let lang = store.get('lang') || 'uz'; if(!I18N[lang]) lang='uz';
+let sid = store.get('sid') || null;
+let health = null, counter = 0, lastQ = '';
+const T = (k, l)=> (I18N[l||lang][k] ?? I18N.uz[k] ?? k);
+const uiLang = l => (l==='uz_cyr'||l==='ru') ? l : 'uz';
+const L = (o, l)=> o ? (l==='ru' ? (o.ru||o.uz) : (o.uz||o.ru)) : '';
+const DMAX='2026-10-30', DMIN='2022-01-03';
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function dmy(iso){ if(!iso) return ''; const m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})/); return m?`${m[3]}.${m[2]}.${m[1]}`:String(iso) }
+function fmtInt(n){ return Math.round(Number(n)||0).toLocaleString('ru-RU').replace(/ /g,' ') }
+function fmtNum(n,d=2){ return (Number(n)||0).toLocaleString('ru-RU',{maximumFractionDigits:d}).replace(/ /g,' ') }
+function compact(v,l){
+  v=Number(v)||0; const u=UNITS[uiLang(l)]; const a=Math.abs(v);
+  if(a>=1e12) return fmtNum(v/1e12,2)+' '+u[3]; if(a>=1e9) return fmtNum(v/1e9,2)+' '+u[2];
+  if(a>=1e6) return fmtNum(v/1e6,2)+' '+u[1]; if(a>=1e4) return fmtNum(v/1e3,1)+' '+u[0];
+  return fmtNum(v, Number.isInteger(v)?0:2);
+}
+function ymLabel(ym,l,withYear){ const [y,m]=ym.split('-'); const s=MON[uiLang(l)][Number(m)-1]; return withYear? `${s} ${y.slice(2)}` : s; }
+function unitL(u,l){ return UNIT_L[u]?.[uiLang(l)] || u || ''; }
+function curL(c,l){ return CUR[c]?.[uiLang(l)] || c || ''; }
+function cssv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+function csvDownload(lines, name){ const blob=new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000); }
+const csvq=s=>'"'+String(s??'').replace(/"/g,'""')+'"';
+
+/* ------------------------------------------------------------------ chrome */
 function applyLang(){
   document.documentElement.lang = lang==='ru'?'ru':'uz';
-  $('#title').textContent=t('title'); $('#intro').textContent=t('intro'); $('#q').placeholder=t('ph');
-  document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('on', b.dataset.l===lang));
-  const c=$('#chips'); c.innerHTML='';
-  (examples[lang]||[]).forEach(x=>{const b=document.createElement('button'); b.className='chip'; b.textContent=x; b.onclick=()=>ask(x); c.appendChild(b)});
-  try{localStorage.setItem('lang',lang)}catch(e){}
+  $('#title').firstChild.textContent = T('title'); $('#subtitle').textContent = T('subtitle');
+  $('#q').placeholder = T('ph'); $('#sendt').textContent = T('send'); $('#keys').textContent = T('keys');
+  $('#newsess').textContent = T('newsess'); $('#h-answers').textContent = T('answers'); $('#h-panel').textContent = T('panel');
+  document.querySelectorAll('.langs button').forEach(b=>b.classList.toggle('on', b.dataset.l===lang));
+  renderFacts(); renderNav(); renderFilters(); if(D) renderDash(D);
+  store.set('lang', lang);
 }
-document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>{lang=b.dataset.l; applyLang()});
-fetch('/api/examples').then(r=>r.json()).then(j=>{examples=j; applyLang()}).catch(()=>applyLang());
+function renderFacts(){
+  const h = health||{}; const asof = dmy(h.data_asof||'2026-10-30');
+  $('#facts').textContent = `${T('range')}: 03.01.2022 – ${asof} · ${h.n_deals?fmtInt(h.n_deals):'500 000'} ${T('deals')}`;
+  const m=(h.models||[])[0]; const v=h.verifier;
+  $('#sidef').innerHTML = (m?`<div>${T('models')}: <b>${esc(m)}</b>${v?` · ${T('verify')}: <b>${esc(v)}</b>`:''} · DuckDB · FastAPI</div>`:'')+`<div>${T('footer')}</div>`;
+}
+function renderNav(){
+  $('#nav').innerHTML = (counter?`<button type="button" data-go="#answers">${T('nav_answers')}<small>${counter}</small></button>`:'')+`<button type="button" data-go="#panel">${T('nav_panel')}</button>`;
+  $('#nav').querySelectorAll('button').forEach(b=>b.onclick=()=>document.querySelector(b.dataset.go)?.scrollIntoView({behavior:'smooth'}));
+}
+document.querySelectorAll('.langs button').forEach(b=>b.onclick=()=>{lang=b.dataset.l; applyLang()});
+$('#newsess').onclick=()=>{ sid=crypto.randomUUID(); store.set('sid',sid); counter=0; $('#cards').innerHTML=''; $('#answers').hidden=true; renderNav(); $('#q').focus(); };
 
-function fmt(v){
-  if(v===null||v===undefined) return '';
-  if(typeof v==='number'){ if(Number.isInteger(v)) return v.toLocaleString('ru-RU'); return v.toLocaleString('ru-RU',{maximumFractionDigits:2}); }
-  return String(v);
-}
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function add(role, html){const d=document.createElement('div'); d.className='msg '+role; d.innerHTML='<div class="bubble">'+html+'</div>'; $('#chat').appendChild(d); d.scrollIntoView({behavior:'smooth',block:'end'}); return d}
+/* ------------------------------------------------------------------ ask */
+const ta=$('#q');
+function grow(){ ta.style.height='auto'; ta.style.height=Math.min(160, ta.scrollHeight)+'px'; }
+ta.addEventListener('input', grow);
+ta.addEventListener('keydown', e=>{
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault(); ask(ta.value)}
+  else if(e.key==='ArrowUp'&&!ta.value&&lastQ){ta.value=lastQ; grow(); e.preventDefault()}
+  else if(e.key==='Escape'){ta.blur()}
+});
+document.addEventListener('keydown', e=>{ if(e.key==='/'&&document.activeElement!==ta&&!e.ctrlKey&&!e.metaKey&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault(); ta.focus()} });
+$('#f').onsubmit=e=>{e.preventDefault(); ask(ta.value)};
+function prefill(q){ ta.value=q; grow(); window.scrollTo({top:0,behavior:'smooth'}); ta.focus(); }
 
 async function ask(q){
   q=(q||'').trim(); if(!q) return;
-  $('#chips').style.display='none';
-  add('user', esc(q)); $('#q').value='';
-  const w=add('bot','<span class="thinking">'+t('wait')+'</span>');
-  $('#send').disabled=true; const t0=performance.now();
+  if(!sid){ sid=crypto.randomUUID(); store.set('sid',sid); }
+  lastQ=q; ta.value=''; grow(); $('#answers').hidden=false;
+  const n=++counter; const l=lang;
+  const card=document.createElement('article'); card.className='card pending'; card.id='c'+n; card.dataset.kind='pending';
+  card.innerHTML=`<header class="card-h"><span class="no">№ ${n}</span><h3>${esc(q)}</h3><span class="meta timer">0,0 ${T('t_ms',l)}</span></header>
+    <div class="wait"><div class="line">${T('wait',l)} — ${T('waitd',l)}</div><div class="bar"></div></div>`;
+  $('#cards').prepend(card); renderNav();
+  window.scrollTo({top:0,behavior:'smooth'});
+  const t0=performance.now(); const tick=setInterval(()=>{const s=((performance.now()-t0)/1000).toFixed(1).replace('.',','); card.querySelectorAll('.timer').forEach(x=>x.textContent=s+' '+T('t_ms',l))},100);
+  $('#send').disabled=true; let j=null;
   try{
     const r=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,session_id:sid,language:null})});
-    const j=await r.json();
-    if(j.session_id) sid=j.session_id;
-    w.querySelector('.bubble').innerHTML=render(j);
-    drawChart(j, w);
-    $('#status').textContent=`${t('time')}: ${((performance.now()-t0)/1000).toFixed(1)} s · ${j.n_rows} ${t('rows')} · ${j.status}`;
-  }catch(e){ w.querySelector('.bubble').innerHTML='<span class="tag bad">'+t('err')+'</span>'; }
-  $('#send').disabled=false;
+    j=await r.json(); if(j.session_id){sid=j.session_id; store.set('sid',sid)}
+  }catch(e){ j={status:'llm_error', answer:T('err',l), language:l}; }
+  clearInterval(tick); $('#send').disabled=false;
+  const secs=(performance.now()-t0)/1000;
+  renderCard(card, n, q, j, secs);
+  $('#status').textContent=`№ ${n} · ${secs.toFixed(1).replace('.',',')} ${T('t_ms',l)}`;
+  if(window.innerWidth>760) ta.focus();
 }
-function render(j){
-  let h='<div class="answer">'+esc(j.answer)+'</div>';
-  const tags=[];
-  if(j.status==='unanswerable'||j.status==='no_rows') tags.push('<span class="tag warn">'+t('nodata')+'</span>');
-  if(j.status==='clarify') tags.push('<span class="tag warn">'+t('clarify')+'</span>');
-  if(j.status==='sql_error'||j.status==='llm_error') tags.push('<span class="tag bad">'+t('err')+'</span>');
-  if(tags.length) h+='<div>'+tags.join('')+'</div>';
-  if(j.sql){
-    const b=j.basis||{};
-    h+='<div class="basis"><b>'+t('basis')+':</b> '+j.n_rows+' '+t('rows')+(j.truncated?' ('+t('truncated')+')':'')+' · '+t('asof')+' '+(b.as_of||'')+(b.sql_ms!=null?' · SQL '+b.sql_ms+' ms':'');
-    if(j.filters&&j.filters.length) h+='<br><b>'+t('filters')+':</b> '+j.filters.map(esc).join('; ');
-    if(j.assumptions&&j.assumptions.length) h+='<br><b>'+t('assumptions')+':</b> '+j.assumptions.map(esc).join('; ');
-    h+='</div>';
-    if(j.rows&&j.rows.length){
-      const cols=j.columns.filter(c=>!c.endsWith('_fmt'));
-      h+='<details><summary>'+t('table')+' ('+j.rows.length+')</summary><div class="tbl"><table><thead><tr>'+cols.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>';
-      j.rows.forEach(r=>{h+='<tr>'+cols.map(c=>{const v=r[c]; const num=typeof v==='number'; return '<td class="'+(num?'num':'')+'">'+esc(fmt(v))+'</td>'}).join('')+'</tr>'});
-      h+='</tbody></table></div></details>';
-    }
-    h+='<details><summary>'+t('sql')+'</summary><pre>'+esc(j.sql)+'</pre></details>';
-    h+='<canvas style="display:none"></canvas>';
+function kindOf(j){ const s=j.status; if(['unanswerable','no_rows','clarify','rate_limited'].includes(s)) return 'nodata'; if(['sql_error','llm_error','error'].includes(s)) return 'error'; return 'ok'; }
+
+/* ------------------------------------------------------------------ answer card */
+function splitBasis(text){
+  const m=String(text||'').match(/\n\s*(Asos|Асос|Основание|Basis)\s*:\s*([\s\S]+)$/);
+  if(!m) return {prose:String(text||'').trim(), basisText:''};
+  return {prose:text.slice(0,m.index).trim(), basisText:m[2].trim().replace(/\.$/,'')};
+}
+const SKIP_TILE=/(^|_)(inn|code|no|year|month|quarter|day|id|pct_share)$|_inn$|_code$|_no$|^month$|^year$/i;
+function sqlFilters(sql, basis){
+  const f={}; if(!sql) return f;
+  let m=sql.match(/family_key\s*=\s*'([a-z0-9_]+)'/i); if(m) f.family=m[1];
+  m=sql.match(/region_id\s*=\s*'([A-Z]{2,4})'/); if(m) f.region=m[1];
+  m=sql.match(/\byear\s*=\s*(20\d\d)/); const mo=sql.match(/\bmonth\s*=\s*(\d{1,2})/);
+  if(m){ const y=m[1]; f.year=Number(y); if(mo){ const mm=String(mo[1]).padStart(2,'0'); const last=new Date(Number(y),Number(mo[1]),0).getDate(); f.from=`${y}-${mm}-01`; f.to=`${y}-${mm}-${last}`; } else { f.from=`${y}-01-01`; f.to=`${y}-12-31`; } }
+  m=sql.match(/deal_date\s+BETWEEN\s+(?:DATE\s*)?'(\d{4}-\d{2}-\d{2})'\s+AND\s+(?:DATE\s*)?'(\d{4}-\d{2}-\d{2})'/i); if(m){ f.from=m[1]; f.to=m[2]; }
+  m=sql.match(/deal_date\s*>=\s*(?:DATE\s*)?'(\d{4}-\d{2}-\d{2})'/i); if(m) f.from=m[1];
+  m=sql.match(/deal_date\s*<=?\s*(?:DATE\s*)?'(\d{4}-\d{2}-\d{2})'/i); if(m) f.to=m[1];
+  if(!f.from&&basis&&basis.period&&basis.period[0]){ f.from=basis.period[0]; f.to=basis.period[1]; }
+  if(f.from&&!f.year&&f.from.slice(0,4)===(f.to||'').slice(0,4)) f.year=Number(f.from.slice(0,4));
+  if(/currency\s*=\s*'USD'/i.test(sql)||/amount_usd/i.test(sql)) f.cur='usd';
+  if(!/NOT\s+is_annulled/i.test(sql)) f.ann='include';
+  if(f.to&&f.to>DMAX) f.to=DMAX; if(f.from&&f.from<DMIN) f.from=DMIN;
+  return f;
+}
+function renderCard(card, n, q, j, secs){
+  const l=j.language && I18N[j.language] ? j.language : lang; const t=k=>T(k,l);
+  const kind=kindOf(j); card.className='card'; card.dataset.kind=kind;
+  const {prose,basisText}=splitBasis(j.answer);
+  const rows=j.rows||[], cols=j.columns||[], labels=j.column_labels||cols, fmt=j.rows_fmt||[];
+  let h=`<header class="card-h"><span class="no">№ ${n}</span><h3>${esc(q)}</h3><span class="meta">${secs.toFixed(1).replace('.',',')} ${t('t_ms')}</span>`;
+  const st=[];
+  if(j.status==='unanswerable') st.push(['gold',t('s_nodata')]);
+  if(j.status==='no_rows') st.push(['gold',t('s_norows')]);
+  if(j.status==='clarify') st.push(['gold',t('s_clarify')]);
+  if(j.status==='rate_limited') st.push(['gold',t('s_busy')]);
+  if(kind==='error') st.push(['red',t('s_err')]);
+  if(j.check==='agreed') st.push(['teal','✓ '+t('s_agreed')]);
+  if(j.check==='adjudicated') st.push(['gold',t('s_adjudicated')]);
+  if(j.status==='template') st.push(['grey',t('s_template')]);
+  if(st.length) h+=`<div class="stamps">${st.map(([c,x])=>`<span class="stamp ${c}">${esc(x)}</span>`).join('')}</div>`;
+  h+=`</header>`;
+  let tiles=[];
+  if(rows.length===1){ cols.forEach((c,i)=>{ const v=rows[0][c]; if(typeof v==='number'&&!SKIP_TILE.test(c)) tiles.push({c,i,v}); }); tiles=tiles.slice(0,4); }
+  if(tiles.length){
+    h+=`<div class="hero">`+tiles.map(({c,i,v})=>{
+      const f=String(fmt[0]?.[i]??v); const m=f.match(/^(.*?)\s*\((.+)\)\s*$/);
+      const big=m?m[2]:(Math.abs(v)>=1e6?compact(v,l):f); const full=m?m[1]:(Math.abs(v)>=1e6?f:'');
+      let unit='';
+      if(/price|amount|total|sum|narx|summa/i.test(c)&&!/usd|uzs/i.test(c)&&typeof rows[0].currency==='string') unit=curL(rows[0].currency,l);
+      else if(/_usd$/i.test(c)) unit='USD'; else if(/_uzs$/i.test(c)) unit=curL('UZS',l);
+      else if(/^(tonnes|volume|volume_t|quantity)/i.test(c)&&typeof rows[0].unit==='string') unit=unitL(rows[0].unit,l);
+      return `<div class="tile"><div class="l">${esc(labels[i]||c)}</div><div class="v">${esc(big)}${unit?`<small>${esc(unit)}</small>`:''}</div>${full?`<div class="f">${esc(full)}</div>`:''}</div>`;
+    }).join('')+`</div>`;
   }
-  return h;
+  if(prose) h+=`<div class="answer">${esc(prose)}</div>`;
+  const ch=pickChart(j);
+  if(ch) h+=`<div class="fig"><div class="cap">${t('chart')}: <b>${esc(labels[cols.indexOf(ch.y)]||ch.y)}</b> · ${esc(labels[cols.indexOf(ch.x)]||ch.x)}</div><div class="plot" style="height:${ch.h}px"><canvas></canvas></div></div>`;
+  const pf=sqlFilters(j.sql, j.basis);
+  if(j.sql&&kind==='ok') h+=`<div class="ctx"><div class="ctx-h"><span class="k">${t('ctx')}</span><span class="f ctx-f"></span></div><div class="skel"></div></div>`;
+  const fl=(j.filters||[]).filter(Boolean), as=(j.assumptions||[]).filter(Boolean);
+  if(fl.length||as.length){ h+=`<dl class="notes">`; if(fl.length) h+=`<dt>${t('filters')}</dt><dd>${fl.map(esc).join('; ')}</dd>`; if(as.length) h+=`<dt class="model">${t('assumptions')}</dt><dd>${as.map(esc).join('; ')}</dd>`; h+=`</dl>`; }
+  const b=j.basis||{}; const range=b.data_range;
+  if(range&&range[0]&&range[1]&&b.period&&b.period[0]){
+    const d=s=>Date.parse(s); const a=d(range[0]), z=d(range[1]); const p0=Math.max(a,d(b.period[0])), p1=Math.min(z,d(b.period[1]));
+    const Lf=(p0-a)/(z-a)*100, W=Math.max(0.4,(p1-p0)/(z-a)*100);
+    const y0=new Date(range[0]).getFullYear(), y1=new Date(range[1]).getFullYear(); let ticks='';
+    for(let y=y0;y<=y1;y++){ const x=(Date.parse(`${y}-01-01`)-a)/(z-a)*100; ticks+= y===y0?`<span style="left:0">${y}</span>`:`<span style="left:${x}%">${y}</span>`; }
+    h+=`<div class="coverage"><div class="lbl"><span>${t('coverage')}</span><span>${dmy(b.period[0])} – ${dmy(b.period[1])}</span></div><div class="track"><div class="fill" style="left:${Lf}%;width:${W}%"></div></div><div class="ticks">${ticks}</div></div>`;
+  }
+  const tools=[];
+  if(j.sql||basisText) tools.push(`<button type="button" class="primary" data-act="basis" aria-expanded="false">${t('basis_btn')}${rows.length?` (${rows.length} ${t('b_rows')})`:''}</button>`);
+  if(j.sql&&kind==='ok') tools.push(`<button type="button" data-act="panel">${t('openpanel')} →</button>`);
+  tools.push(`<span class="sp"></span><button type="button" data-act="copy">${t('copy')}</button>`);
+  h+=`<div class="tools">${tools.join('')}</div>`;
+  if(j.sql||basisText){
+    let bp=`<div class="panel-x basis-panel" hidden><div class="basis-p"><div class="line"><span class="k${kind==='nodata'?' gold':''}">${t('basis')}</span>`;
+    if(basisText) bp+=`<span>${esc(basisText)}</span>`; else { if(b.n_deals!=null) bp+=`<span><b>${fmtInt(b.n_deals)}</b> ${t('b_deals')}</span>`; if(b.as_of) bp+=`<span>${dmy(b.as_of)} ${t('b_asof')}</span>`; }
+    if(b.sql_ms!=null) bp+=`<span class="t">SQL ${Math.round(b.sql_ms)} ms</span>`; bp+=`</div>`;
+    if(rows.length){
+      const numCol=cols.map(c=>typeof rows[0][c]==='number'); const codeCol=cols.map(c=>/inn$|_code$|^code$|broker$|_no$/.test(c));
+      bp+=`<div class="tblwrap"><table><thead><tr>${labels.map((c,i)=>`<th class="${numCol[i]?'n':''}">${esc(c)}</th>`).join('')}</tr></thead><tbody>`;
+      fmt.forEach(r=>{ bp+='<tr>'+r.map((v,i)=>`<td class="${numCol[i]?'n':''}${codeCol[i]?' code':''}">${esc(v)}</td>`).join('')+'</tr>'; });
+      bp+='</tbody></table></div>'+(j.truncated?`<div class="tblnote">${t('truncated')}</div>`:'');
+    }
+    bp+=`<div class="acts">${rows.length?`<button type="button" class="btn solid" data-act="csv">↓ ${t('csvrows')}</button>`:''}${j.sql?`<button type="button" class="btn" data-act="sql" aria-expanded="false">${t('basis_sql')}</button><button type="button" class="btn" data-act="copysql">${t('copysql')}</button>`:''}</div>`;
+    if(j.sql) bp+=`<pre class="sql" hidden>${hiSQL(j.sql)}</pre>`;
+    bp+=`</div></div>`; h+=bp;
+  }
+  const fus=followups(pf, l); if(kind!=='error'&&fus.length) h+=`<div class="followups"><div class="l">${t('followups')}</div><div class="fu">${fus.map(x=>`<button type="button">${esc(x)}</button>`).join('')}</div></div>`;
+  card.innerHTML=h;
+  card.querySelectorAll('button[data-act]').forEach(btn=>btn.onclick=()=>{
+    const a=btn.dataset.act;
+    if(a==='basis'){ const p=card.querySelector('.basis-panel'); const open=p.hidden; p.hidden=!open; btn.setAttribute('aria-expanded',open); if(open) p.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+    if(a==='sql'){ const p=card.querySelector('pre.sql'); p.hidden=!p.hidden; btn.setAttribute('aria-expanded',!p.hidden); }
+    if(a==='copy'||a==='copysql'){ const txt=a==='copy'?`${q}\n\n${j.answer||''}`:j.sql; navigator.clipboard?.writeText(txt).then(()=>{const o=btn.textContent; btn.textContent=t('copied'); setTimeout(()=>btn.textContent=o,1200)}); }
+    if(a==='csv'){ const lines=[csvq(q),'',labels.map(csvq).join(';')]; fmt.forEach(r=>lines.push(r.map(csvq).join(';'))); lines.push('',csvq(basisText||''),csvq(j.sql||'')); csvDownload(lines,`uzex-javob-${n}.csv`); }
+    if(a==='panel'){ F.family=null; F.region=null; const {year,...rest}=pf; Object.assign(F, rest); if(!F.from){F.from='2025-11-01'; F.to=DMAX;} setHash(); renderFilters(); loadDash(); $('#panel').scrollIntoView({behavior:'smooth'}); }
+  });
+  card.querySelectorAll('.fu button').forEach(b=>b.onclick=()=>ask(b.textContent));
+  if(ch) drawChart(j, card, ch, l);
+  if(j.sql&&kind==='ok') loadContext(card, pf, l);
 }
-function drawChart(j, node){
-  const c=j.chart||{}; if(!window.Chart||!c.type||c.type==='none'||!j.rows||j.rows.length<2) return;
-  const x=c.x, y=c.y; if(!(x in j.rows[0])||!(y in j.rows[0])) return;
-  const cv=node.querySelector('canvas'); if(!cv) return; cv.style.display='block';
-  const labels=j.rows.map(r=>String(r[x])); const data=j.rows.map(r=>Number(r[y])||0);
-  const accent=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-  new Chart(cv,{type:c.type==='line'?'line':'bar',data:{labels,datasets:[{label:y,data,borderColor:accent,backgroundColor:accent+'88',tension:.25}]},
-    options:{plugins:{legend:{display:false}},scales:{x:{ticks:{maxRotation:45,autoSkip:true}},y:{ticks:{callback:v=>Number(v).toLocaleString('ru-RU')}}}}});
+const KW=/\b(SELECT|FROM|WHERE|GROUP BY|ORDER BY|HAVING|LIMIT|AND|OR|NOT|AS|ON|JOIN|LEFT|INNER|CASE|WHEN|THEN|ELSE|END|IN|IS|NULL|DISTINCT|BETWEEN|LIKE|ILIKE|WITH|UNION|ALL|DESC|ASC|OVER|PARTITION BY|CAST|COALESCE|ROUND|SUM|COUNT|AVG|MIN|MAX|FILTER)\b/gi;
+function hiSQL(s){ return esc(s).replace(/'([^']*)'/g,"<i>'$1'</i>").replace(KW,m=>`<b>${m.toUpperCase()}</b>`); }
+function famLabel(key,l){ const o=(OPTS?.families||[]).find(x=>x.key===key); return o?L(o,l):key; }
+function regLabel(id,l){ const o=(OPTS?.regions||[]).find(x=>x.id===id); return o?L(o,l):id; }
+function followups(pf, l){
+  const t=k=>T(k,l); const fill=(k,v)=>Object.entries(v).reduce((s,[kk,x])=>s.split('{'+kk+'}').join(x), t(k));
+  const Y=pf.year||2026; const out=[];
+  if(pf.family){ const F=famLabel(pf.family,l);
+    out.push(fill('fu_price',{F,Y}), fill('fu_buyers',{F,Y}), fill('fu_regions',{F,Y}), fill('fu_ann',{F,Y}));
+    if(pf.year&&pf.year>2022) out.push(fill('fu_prev',{Y:pf.year-1}));
+  } else if(pf.region){ const R=regLabel(pf.region,l);
+    out.push(fill('fu_rtop',{R,Y}), fill('fu_rbuy',{R,Y}), fill('fu_rmonth',{R,Y}));
+    if(pf.year&&pf.year>2022) out.push(fill('fu_prev',{Y:pf.year-1}));
+  } else out.push(t('fu_g1'), t('fu_g2'), t('fu_g3'));
+  return out.slice(0,5);
 }
-$('#f').onsubmit=e=>{e.preventDefault(); ask($('#q').value)};
-$('#q').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault(); ask($('#q').value)}});
+
+/* ------------------------------------------------------------------ context block (per answer) */
+async function loadContext(card, pf, l){
+  const box=card.querySelector('.ctx'); if(!box) return;
+  const from=pf.from||DMIN, to=pf.to||DMAX; const cur=pf.cur||'uzs'; const ann=pf.ann||'exclude';
+  const p=new URLSearchParams({from,to,cur,annulled:ann}); if(pf.family) p.set('family',pf.family); if(pf.region) p.set('region',pf.region); if(!OPTS) p.set('opts','1');
+  try{
+    const r=await fetch('/api/dash?'+p.toString()); const d=await r.json(); if(d.options&&!OPTS){ OPTS=d.options; renderFilters(); }
+    renderContext(box, d, pf, l, cur);
+    const fu=card.querySelector('.followups .fu'); if(fu){ fu.innerHTML=followups(pf,l).map(x=>`<button type="button">${esc(x)}</button>`).join(''); fu.querySelectorAll('button').forEach(b=>b.onclick=()=>ask(b.textContent)); }
+  }catch(e){ box.querySelector('.skel')?.remove(); }
+}
+function renderContext(box, d, pf, l, cur){
+  const t=k=>T(k,l); const unit=cur==='usd'?'USD':curL('UZS',l); const k=d.kpi;
+  const parts=[]; if(pf.family) parts.push(famLabel(pf.family,l)); if(pf.region) parts.push(regLabel(pf.region,l));
+  parts.push(`${dmy(d.filters.from)} – ${dmy(d.filters.to)}`);
+  box.querySelector('.ctx-f').innerHTML = parts.map(x=>`<b>${esc(x)}</b>`).join(' · ')+` <span style="color:var(--ink-3)">· ${t('ctx_note')}</span>`;
+  box.querySelector('.skel')?.remove();
+  if(!k.n_deals){ box.insertAdjacentHTML('beforeend',`<div class="empty-b">${t('nodeals')}</div>`); return; }
+  const expRow=d.export.find(x=>x.is_export), domRow=d.export.find(x=>!x.is_export); const expN=expRow?.n||0, domN=domRow?.n||0; const expShare=(expN+domN)?expN/(expN+domN)*100:0;
+  const lt=d.late; const lp=lt.n_base?lt.n_late/lt.n_base*100:0; const annShare=k.n_deals?k.n_annulled/k.n_deals*100:0;
+  let h=`<div class="kpis">
+    <div class="tile"><div class="l">${t('k_turn')}</div><div class="v">${compact(k.turnover,l)}<small>${unit}</small></div>${delta(k.turnover,k.prev_turnover,l)}</div>
+    <div class="tile"><div class="l">${t('k_deals')}</div><div class="v">${fmtInt(k.n_base)}</div><div class="f">${fmtInt(k.n_annulled)} ${t('k_ann')} · ${fmtNum(annShare,1)} %</div></div>
+    <div class="tile"><div class="l">${t('k_tonnes')}</div><div class="v">${compact(k.tonnes,l)}</div></div>
+    <div class="tile"><div class="l">${t('k_export')}</div><div class="v">${fmtNum(expShare,1)}<small>%</small></div><div class="f">${fmtInt(expN)} ${t('b_deals')}</div></div>
+    <div class="tile"><div class="l">${t('k_late')}</div><div class="v">${fmtNum(lp,1)}<small>%</small></div><div class="f">${lt.avg_delay?`${t('avgdelay')} ${fmtNum(lt.avg_delay,1)} ${t('days')}`:''}</div></div>
+    <div class="tile"><div class="l">${t('k_parties')}</div><div class="v">${fmtInt(k.n_buyers)}<small>/ ${fmtInt(k.n_sellers)}</small></div><div class="f">${t('k_products')}: ${fmtInt(k.n_products)}</div></div></div>`;
+  const ids={m:'cm'+Math.random().toString(36).slice(2), s:'cs'+Math.random().toString(36).slice(2), p:'cp'+Math.random().toString(36).slice(2)};
+  const blocks=[];
+  blocks.push(`<div class="blk"><div class="blk-h"><h4>${t('m_turn')}</h4><small>${unit}</small></div><div class="plot"><canvas id="${ids.m}"></canvas></div></div>`);
+  const seas=d.seasonal||[]; const peak=seas.reduce((a,b)=>(!a||(b.n/b.ny)>(a.n/a.ny))?b:a,null);
+  blocks.push(`<div class="blk"><div class="blk-h"><h4>${t('season')}</h4><small>${peak?`${t('season_peak')}: ${MONF[uiLang(l)][peak.month-1]}`:''}</small></div><div class="plot"><canvas id="${ids.s}"></canvas></div><div class="foot">${t('season_sub')} · ${t('ctx_all')}</div></div>`);
+  const groups={executed:0,partial:0,annulled:0,other:0}; const total=d.statuses.reduce((s,r)=>s+r.n,0); d.statuses.forEach(r=>{groups[r.code in groups?r.code:'other']+=r.n});
+  const seg=Object.entries(groups).filter(([,v])=>v>0).map(([kk,v])=>`<div class="s-${kk}" style="flex:${v}" title="${esc(t('st_'+kk))}: ${fmtInt(v)}">${v/total>0.1?`<span>${fmtNum(v/total*100,0)} %</span>`:''}</div>`).join('');
+  const legend=Object.entries(groups).map(([kk,v])=>`<div class="row"><span class="sw s-${kk}"></span><span>${t('st_'+kk)}</span><span class="v">${fmtInt(v)}</span><span class="p">${total?fmtNum(v/total*100,1):0} %</span></div>`).join('');
+  blocks.push(blk(t('r_status'),t('r_status_sub'),`<div class="segbar">${seg}</div><div class="legend">${legend}</div>`));
+  const tt=(d.trade_types||[]).map(r=>`<div class="row"><span class="sw" style="background:var(--navy-2)"></span><span>${esc(L(r,l))}</span><span class="v">${fmtInt(r.n)}</span><span class="p">${k.n_base?fmtNum(r.n/k.n_base*100,1):0} %</span></div>`).join('');
+  const eb=`<div class="segbar"><div class="s-dom" style="flex:${domN||0.0001}" title="${t('exp_dom')}">${domN/(domN+expN||1)>0.1?`<span>${fmtNum(domN/(domN+expN||1)*100,0)} %</span>`:''}</div>${expN?`<div class="s-exp" style="flex:${expN}" title="${t('exp_exp')}">${expShare>10?`<span>${fmtNum(expShare,0)} %</span>`:''}</div>`:''}</div>
+    <div class="legend"><div class="row"><span class="sw s-dom"></span><span>${t('exp_dom')}</span><span class="v">${fmtInt(domN)}</span><span class="p">${compact(domRow?.turnover||0,l)}</span></div><div class="row"><span class="sw s-exp"></span><span>${t('exp_exp')}</span><span class="v">${fmtInt(expN)}</span><span class="p">${compact(expRow?.turnover||0,l)}</span></div></div>
+    <div class="late"><div style="margin-bottom:4px">${t('tt')}</div><div class="legend">${tt}</div></div>`;
+  blocks.push(blk(t('exp'),unit,eb));
+  if(pf.family){
+    const pr=(d.products||[]); const mx=Math.max(...pr.map(x=>x.turnover||0))||1;
+    blocks.push(blk(t('products'),t('products_sub'),barList(pr,r=>L(r,l),r=>r.turnover,r=>`${compact(r.turnover,l)}<small>${fmtInt(r.n)} ${t('b_deals')}${(r.turnover||0)/mx<0.05?` · ${t('small')}`:''}</small>`,null,r=>unitL(r.unit,l))));
+  } else {
+    const fm=(d.families||[]); const mx=Math.max(...fm.map(x=>x.turnover||0))||1;
+    blocks.push(blk(t('r_families'),t('by_turn'),barList(fm,r=>L(r,l),r=>r.turnover,r=>`${compact(r.turnover,l)}<small>${fmtInt(r.n)} ${t('b_deals')}${(r.turnover||0)/mx<0.05?` · ${t('small')}`:''}</small>`,null)));
+  }
+  let priceSeries=null;
+  if(pf.family&&d.price_monthly&&d.price_monthly.length){
+    const cnt={}; d.price_monthly.forEach(r=>{const kk=r.unit+'|'+r.currency; cnt[kk]=(cnt[kk]||0)+r.n}); const best=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0][0]; const [u,c]=best.split('|');
+    priceSeries={rows:d.price_monthly.filter(r=>r.unit===u&&r.currency===c), u, c};
+    blocks.push(`<div class="blk"><div class="blk-h"><h4>${t('price')}</h4><small>${curL(c,l)} ${t('per')} ${unitL(u,l)} · ${t('price_sub')}</small></div><div class="plot"><canvas id="${ids.p}"></canvas></div></div>`);
+  } else if(!pf.region){
+    blocks.push(blk(t('r_regions'),t('by_turn'),barList(d.regions.slice(0,8),r=>L(r,l),r=>r.turnover,r=>`${compact(r.turnover,l)}<small>${fmtInt(r.n)} ${t('b_deals')}</small>`,null)));
+  } else {
+    blocks.push(blk(t('t_buyers'),t('by_turn'),barList(d.top_buyers.slice(0,8),r=>r.name,r=>r.turnover,r=>`${compact(r.turnover,l)}<small>${fmtInt(r.n)} ${t('b_deals')}</small>`,null)));
+  }
+  h+=`<div class="cgrid">${blocks.join('')}</div>`;
+  box.insertAdjacentHTML('beforeend',h);
+  if(!window.Chart) return;
+  const B=chartBase(l);
+  const withYear=new Set(d.monthly.map(m=>m.ym.slice(0,4))).size>1; const labels=d.monthly.map(m=>ymLabel(m.ym,l,withYear)); const turn=d.monthly.map(m=>m.turnover||0);
+  new Chart(document.getElementById(ids.m),{type:'bar',data:{labels,datasets:[{data:turn,backgroundColor:B.navy,maxBarThickness:22,borderRadius:{topLeft:4,topRight:4,bottomLeft:0,bottomRight:0},borderSkipped:false}]},options:{...B.common,plugins:{legend:{display:false},tooltip:{...B.common.plugins.tooltip,callbacks:{label:ctx=>fmtNum(turn[ctx.dataIndex],0)+' '+unit+' · '+fmtInt(d.monthly[ctx.dataIndex].n)+' '+t('b_deals')}}},scales:{x:{grid:{display:false},border:{color:cssv('--line')},ticks:B.catTicks},y:{beginAtZero:true,grid:B.grid,border:B.border,ticks:B.numTicks}}}});
+  const sv=Array.from({length:12},(_,i)=>{const r=seas.find(x=>x.month===i+1); return r? r.n/Math.max(1,r.ny) : 0}); const smax=Math.max(...sv)||1;
+  const ramp=['--ramp1','--ramp2','--ramp3','--ramp4','--ramp5'].map(cssv); const scol=sv.map(v=>ramp[Math.min(4,Math.floor(v/smax*4.999))]);
+  new Chart(document.getElementById(ids.s),{type:'bar',data:{labels:MON[uiLang(l)],datasets:[{data:sv,backgroundColor:scol,maxBarThickness:22,borderRadius:{topLeft:4,topRight:4,bottomLeft:0,bottomRight:0},borderSkipped:false}]},options:{...B.common,plugins:{legend:{display:false},tooltip:{...B.common.plugins.tooltip,callbacks:{label:ctx=>fmtInt(sv[ctx.dataIndex])+' '+t('b_deals')}}},scales:{x:{grid:{display:false},border:{color:cssv('--line')},ticks:{...B.catTicks,autoSkip:false}},y:{beginAtZero:true,grid:B.grid,border:B.border,ticks:B.numTicks}}}});
+  if(priceSeries){ const pr=priceSeries.rows; const wy=new Set(pr.map(m=>m.ym.slice(0,4))).size>1;
+    new Chart(document.getElementById(ids.p),{type:'line',data:{labels:pr.map(m=>ymLabel(m.ym,l,wy)),datasets:[{data:pr.map(m=>m.price),borderColor:B.navy,backgroundColor:B.navy,borderWidth:2,tension:.2,pointRadius:pr.length>24?0:3,pointHoverRadius:6,pointBackgroundColor:B.navy,pointBorderColor:B.surface,pointBorderWidth:2}]},options:{...B.common,plugins:{legend:{display:false},tooltip:{...B.common.plugins.tooltip,callbacks:{label:ctx=>fmtNum(pr[ctx.dataIndex].price,2)+' '+curL(priceSeries.c,l)+' · '+fmtInt(pr[ctx.dataIndex].n)+' '+t('b_deals')}}},interaction:{mode:'index',intersect:false},scales:{x:{grid:{display:false},border:{color:cssv('--line')},ticks:B.catTicks},y:{grid:B.grid,border:B.border,ticks:B.numTicks}}}});
+  }
+  bindBars(box);
+}
+
+/* ------------------------------------------------------------------ charts (shared) */
+function chartBase(l){
+  const navy=cssv('--navy'), line=cssv('--line-2'), ink2=cssv('--ink-2'), surface=cssv('--surface'), ink=cssv('--ink');
+  const font={family:cssv('--sans')||'system-ui',size:11};
+  return {navy,line,ink2,surface,ink,font,
+    common:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{backgroundColor:surface,titleColor:ink,bodyColor:ink2,borderColor:cssv('--line'),borderWidth:1,displayColors:false,padding:8,titleFont:{...font,weight:'500'},bodyFont:font}}},
+    numTicks:{color:ink2,font,callback:v=>compact(Number(v),l),maxTicksLimit:6}, catTicks:{color:ink2,font,autoSkip:true,maxRotation:0}, grid:{color:line,drawTicks:false}, border:{display:false}};
+}
+function pickChart(j){
+  const rows=j.rows||[]; const first=rows[0]; if(!first||rows.length<2) return null;
+  const cols=j.columns; const c=j.chart||{}; let type=null,x=null,y=null;
+  if(c.type&&c.type!=='none'&&(c.x in first)&&typeof first[c.y]==='number'){ type=c.type; x=c.x; y=c.y; }
+  else{
+    const time=cols.find(k=>['month','year','quarter','deal_date','week','date'].includes(k));
+    const metric=cols.find(k=>k!==time&&typeof first[k]==='number'&&!SKIP_TILE.test(k)); if(!metric) return null;
+    if(time&&!cols.some(k=>k!==time&&typeof first[k]==='string')){ type='line'; x=time; y=metric; }
+    else { const name=cols.find(k=>typeof first[k]==='string'&&!/inn$/.test(k)); if(name&&rows.length<=20){ type='bar'; x=name; y=metric; } }
+  }
+  if(!type||rows.length>60) return null;
+  const horizontal = type!=='line' && rows.length<=20;
+  return {type,x,y,horizontal,h: horizontal ? Math.max(120, rows.length*30+28) : 240};
+}
+function drawChart(j, card, c, l){
+  if(!window.Chart) return; const cv=card.querySelector('.fig canvas'); if(!cv) return;
+  const cols=j.columns, xi=cols.indexOf(c.x), yi=cols.indexOf(c.y); const yc=cols.indexOf('year');
+  const labels=j.rows.map((r,i)=>{ let s=j.rows_fmt?String(j.rows_fmt[i][xi]):String(r[c.x]); if(c.x==='month'&&yc>=0&&new Set(j.rows.map(q=>q.year)).size>1) s=s+' '+r.year; return s; });
+  const data=j.rows.map(r=>Number(r[c.y])||0); const B=chartBase(l);
+  const tt={...B.common.plugins.tooltip,callbacks:{label:ctx=>j.rows_fmt?String(j.rows_fmt[ctx.dataIndex][yi]):String(data[ctx.dataIndex])}};
+  let cfg;
+  if(c.type==='line') cfg={type:'line',data:{labels,datasets:[{data,borderColor:B.navy,backgroundColor:B.navy,borderWidth:2,tension:.2,pointRadius:4,pointHoverRadius:6,pointBackgroundColor:B.navy,pointBorderColor:B.surface,pointBorderWidth:2}]},options:{...B.common,plugins:{legend:{display:false},tooltip:tt},interaction:{mode:'index',intersect:false},scales:{x:{grid:{display:false},border:{color:cssv('--line')},ticks:B.catTicks},y:{beginAtZero:true,grid:B.grid,border:B.border,ticks:B.numTicks}}}};
+  else if(c.horizontal) cfg={type:'bar',data:{labels,datasets:[{data,backgroundColor:B.navy,maxBarThickness:18,borderRadius:{topRight:4,bottomRight:4,topLeft:0,bottomLeft:0},borderSkipped:false}]},options:{...B.common,plugins:{legend:{display:false},tooltip:tt},indexAxis:'y',scales:{x:{beginAtZero:true,grid:B.grid,border:B.border,ticks:B.numTicks,position:'top'},y:{grid:{display:false},border:{color:cssv('--line')},ticks:{color:B.ink,font:{...B.font,size:12},autoSkip:false,callback:function(v){const s=this.getLabelForValue(v); return s.length>34?s.slice(0,33)+'…':s}}}}}};
+  else cfg={type:'bar',data:{labels,datasets:[{data,backgroundColor:B.navy,maxBarThickness:24,borderRadius:{topLeft:4,topRight:4,bottomLeft:0,bottomRight:0},borderSkipped:false}]},options:{...B.common,plugins:{legend:{display:false},tooltip:tt},scales:{x:{grid:{display:false},border:{color:cssv('--line')},ticks:B.catTicks},y:{beginAtZero:true,grid:B.grid,border:B.border,ticks:B.numTicks}}}};
+  new Chart(cv,cfg);
+}
+
+/* ------------------------------------------------------------------ market panel */
+const F = {from:'2025-11-01', to:DMAX, family:null, region:null, cur:'uzs', ann:'exclude'};
+let D=null, OPTS=null, dashCharts=[], dashReq=0, dashTimer=null;
+function readHash(){
+  const m=location.hash.match(/p=([^&]+)/); if(!m) return;
+  const p=new URLSearchParams(decodeURIComponent(m[1]));
+  for(const k of ['from','to','family','region','cur','ann']) if(p.get(k)) F[k]=p.get(k);
+}
+function setHash(){ const p=new URLSearchParams(); for(const k of ['from','to','family','region','cur','ann']) if(F[k]) p.set(k,F[k]); history.replaceState(null,'','#p='+encodeURIComponent(p.toString())); }
+function monthEnd(ym){ const [y,m]=ym.split('-').map(Number); return new Date(Date.UTC(y,m,0)).toISOString().slice(0,10); }
+function presetOf(){ if(F.to!==DMAX) return null; return F.from===DMIN?'all' : F.from==='2026-01-01'?'ytd' : F.from==='2026-08-01'?'p3' : F.from==='2026-05-01'?'p6' : F.from==='2025-11-01'?'p12' : null; }
+function applyPreset(p){ F.to=DMAX; F.from = p==='all'?DMIN : p==='ytd'?'2026-01-01' : p==='p3'?'2026-08-01' : p==='p6'?'2026-05-01' : '2025-11-01'; }
+function renderFilters(){
+  const box=$('#filters'); const cur=presetOf();
+  const opt=(list,key,sel)=>`<option value="">${T('f_all')}</option>`+(list||[]).map(o=>`<option value="${esc(o[key])}"${o[key]===sel?' selected':''}>${esc(L(o,lang))}</option>`).join('');
+  box.innerHTML=`<span class="fg"><span class="lbl">${T('f_period')}</span>
+    <span class="seg" id="presets">${['p3','p6','p12','ytd','all'].map(p=>`<button type="button" data-p="${p}" class="${cur===p?'on':''}">${T(p==='ytd'?'pytd':p==='all'?'pall':p)}</button>`).join('')}</span></span>
+    <span class="fg"><input type="month" id="f-from" value="${F.from.slice(0,7)}" min="2022-01" max="2026-10" aria-label="from"> – <input type="month" id="f-to" value="${F.to.slice(0,7)}" min="2022-01" max="2026-10" aria-label="to"></span>
+    <span class="fg"><span class="lbl">${T('f_family')}</span><select id="f-family">${opt(OPTS?.families,'key',F.family)}</select></span>
+    <span class="fg"><span class="lbl">${T('f_region')}</span><select id="f-region">${opt(OPTS?.regions,'id',F.region)}</select></span>
+    <span class="seg" id="f-cur"><button type="button" data-c="uzs" class="${F.cur==='uzs'?'on':''}">${curL('UZS',lang)}</button><button type="button" data-c="usd" class="${F.cur==='usd'?'on':''}">USD</button></span>
+    <label class="chk"><input type="checkbox" id="f-ann" ${F.ann==='exclude'?'checked':''}> ${T('f_excl')}</label>
+    <span class="sp"></span><button type="button" class="csv" id="csv">↓ ${T('csv')}</button>`;
+  box.querySelectorAll('#presets button').forEach(b=>b.onclick=()=>{applyPreset(b.dataset.p); changed()});
+  $('#f-from').onchange=e=>{ if(e.target.value){ F.from=e.target.value+'-01'; if(F.from>F.to) F.to=monthEnd(e.target.value); if(F.to>DMAX) F.to=DMAX; changed(); } };
+  $('#f-to').onchange=e=>{ if(e.target.value){ F.to=monthEnd(e.target.value); if(F.to>DMAX) F.to=DMAX; if(F.to<F.from) F.from=e.target.value+'-01'; changed(); } };
+  $('#f-family').onchange=e=>{F.family=e.target.value||null; changed()};
+  $('#f-region').onchange=e=>{F.region=e.target.value||null; changed()};
+  box.querySelectorAll('#f-cur button').forEach(b=>b.onclick=()=>{F.cur=b.dataset.c; changed()});
+  $('#f-ann').onchange=e=>{F.ann=e.target.checked?'exclude':'include'; changed()};
+  $('#csv').onclick=downloadCSV;
+  renderChips();
+}
+function renderChips(){
+  const c=$('#chips'); const items=[];
+  if(F.family) items.push([T('f_family'), famLabel(F.family,lang), ()=>{F.family=null}]);
+  if(F.region) items.push([T('f_region'), regLabel(F.region,lang), ()=>{F.region=null}]);
+  c.innerHTML=items.map(([k,v],i)=>`<span class="chip">${esc(k)}: ${esc(v)}<button type="button" data-i="${i}" aria-label="×">×</button></span>`).join('');
+  c.querySelectorAll('button').forEach(b=>b.onclick=()=>{items[Number(b.dataset.i)][2](); changed()});
+}
+function changed(){ setHash(); renderFilters(); clearTimeout(dashTimer); dashTimer=setTimeout(loadDash,120); }
+async function loadDash(){
+  const id=++dashReq; $('#panel').setAttribute('aria-busy','true');
+  const p=new URLSearchParams({from:F.from,to:F.to,cur:F.cur,annulled:F.ann}); if(F.family) p.set('family',F.family); if(F.region) p.set('region',F.region); if(!OPTS) p.set('opts','1');
+  try{
+    const r=await fetch('/api/dash?'+p.toString()); const d=await r.json(); if(id!==dashReq) return;
+    if(d.options){ OPTS=d.options; renderFilters(); }
+    D=d; renderDash(d);
+  }catch(e){ if(id===dashReq) $('#kpis').innerHTML=`<div class="tile"><div class="l">${T('err')}</div></div>`; }
+  if(id===dashReq) $('#panel').setAttribute('aria-busy','false');
+}
+function delta(a,b,l){ if(!b) return ''; const p=(a-b)/b*100; if(!isFinite(p)) return ''; const cls=p>=0?'up':'down'; return `<div class="d"><b class="${cls}">${p>=0?'▲':'▼'} ${fmtNum(Math.abs(p),1)} %</b> ${T('prev',l)}</div>`; }
+function renderDash(d){
+  const l=lang; const unit=F.cur==='usd'?'USD':curL('UZS',l); const k=d.kpi;
+  $('#panel-sub').innerHTML=`<b>${dmy(d.filters.from)} – ${dmy(d.filters.to)}</b> · ${dmy(d.as_of)} ${T('asof')}`;
+  const annShare = k.n_deals ? k.n_annulled/k.n_deals*100 : 0;
+  $('#kpis').innerHTML = !k.n_deals ? `<div class="tile empty-b">${T('nodeals')}</div>` : [
+    `<div class="tile"><div class="l">${T('k_turn')}</div><div class="v">${compact(k.turnover,l)}<small>${unit}</small></div>${delta(k.turnover,k.prev_turnover,l)}</div>`,
+    `<div class="tile"><div class="l">${T('k_deals')}</div><div class="v">${fmtInt(k.n_base)}</div>${delta(k.n_base,k.prev_n,l)}<div class="f">${fmtInt(k.n_annulled)} ${T('k_ann')} · ${fmtNum(annShare,1)} %</div></div>`,
+    `<div class="tile"><div class="l">${T('k_tonnes')}</div><div class="v">${compact(k.tonnes,l)}</div></div>`,
+    `<div class="tile"><div class="l">${T('k_avg')}</div><div class="v">${compact(k.avg_deal,l)}<small>${unit}</small></div></div>`,
+    `<div class="tile"><div class="l">${T('k_parties')}</div><div class="v">${fmtInt(k.n_buyers)}<small>/ ${fmtInt(k.n_sellers)}</small></div><div class="f">${T('k_products')}: ${fmtInt(k.n_products)}</div></div>`].join('');
+  dashCharts.forEach(c=>c.destroy()); dashCharts=[];
+  const withYear=new Set(d.monthly.map(m=>m.ym.slice(0,4))).size>1;
+  const labels=d.monthly.map(m=>ymLabel(m.ym,l,withYear));
+  const mtbl=`<div class="mtbl tblwrap" hidden><table><thead><tr><th>${T('month')}</th><th class="n">${T('k_deals')}</th><th class="n">${T('m_ann')}</th><th class="n">${T('k_turn')}, ${unit}</th><th class="n">${T('k_tonnes')}</th></tr></thead><tbody>${d.monthly.map(m=>`<tr><td>${m.ym}</td><td class="n">${fmtInt(m.n)}</td><td class="n">${fmtInt(m.n_annulled)}</td><td class="n">${fmtNum(m.turnover,0)}</td><td class="n">${fmtNum(m.tonnes,0)}</td></tr>`).join('')}</tbody></table></div>`;
+  $('#row-months').innerHTML=`
+    <div class="blk"><div class="blk-h"><h4>${T('m_turn')}</h4><small>${unit}</small></div><div class="plot"><canvas id="ch-turn"></canvas></div></div>
+    <div class="blk"><div class="blk-h"><h4>${T('m_deals')}</h4><button type="button" id="mtbl-btn" aria-expanded="false">${T('table')}</button></div><div class="plot"><canvas id="ch-deals"></canvas></div>${mtbl}</div>`;
+  $('#mtbl-btn').onclick=()=>{const t=$('#row-months .mtbl'); t.hidden=!t.hidden; $('#mtbl-btn').setAttribute('aria-expanded',!t.hidden)};
+  if(window.Chart&&d.monthly.length){
+    const B=chartBase(l);
+    const turn=d.monthly.map(m=>m.turnover||0), n=d.monthly.map(m=>m.n), nann=d.monthly.map(m=>m.n_annulled);
+    const tt1={...B.common.plugins.tooltip,callbacks:{label:ctx=>fmtNum(turn[ctx.dataIndex],0)+' '+unit}};
+    const tt2={...B.common.plugins.tooltip,callbacks:{label:ctx=>[fmtInt(n[ctx.dataIndex])+' '+T('b_deals'), fmtInt(nann[ctx.dataIndex])+' '+T('m_ann')]}};
+    dashCharts.push(new Chart($('#ch-turn'),{type:'bar',data:{labels,datasets:[{data:turn,backgroundColor:B.navy,maxBarThickness:24,borderRadius:{topLeft:4,topRight:4,bottomLeft:0,bottomRight:0},borderSkipped:false}]},options:{...B.common,plugins:{legend:{display:false},tooltip:tt1},scales:{x:{grid:{display:false},border:{color:cssv('--line')},ticks:B.catTicks},y:{beginAtZero:true,grid:B.grid,border:B.border,ticks:B.numTicks}}}}));
+    dashCharts.push(new Chart($('#ch-deals'),{type:'line',data:{labels,datasets:[{data:n,borderColor:B.navy,backgroundColor:B.navy,borderWidth:2,tension:.2,pointRadius:d.monthly.length>24?0:4,pointHoverRadius:6,pointBackgroundColor:B.navy,pointBorderColor:B.surface,pointBorderWidth:2}]},options:{...B.common,plugins:{legend:{display:false},tooltip:tt2},interaction:{mode:'index',intersect:false},scales:{x:{grid:{display:false},border:{color:cssv('--line')},ticks:B.catTicks},y:{beginAtZero:true,grid:B.grid,border:B.border,ticks:B.numTicks}}}}));
+  }
+  const askQ=(tpl,vars)=>prefill(Object.entries(vars).reduce((s,[kk,v])=>s.replace('{'+kk+'}',v),T(tpl)));
+  $('#row-tops').innerHTML=[
+    blk(T('t_buyers'),T('by_turn'),barList(d.top_buyers,r=>r.name,r=>r.turnover,r=>`${compact(r.turnover,l)}<small>${fmtInt(r.n)} ${T('b_deals')}</small>`,r=>()=>askQ('q_company',{n:r.name}),r=>r.inn), T('askabout')),
+    blk(T('t_sellers'),T('by_turn'),barList(d.top_sellers,r=>r.name,r=>r.turnover,r=>`${compact(r.turnover,l)}<small>${fmtInt(r.n)} ${T('b_deals')}</small>`,r=>()=>askQ('q_company',{n:r.name}),r=>r.inn), T('askabout')),
+    blk(T('t_brokers'),T('by_n'),barList(d.top_brokers,r=>r.name||r.code,r=>r.n,r=>`${fmtInt(r.n)}<small>${compact(r.turnover,l)} ${unit}</small>`,r=>()=>askQ('q_broker',{c:r.code}),r=>r.code), T('askabout'))].join('');
+  const regions=barList(d.regions,r=>L(r,l),r=>r.turnover,r=>`${compact(r.turnover,l)}<small>${fmtInt(r.n)} ${T('b_deals')}</small>`,r=>()=>{F.region=F.region===r.id?null:r.id; changed()},null,r=>r.id===F.region);
+  const fams=barList(d.families,r=>L(r,l),r=>r.turnover,r=>`${compact(r.turnover,l)}<small>${fmtInt(r.n)} ${T('b_deals')}</small>`,r=>()=>{F.family=F.family===r.key?null:r.key; changed()},null,r=>r.key===F.family);
+  const groups={executed:0,partial:0,annulled:0,other:0}; const total=d.statuses.reduce((s,r)=>s+r.n,0);
+  d.statuses.forEach(r=>{ groups[r.code in groups?r.code:'other']+=r.n; });
+  const seg=Object.entries(groups).filter(([,v])=>v>0).map(([kk,v])=>`<div class="s-${kk}" style="flex:${v}" title="${esc(T('st_'+kk))}: ${fmtInt(v)}">${v/total>0.08?`<span>${fmtNum(v/total*100,0)} %</span>`:''}</div>`).join('');
+  const legend=Object.entries(groups).map(([kk,v])=>`<div class="row"><span class="sw s-${kk}"></span><span>${T('st_'+kk)}</span><span class="v">${fmtInt(v)}</span><span class="p">${total?fmtNum(v/total*100,1):0} %</span></div>`).join('');
+  const lt=d.late; const lp=lt.n_base?lt.n_late/lt.n_base*100:0;
+  const status= total ? `<div class="segbar">${seg}</div><div class="legend">${legend}</div><div class="late">${T('late')}: <b>${fmtInt(lt.n_late)}</b> · <b>${fmtNum(lp,1)} %</b> ${T('late_of')}${lt.avg_delay?` · ${T('avgdelay')} <b>${fmtNum(lt.avg_delay,1)}</b> ${T('days')}`:''}<div class="meter"><i style="width:${Math.min(100,lp)}%"></i></div></div>` : '';
+  $('#row-split').innerHTML=[blk(T('r_regions'),T('click_filter'),regions), blk(T('r_families'),T('click_filter'),fams), blk(T('r_status'),T('r_status_sub'),status)].join('');
+  bindBars($('#row-tops')); bindBars($('#row-split'));
+  $('#defs').innerHTML=T('defs');
+}
+function blk(title,sub,body,foot){ return `<div class="blk"><div class="blk-h"><h4>${esc(title)}</h4><small>${esc(sub||'')}</small></div><div class="body">${body||`<div class="empty-b">${T('nodeals')}</div>`}</div>${foot?`<div class="foot">${esc(foot)}</div>`:''}</div>`; }
+const _handlers=[];
+function barList(rows,nameF,valF,valHtml,onClick,codeF,isOn){
+  if(!rows||!rows.length) return '';
+  const max=Math.max(...rows.map(r=>Number(valF(r))||0))||1;
+  return `<div class="bl">${rows.map(r=>{ const i=_handlers.push(onClick?onClick(r):null)-1; const on=isOn&&isOn(r);
+    return `<button type="button" class="row${onClick?' act':''}${on?' on':''}" data-h="${i}"${onClick?'':' tabindex="-1"'}><span class="nm" title="${esc(nameF(r))}">${esc(nameF(r))}${codeF&&codeF(r)?`<small>${esc(codeF(r))}</small>`:''}</span><span class="bar"><i style="width:${(Number(valF(r))||0)/max*100}%"></i></span><span class="val">${valHtml(r)}</span></button>`; }).join('')}</div>`;
+}
+function bindBars(root){ root.querySelectorAll('.bl .row').forEach(b=>{ const h=_handlers[Number(b.dataset.h)]; if(h) b.onclick=h; }); }
+function downloadCSV(){
+  if(!D) return; const l=lang; const unit=F.cur==='usd'?'USD':'UZS'; const num=v=>String(v??'').replace('.',',');
+  const lines=[`${T('panel')};${dmy(D.filters.from)} – ${dmy(D.filters.to)};${T('f_family')}: ${F.family||T('f_all')};${T('f_region')}: ${F.region||T('f_all')};${unit};${F.ann}`,''];
+  lines.push(`${T('month')};${T('k_deals')};${T('m_ann')};${T('k_turn')} (${unit});${T('k_tonnes')}`); D.monthly.forEach(m=>lines.push([m.ym,m.n,m.n_annulled,num(Math.round(m.turnover||0)),num(Math.round(m.tonnes||0))].join(';'))); lines.push('');
+  [[T('t_buyers'),D.top_buyers,'inn'],[T('t_sellers'),D.top_sellers,'inn'],[T('t_brokers'),D.top_brokers,'code']].forEach(([title,rows,c])=>{ lines.push(`${title};${c.toUpperCase()};${T('k_deals')};${T('k_turn')} (${unit})`); rows.forEach(r=>lines.push([csvq(r.name),r[c],r.n,num(Math.round(r.turnover||0))].join(';'))); lines.push(''); });
+  lines.push(`${T('r_regions')};${T('k_deals')};${T('k_turn')} (${unit})`); D.regions.forEach(r=>lines.push([csvq(L(r,l)),r.n,num(Math.round(r.turnover||0))].join(';'))); lines.push('');
+  lines.push(`${T('r_families')};${T('k_deals')};${T('k_turn')} (${unit})`); D.families.forEach(r=>lines.push([csvq(L(r,l)),r.n,num(Math.round(r.turnover||0))].join(';'))); lines.push('');
+  lines.push(`${T('r_status')};${T('k_deals')};${T('k_turn')} (${unit})`); D.statuses.forEach(r=>lines.push([csvq(L(r,l)),r.n,num(Math.round(r.turnover||0))].join(';')));
+  csvDownload(lines, `uzex-panel-${D.filters.from}-${D.filters.to}.csv`);
+}
+
+/* ------------------------------------------------------------------ boot */
+readHash();
+fetch('/api/health').then(r=>r.json()).then(j=>{health=j; renderFacts()}).catch(()=>{});
+applyLang();
+loadDash();
 </script>
 </body>
 </html>

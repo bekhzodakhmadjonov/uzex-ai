@@ -37,6 +37,9 @@ class FallbackPlanner:
     def compose(self, *a, **kw):
         return self._call("compose", *a, **kw)
 
+    def adjudicate(self, *a, **kw):
+        return self._call("adjudicate", *a, **kw)
+
 
 def build_planner():
     if os.environ.get("UZEX_FAKE_LLM"):
@@ -52,7 +55,19 @@ def build_planner():
         if name == "gemini" and have_gemini:
             from .llm_gemini import GeminiPlanner
             planners.append(GeminiPlanner())
+            fallback = os.environ.get("UZEX_GEMINI_FALLBACK")
+            if fallback:
+                planners.append(GeminiPlanner(model=fallback))
         elif name in ("claude", "anthropic") and have_claude:
             from .llm import ClaudePlanner
             planners.append(ClaudePlanner())
     return FallbackPlanner(planners)
+
+
+def build_verifier():
+    """Second, different model that plans independently. Empty UZEX_GEMINI_VERIFY disables it."""
+    model = os.environ.get("UZEX_GEMINI_VERIFY")
+    if os.environ.get("UZEX_FAKE_LLM") or not model or not (os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")):
+        return None
+    from .llm_gemini import GeminiPlanner
+    return GeminiPlanner(model=model)

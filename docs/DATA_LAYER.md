@@ -39,9 +39,9 @@ To'liq ustunlar va qoidalar: `docs/schema_for_llm.md`. Yashirin: `internal.*` (x
 
 ## Birja ta'riflari (SQL da shunday yoziladi)
 
-- Standart populyatsiya: BUTUN reyestr (hakamlar reyestrdan hisoblaydi). Har so'rovda `count(*) FILTER (WHERE is_annulled) AS n_annulled`, pul/hajmda qo'shimcha `*_valid` (bekor qilinganlarsiz) ustuni. Bekor qilinganlar faqat savol "amalga oshgan / bajarilgan / bekor qilinganlarsiz" desa asosiy raqamdan chiqariladi.
-- Aylanma: `sum(amount_uzs)` + `sum(amount_uzs) FILTER (WHERE NOT is_annulled) AS amount_uzs_valid`
-- O'rtacha narx: `wavg_price(amount, volume)` — DOIM `unit` va `currency` bo'yicha guruhlab
+- Bitimlar soni: butun reyestr, `n_annulled` alohida.
+- Summa, hajm, narx: asosiy raqam bekor qilinganlarsiz (`*_valid`), yonida hammasi (`*_all`). Sabab: README bo'yicha bekor qilingan bitim amalga oshmagan. Hakamlar qaysi birini kutishi noma'lum, shuning uchun ikkalasi ham ko'rsatiladi.
+- O'rtacha narx: sum(amount)/sum(volume), DOIM `unit` va `currency` bo'yicha guruhlab
 - Hajm tonnada: `sum(volume_t)`
 - Kechikkan yetkazish: `is_delivery_late`; muddati o'tgan to'lov: yo'q (hammasi `is_annulled`)
 

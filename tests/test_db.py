@@ -197,3 +197,38 @@ def test_comments_present(con):
     n = one(con, "SELECT count(*) FROM duckdb_columns() WHERE table_name='deals' AND comment IS NULL")
     assert n == 0
     assert one(con, "SELECT count(*) FROM duckdb_tables() WHERE schema_name='main' AND comment IS NOT NULL") == 5
+
+
+# ---- regressions from the 05.11 probe: counted from the raw CSV, not from the database --------
+def _raw_contracts():
+    import csv
+    with open(os.path.join(ROOT, "uzex_spot_data", "contracts.csv"), encoding="utf-8", newline="") as f:
+        return list(csv.DictReader(f))
+
+
+def test_contract_class_matches_raw_card(con):
+    import sys
+    sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+    from normalize import parse_class
+    raw = _raw_contracts()
+    expected = sum(1 for c in raw if c["Наименование продукта"].lower().startswith("хлопок")
+                   and (parse_class(c["Класс товара"]) or parse_class(c["Наименование продукта"])) == 2)
+    assert expected == 720  # the card column holds 664 of them, the name the other 56
+    assert con.execute("SELECT count(*) FROM contracts WHERE family_key='cotton' AND grade_class=2").fetchone()[0] == expected
+
+
+def test_contract_brand_matches_raw_card(con):
+    n = sum(1 for c in _raw_contracts() if "аи-92" in (c["Наименование продукта"] + " " + c["Марка товара"]).lower())
+    assert con.execute("SELECT count(*) FROM contracts WHERE brand='АИ-92'").fetchone()[0] == n == 108
+
+
+def test_due_dates_are_dates(con):
+    assert con.execute("SELECT typeof(pay_due_date), typeof(delivery_due_date) FROM deals LIMIT 1").fetchone() == ("DATE", "DATE")
+
+
+def test_at_start_price_matches_raw_decimal_comparison(con):
+    from decimal import Decimal
+    d = pd.concat([pd.read_csv(f, dtype=str) for f in sorted(glob.glob(os.path.join(DATA, "deals_*.csv")))], ignore_index=True)
+    d = d[d["Тип торгов"] == "Английский аукцион"]
+    n = sum(Decimal(a.replace(" ", "")) == Decimal(s.replace(" ", "")) * int(q) * int(l) for a, s, q, l in zip(d["Сумма сделки"], d["Стартовая цена"], d["Количество"], d["Лот"]))
+    assert one(con, "SELECT count(*) FROM deals WHERE trade_type='Английский аукцион' AND is_at_start_price") == n == 88816

@@ -2,6 +2,8 @@
 
 Javoblar bazadan to‘g‘ridan-to‘g‘ri hisoblangan (05.11.2026). Agent javobida shu raqamlar bo‘lishi kerak; qo‘shimcha ravishda "shundan N ta bekor qilingan" deyishi mumkin. Davr, birlik, valyuta aytilishi va javob savol tilida bo‘lishi tekshiriladi.
 
+**Eslatma:** summa, hajm va narx savollarida agent avval bekor qilinganlarsiz raqamni, keyin hammasi bilan birga raqamni beradi. Quyidagi jadvalda ikkalasidan biri bo‘lishi mumkin. Mustaqil test to‘plami: `tests/hard_cases.py` va `tests/holdout_cases.py`.
+
 ## A. Oltin savollar (avtomatik evalda ham bor)
 
 | # | Savol (uz) | Savol (ru) | Kutilgan javob |

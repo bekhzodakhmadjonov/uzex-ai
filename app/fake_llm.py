@@ -42,8 +42,8 @@ class FakePlanner:
 
     def compose(self, question, lang, sql, assumptions, rows_json, n_rows, extra="") -> str:
         rows = json.loads(rows_json)
-        if not rows:
-            return "Reyestrda mos bitim topilmadi." if lang.startswith("uz") else "В реестре нет подходящих сделок."
-        r0 = rows[0]
-        parts = [f"{k}: {v}" for k, v in r0.items() if k.endswith("_fmt") or not any(kk == k + "_fmt" for kk in r0)]
-        return ("Natija: " if lang.startswith("uz") else "Результат: ") + "; ".join(parts) + f". Asos: {n_rows} qator."
+        cols = [k for k in rows[0] if k != "row"]
+        return ("Natija: " if lang.startswith("uz") else "Результат: ") + "; ".join(f"{{{{0.{c}}}}}" for c in cols)
+
+    def adjudicate(self, question, a, b) -> str:
+        return "A"

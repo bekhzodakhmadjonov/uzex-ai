@@ -22,6 +22,7 @@ def connection() -> duckdb.DuckDBPyConnection:
     with _lock:
         if _conn is None:
             _conn = duckdb.connect(DB_PATH, read_only=True, config=RO_CONFIG)
+            _conn.execute("SET memory_limit='300MB'")  # a bad LLM query must not take the server down
         return _conn
 
 
