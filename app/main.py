@@ -169,12 +169,12 @@ app.include_router(talab_router)
 
 @app.get("/")
 def index():
-    return FileResponse(os.path.join(STATIC, "talab.html"))
+    return FileResponse(os.path.join(STATIC, "talab.html"), headers={"Cache-Control": "no-cache"})  # always fetch the latest deploy
 
 
 @app.get("/tahlil")
 def tahlil():
-    return FileResponse(os.path.join(STATIC, "index.html"))
+    return FileResponse(os.path.join(STATIC, "index.html"), headers={"Cache-Control": "no-cache"})
 
 
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
