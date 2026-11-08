@@ -1,0 +1,1175 @@
+<!doctype html>
+<html lang="uz" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UZEX Talab · talab birjasi</title>
+<meta name="description" content="Talab birjasi: nima kerakligini yozing, ayting yoki smeta rasmini yuklang. AI tushunadi, kod kafolatlaydi, siz imzolaysiz.">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23283f78'/%3E%3Cpath d='M8 9h16v3.5H8zM14.25 12.5h3.5V24h-3.5z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --paper:#f4f6f9; --surface:#ffffff; --surface-2:#f7f8fa;
+  --ink:#141b2d; --ink-2:#4e5869; --ink-3:#7c8597;
+  --line:#e1e5ec; --line-2:#eef1f5;
+  --navy:#283f78; --navy-d:#1e3061; --navy-tint:#eaeef7; --navy-2:#6f85bf;
+  --teal:#0a7a6d; --teal-tint:#dff1ee;
+  --gold:#8f6412; --gold-tint:#fbf2dc; --gold-mark:#d9a441;
+  --red:#b3261e; --red-tint:#f9e4e2;
+  --plum-tint:#efeaf7; --rose-tint:#fbe9e7;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --r:12px; --sh:0 1px 2px rgba(20,27,45,.05),0 2px 8px rgba(20,27,45,.05); --sh2:0 8px 28px rgba(20,27,45,.14);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 var(--sans);min-height:100vh}
+button,textarea,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 16px}
+.mono{font-family:var(--mono)} .muted{color:var(--ink-3)} .ink2{color:var(--ink-2)}
+h1,h2,h3{margin:0}
+.sp{flex:1}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* modes */
+body[data-mode=oddiy] .biz,body[data-mode=oddiy] .pro{display:none!important}
+body[data-mode=biznes] .pro{display:none!important}
+body:not([data-mode=oddiy]) .odd{display:none!important}
+
+/* ---------- header ---------- */
+.hdr{position:sticky;top:0;z-index:30;background:var(--surface);box-shadow:0 1px 0 var(--line)}
+.hdr .r1{display:flex;align-items:center;gap:16px;min-height:68px}
+.logo{display:flex;align-items:center;gap:12px;flex:none}
+.logo img{height:30px;display:block}
+.logo .wm{display:flex;flex-direction:column;line-height:1}
+.logo .wm b{font:700 17px/1 var(--sans);letter-spacing:.16em;color:var(--navy)}
+.logo .wm span{font:400 11.5px/1 var(--sans);color:var(--ink-3);margin-top:4px}
+.logo .dv{width:1px;height:30px;background:var(--line)}
+.search{flex:1;display:flex;align-items:center;gap:4px;background:var(--surface);border:2px solid var(--navy);border-radius:12px;padding:3px 4px 3px 12px;min-width:0}
+.search svg.ai{color:var(--gold);width:20px;height:20px}
+.search input{flex:1;border:0;outline:0;background:transparent;padding:9px 6px;font-size:15.5px;min-width:0}
+.search .ib{border:0;background:transparent;width:38px;height:38px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;color:var(--ink-2)}
+.search .ib:hover{background:var(--navy-tint);color:var(--navy)}
+.search .ib.rec{background:var(--red);color:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(179,38,30,.15)}}
+.search .go{border:0;background:var(--navy);color:#fff;border-radius:9px;padding:9px 18px;font-weight:600}
+.search .go:hover{background:var(--navy-d)}
+.hico{display:flex;gap:4px;flex:none}
+.hico a,.hico button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;border-radius:10px;font-size:12px;color:var(--ink-2);position:relative}
+.hico a:hover,.hico button:hover{background:var(--surface-2);color:var(--navy)}
+.hico .badge{position:absolute;top:2px;right:8px;background:var(--red);color:#fff;font:600 11px/1 var(--sans);padding:3px 5px;border-radius:9px;min-width:18px;text-align:center}
+.hdr .r2{display:flex;align-items:center;gap:6px;min-height:44px;overflow-x:auto;scrollbar-width:none}
+.hdr .r2::-webkit-scrollbar{display:none}
+.cat{border:0;background:transparent;padding:7px 12px;border-radius:8px;font-size:14px;color:var(--ink-2);white-space:nowrap}
+.cat:hover{background:var(--surface-2);color:var(--ink)}
+.cat.on{background:var(--navy-tint);color:var(--navy);font-weight:600}
+.seg{display:flex;background:var(--surface-2);border-radius:9px;padding:3px;flex:none}
+.seg button{border:0;background:transparent;padding:5px 10px;font-size:12.5px;border-radius:7px;color:var(--ink-2);white-space:nowrap}
+.seg button.on{background:var(--surface);color:var(--navy);font-weight:600;box-shadow:var(--sh)}
+.aichip{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2);white-space:nowrap;padding:4px 10px;border-radius:999px;background:var(--surface-2)}
+.aichip i{width:8px;height:8px;border-radius:50%;background:var(--ink-3)}
+.aichip.live i{background:#16a34a} .aichip.fake i{background:var(--gold-mark)}
+@media (max-width:860px){
+  .hdr .r1{flex-wrap:wrap;gap:10px;padding:8px 0}
+  .search{order:3;flex-basis:100%}
+  .logo .wm span,.hico span{display:none}
+  .hico{margin-left:auto}
+  .hdr .r2{flex-wrap:wrap;overflow:visible;padding-bottom:6px;gap:6px}
+  #cats{width:100%;overflow-x:auto;scrollbar-width:none}
+  #cats::-webkit-scrollbar{display:none}
+  .hdr .r2 .sp{display:none}
+}
+
+/* ---------- common ---------- */
+main.wrap{padding-top:20px;padding-bottom:90px}
+.card{background:var(--surface);border-radius:var(--r);box-shadow:var(--sh);padding:18px}
+.btn{border:0;background:var(--navy);color:#fff;padding:11px 18px;border-radius:10px;font-weight:600;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+.btn:hover{background:var(--navy-d)}
+.btn.lg{padding:14px 22px;font-size:16px}
+.btn.ghost{background:var(--surface);color:var(--navy);box-shadow:inset 0 0 0 1.5px var(--navy)}
+.btn.ghost:hover{background:var(--navy-tint)}
+.btn.soft{background:var(--navy-tint);color:var(--navy)}
+.btn.soft:hover{background:#dde4f3}
+.btn.teal{background:var(--teal)} .btn.teal:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.block{width:100%}
+.stamp{display:inline-flex;align-items:center;gap:5px;font:600 11.5px/1 var(--sans);padding:5px 8px;border-radius:6px;white-space:nowrap}
+.stamp.ai{color:var(--gold);background:var(--gold-tint)}
+.stamp.code{color:var(--teal);background:var(--teal-tint)}
+.stamp.human{color:var(--navy);background:var(--navy-tint)}
+.stamp.no{color:var(--red);background:var(--red-tint)}
+.stamp.plain{color:var(--ink-2);background:var(--surface-2)}
+.stamp svg.i{width:13px;height:13px;stroke-width:2.2}
+.crumbs{font-size:13px;color:var(--ink-3);margin-bottom:10px}
+.crumbs a:hover{color:var(--navy)}
+.sec-h{display:flex;align-items:baseline;gap:12px;margin:26px 0 12px}
+.sec-h h2{font:700 21px/1.2 var(--sans)}
+.sec-h a{font-size:14px;color:var(--navy)}
+input.f,select.f{border:1px solid var(--line);border-radius:9px;padding:9px 11px;background:var(--surface);width:100%;min-width:0}
+input.f:focus,select.f:focus{outline:2px solid var(--navy-2);border-color:transparent}
+label.l{display:block;font-size:12.5px;color:var(--ink-3);margin:0 0 4px}
+.loading{color:var(--ink-3);padding:30px 0;text-align:center}
+.err{color:var(--red)}
+.note{font-size:12.5px;color:var(--ink-3)}
+.why{font-size:12.5px;color:var(--ink-3)}
+.term{border:0;background:none;padding:0;color:inherit;border-bottom:1px dashed var(--navy-2);cursor:help;font:inherit}
+.pop{position:absolute;z-index:80;max-width:320px;background:var(--ink);color:#fff;font-size:13px;line-height:1.45;padding:10px 12px;border-radius:10px;box-shadow:var(--sh2)}
+
+/* ---------- home ---------- */
+.hero{background:var(--navy);color:#fff;border-radius:16px;padding:28px 28px 24px;display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:center}
+.hero h1{font:700 30px/1.15 var(--sans);letter-spacing:-.01em}
+.hero p{color:#cfd7ee;margin:10px 0 18px;font-size:15.5px;max-width:560px}
+.hero .ways{display:flex;gap:8px;flex-wrap:wrap}
+.hero .way{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff;padding:9px 14px;border-radius:10px;font-size:14px}
+.hero .way:hover{background:rgba(255,255,255,.18)}
+.hero .trustg{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:14px 16px}
+.hero .trustg>b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#aebbe0;margin-bottom:6px}
+.tg{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:14px}
+.tg i{width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.tg i svg{width:15px;height:15px;stroke-width:2.2}
+.tg .a{background:var(--gold-tint);color:var(--gold)} .tg .c{background:var(--teal-tint);color:var(--teal)} .tg .h{background:var(--navy-tint);color:var(--navy)}
+.hero .tg strong{color:#fff} .hero .tg span{color:#cfd7ee}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding:22px}.hero h1{font-size:24px}}
+.intents{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+.intent{background:var(--surface);border-radius:var(--r);box-shadow:var(--sh);padding:16px;text-align:left;border:0;display:flex;gap:12px;align-items:flex-start;transition:transform .12s,box-shadow .12s}
+.intent:hover{transform:translateY(-2px);box-shadow:var(--sh2)}
+.intent .ic{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none}
+.intent b{display:block;font-size:15.5px}
+.intent span span{font-size:13px;color:var(--ink-3)}
+@media (max-width:860px){.intents{grid-template-columns:1fr 1fr}}
+.how{display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface);border-radius:var(--r);box-shadow:var(--sh);margin-top:14px;overflow:hidden}
+.how div{padding:14px 16px;display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--ink-2)}
+.how div+div{border-left:1px solid var(--line-2)}
+.how b{display:block;color:var(--ink);font-size:14px}
+.how .n{font:600 12px var(--mono);width:24px;height:24px;border-radius:50%;background:var(--navy-tint);color:var(--navy);display:flex;align-items:center;justify-content:center;flex:none}
+@media (max-width:860px){.how{grid-template-columns:1fr 1fr}.how div:nth-child(3){border-left:0}.how div:nth-child(n+3){border-top:1px solid var(--line-2)}}
+
+/* product grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+@media (max-width:520px){.grid{grid-template-columns:1fr 1fr;gap:10px}}
+.pc{background:var(--surface);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;display:flex;flex-direction:column;transition:transform .12s,box-shadow .12s}
+.pc:hover{transform:translateY(-2px);box-shadow:var(--sh2)}
+.pc .pic{height:118px;display:flex;align-items:center;justify-content:center;position:relative}
+.pc .pic svg.i{width:56px;height:56px;stroke-width:1.4}
+.pc .pic .sig{position:absolute;bottom:10px;left:10px}
+.pc .pic .chg{position:absolute;top:10px;right:10px;font:600 12px var(--mono);background:var(--surface);padding:3px 7px;border-radius:6px}
+.pc .body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1}
+.pc .nm{font-weight:600;font-size:15.5px}
+.pc .pr{font-size:12.5px;color:var(--ink-3)}
+.pc .pr b{display:block;font:700 18px/1.25 var(--sans);color:var(--ink)}
+.pc .meta{font-size:12.5px;color:var(--ink-3);margin-top:2px;flex:1}
+.pc .add{margin-top:10px;padding:9px 12px}
+.up{color:var(--red)} .dn{color:var(--teal)}
+.t-qurilish{background:var(--navy-tint);color:var(--navy)} .t-oziq{background:var(--gold-tint);color:var(--gold)} .t-yoqilgi{background:var(--rose-tint);color:var(--red)} .t-qishloq{background:var(--teal-tint);color:var(--teal)} .t-kimyo{background:var(--plum-tint);color:#5b3f99}
+.ic.sq{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none}
+
+/* product page */
+.pp{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start}
+@media (max-width:960px){.pp{grid-template-columns:minmax(0,1fr)}}
+.pp .head{display:flex;gap:16px;align-items:center}
+.pp .head .pic{width:76px;height:76px;border-radius:16px;display:flex;align-items:center;justify-content:center;flex:none}
+.pp .head .pic svg.i{width:40px;height:40px;stroke-width:1.5}
+.pp .head h1{font:700 26px/1.2 var(--sans)}
+.buybox{position:sticky;top:130px}
+.buybox .big{font:700 26px/1.1 var(--sans)}
+.buybox .fld{margin-top:10px}
+.buybox .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.band{position:relative;height:56px;margin:30px 8px 8px}
+.band .rail{position:absolute;top:22px;left:0;right:0;height:12px;background:var(--line-2);border-radius:6px}
+.band .mid{position:absolute;top:22px;height:12px;background:var(--navy-2);border-radius:6px}
+.band .tick{position:absolute;top:40px;font:500 11.5px var(--mono);color:var(--ink-3);transform:translateX(-50%);white-space:nowrap}
+.band .you{position:absolute;top:10px;width:3px;height:36px;background:var(--ink);border-radius:2px}
+.band .you span{position:absolute;bottom:38px;left:50%;transform:translateX(-50%);font:600 12px var(--sans);white-space:nowrap;background:var(--ink);color:#fff;padding:3px 7px;border-radius:6px}
+.sigbox{border-radius:12px;padding:14px 16px;background:var(--navy-tint)}
+.sigbox.buy{background:var(--teal-tint)} .sigbox.wait{background:var(--gold-tint)}
+.sigbox b{display:block;font-size:17px;margin-bottom:2px}
+.chartbox{position:relative;height:230px}
+.chartbox.sm{height:150px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:760px){.g2{grid-template-columns:minmax(0,1fr)!important}}
+.nega{border:0;background:var(--gold-tint);color:var(--gold);border-radius:7px;font:600 12px var(--sans);padding:5px 9px;display:inline-flex;align-items:center;gap:5px}
+.nega svg.i{width:13px;height:13px}
+.expl{margin-top:10px;background:var(--gold-tint);border-radius:10px;padding:10px 12px;font-size:14px}
+.expl .src{font-size:11.5px;color:var(--gold);margin-top:6px}
+.lots{width:100%;border-collapse:collapse;font-size:14px}
+.lots th{text-align:left;font-weight:500;color:var(--ink-3);font-size:12.5px;padding:8px 6px;border-bottom:1px solid var(--line)}
+.lots th.n,.lots td.n{text-align:right;font-family:var(--mono);white-space:nowrap}
+.lots td{padding:10px 6px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+.trust{display:inline-flex;align-items:center;gap:6px;font-size:13px;white-space:nowrap}
+.trust .bar{width:56px;height:6px;background:var(--line-2);border-radius:3px;overflow:hidden}
+.trust .bar i{display:block;height:100%;background:var(--teal)}
+.trust.low .bar i{background:var(--red)}
+.list{list-style:none;margin:0;padding:0}
+.list li{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line-2);font-size:14px;align-items:center}
+.list li:last-child{border-bottom:0}
+
+/* sheets */
+.ov{position:fixed;inset:0;z-index:60;background:rgba(20,27,45,.45);display:none;align-items:flex-start;justify-content:center;overflow:auto;padding:30px 12px}
+.ov.on{display:flex}
+.sheet{background:var(--paper);border-radius:16px;max-width:860px;width:100%;box-shadow:var(--sh2);overflow:hidden}
+.sheet .top{background:var(--surface);padding:16px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.sheet .top h2{font:700 19px/1.2 var(--sans)}
+.sheet .top>svg.i{color:var(--gold)}
+.sheet .x{border:0;background:var(--surface-2);width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.sheet .bd{padding:16px 20px 20px}
+.thinking{display:flex;flex-direction:column;align-items:center;gap:12px;padding:40px 0;color:var(--ink-2)}
+.dots{display:inline-flex;gap:6px}.dots i{width:9px;height:9px;border-radius:50%;background:var(--gold-mark);animation:b 1s infinite}.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes b{50%{transform:translateY(-6px);opacity:.5}}
+.heard{background:var(--surface);border-radius:12px;padding:12px 14px;font-size:14.5px;display:flex;gap:12px;align-items:flex-start}
+.heard img{width:84px;height:84px;object-fit:cover;border-radius:8px;flex:none}
+.chk{list-style:none;margin:8px 0 0;padding:0;font-size:13.5px}
+.chk li{display:flex;gap:8px;padding:3px 0}
+.chk li i{font-style:normal;font-weight:700;width:16px;text-align:center}
+.chk .ok i{color:var(--teal)} .chk .warn i{color:var(--gold)} .chk .fail i{color:var(--red)}
+.tn{background:var(--surface);border-radius:12px;padding:14px 16px;margin-top:10px;box-shadow:var(--sh)}
+.tn .h{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.tn .h b{font-size:16px}
+.tn .ff{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:700px){.tn .ff{grid-template-columns:1fr 1fr}}
+.qs{background:var(--gold-tint);border-radius:10px;padding:10px 12px;margin-top:10px;font-size:14px}
+.convo{display:flex;flex-direction:column;gap:10px}
+.msg{display:flex;gap:10px;align-items:flex-start;max-width:88%}
+.msg .av{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex:none}
+.msg .av svg.i{width:16px;height:16px}
+.msg .tx{background:var(--surface);border-radius:12px;padding:10px 13px;font-size:14.5px;box-shadow:var(--sh)}
+.msg.me{align-self:flex-end;flex-direction:row-reverse}
+.msg.me .tx{background:var(--navy);color:#fff;box-shadow:none}
+.msg.me .av{background:var(--navy-tint);color:var(--navy)}
+.msg.ag .av{background:var(--gold-tint);color:var(--gold)}
+.fcard{background:var(--surface);border-radius:12px;padding:12px 14px;box-shadow:var(--sh);margin-left:40px;border-left:4px solid var(--teal)}
+.fcard .big{font:700 20px/1.2 var(--sans)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-left:40px}
+.chip2{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-size:13.5px;color:var(--navy);text-align:left}
+.chip2:hover{border-color:var(--navy);background:var(--navy-tint)}
+.reply{display:flex;gap:6px;align-items:center;background:var(--surface);border:2px solid var(--navy);border-radius:12px;padding:3px 4px 3px 12px;margin-top:14px}
+.reply input{flex:1;border:0;outline:0;padding:9px 4px;font-size:15px;background:transparent;min-width:0}
+.reply button{border:0;border-radius:9px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:transparent;color:var(--ink-2)}
+.reply button.send{background:var(--navy);color:#fff;width:auto;padding:0 14px;font-weight:600}
+
+/* cart */
+.cartg{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start}
+@media (max-width:960px){.cartg{grid-template-columns:minmax(0,1fr)}}
+.sum{position:sticky;top:130px}
+.sum .ln{display:flex;justify-content:space-between;gap:10px;padding:6px 0;font-size:14.5px}
+.sum .ln b{font-family:var(--mono);font-weight:600;white-space:nowrap}
+.sum .tot{border-top:1px solid var(--line);margin-top:6px;padding-top:10px;font-size:16px}
+.empty{text-align:center;padding:50px 20px;color:var(--ink-2)}
+.empty svg.i{width:56px;height:56px;color:var(--ink-3);stroke-width:1.3}
+.rm{border:0;background:transparent;color:var(--ink-3);padding:6px;border-radius:8px}
+.rm:hover{background:var(--red-tint);color:var(--red)}
+
+/* agent */
+.agentg{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.3fr);gap:18px;align-items:start}
+@media (max-width:960px){.agentg{grid-template-columns:minmax(0,1fr)}.agentg .card{position:static!important}}
+.feed{list-style:none;margin:0;padding:0}
+.feed li{display:flex;gap:12px;padding:8px 0;font-size:14.5px;align-items:flex-start;animation:fin .35s both}
+@keyframes fin{from{opacity:0;transform:translateY(6px)}}
+.feed li .ic{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex:none}
+.feed li .ic svg.i{width:15px;height:15px;stroke-width:2.2}
+.feed li .ic.c{background:var(--teal-tint);color:var(--teal)} .feed li .ic.a{background:var(--gold-tint);color:var(--gold)} .feed li .ic.r{background:var(--red-tint);color:var(--red)} .feed li .ic.n{background:var(--navy-tint);color:var(--navy)}
+.feed li small{display:block;color:var(--ink-3);font-size:12.5px}
+.offer{background:var(--surface);border-radius:var(--r);box-shadow:var(--sh);padding:16px;margin-bottom:12px;border-top:4px solid var(--teal);animation:fin .4s both}
+.offer .h{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.offer .kv{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}
+.offer .kv div{background:var(--surface-2);border-radius:10px;padding:10px 12px}
+.offer .kv span{display:block;font-size:12px;color:var(--ink-3)}
+.offer .kv b{font-size:15px}
+@media (max-width:700px){.offer .kv{grid-template-columns:1fr 1fr}}
+.rej{background:var(--red-tint);border-radius:10px;padding:10px 12px;margin-top:8px;font-size:13.5px}
+.rej>b{color:var(--red)}
+.inj{font:400 12px var(--mono);background:var(--surface);border:1px dashed var(--line);padding:6px 8px;border-radius:6px;margin-top:6px;color:var(--ink-2)}
+.pool .prog{height:12px;background:var(--line-2);border-radius:6px;overflow:hidden;margin:8px 0}
+.pool .prog i{display:block;height:100%;background:var(--teal);width:0;transition:width 1s}
+.mem{display:flex;gap:6px;flex-wrap:wrap}
+.mem span{font-size:12.5px;border-radius:7px;padding:4px 8px;background:var(--surface-2)}
+.mem span.me{background:var(--navy-tint);color:var(--navy);font-weight:600}
+details summary{cursor:pointer;color:var(--navy);font-size:13.5px;margin-top:8px}
+.checks{list-style:none;margin:6px 0 0;padding:0;font-size:13px}
+.checks li{display:grid;grid-template-columns:18px 1fr;gap:6px;padding:3px 0}
+.checks li .x{font-weight:700;text-align:center}
+.checks .ok .x{color:var(--teal)} .checks .fail .x{color:var(--red)} .checks .warn .x{color:var(--gold)}
+.ref{font:400 11.5px var(--mono);color:var(--ink-3)}
+
+/* checkout + orders */
+table.cost{width:100%;border-collapse:collapse;font-size:14.5px}
+table.cost td{padding:9px 0;border-bottom:1px solid var(--line-2);vertical-align:top}
+table.cost td:last-child{text-align:right;font-family:var(--mono);white-space:nowrap;padding-left:10px}
+table.cost td small{display:block;color:var(--ink-3);font-size:12px}
+.okm{color:var(--teal);font-weight:600;display:inline-flex;gap:6px;align-items:center}
+.order{background:var(--surface);border-radius:var(--r);box-shadow:var(--sh);padding:16px;margin-top:12px}
+.track{display:grid;grid-template-columns:repeat(4,1fr);margin:14px 0 4px}
+.track div{text-align:center;font-size:12.5px;color:var(--ink-3);position:relative;padding-top:24px}
+.track div::before{content:"";position:absolute;top:6px;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:var(--surface);border:2px solid var(--line);z-index:1}
+.track div::after{content:"";position:absolute;top:12px;left:-50%;width:100%;height:2px;background:var(--line)}
+.track div:first-child::after{display:none}
+.track div.done{color:var(--ink)} .track div.done::before{background:var(--teal);border-color:var(--teal)} .track div.done::after{background:var(--teal)}
+.track div b{display:block;font-family:var(--mono);font-weight:500;font-size:12px}
+.facts{width:100%;border-collapse:collapse;font-size:14px}
+.facts td{padding:7px 0;border-bottom:1px solid var(--line-2);vertical-align:top}
+.facts td:first-child{color:var(--ink-3);width:110px}
+.draft{background:var(--gold-tint);border-radius:12px;padding:14px 16px;margin:10px 0;white-space:pre-wrap;font-size:14.5px}
+.opt{background:var(--surface-2);border-radius:10px;padding:10px 12px;margin-top:8px;font-size:14px}
+.quote{font-size:13px;color:var(--ink-2);border-left:3px solid var(--line);padding-left:10px;margin:8px 0}
+.who .tg{color:var(--ink)}
+
+/* floating audit + mobile nav */
+.fab{position:fixed;right:16px;bottom:16px;z-index:25;border:0;background:var(--surface);box-shadow:var(--sh2);border-radius:999px;padding:9px 14px;font-size:13px;display:flex;gap:8px;align-items:center;color:var(--ink-2)}
+.fab b{font-family:var(--mono);color:var(--navy)}
+.drawer{position:fixed;right:32px;top:126px;bottom:auto;z-index:25;width:min(460px,calc(100vw - 32px));max-height:50vh;overflow:auto;background:var(--surface);border-radius:14px;box-shadow:var(--sh2);padding:14px 16px;display:none}
+.drawer.on{display:block}
+.drawer ol{margin:6px 0 0;padding-left:20px;font-size:13px}
+.drawer li{padding:4px 0}
+.hash{font:400 11px var(--mono);color:var(--ink-3)}
+.bnav{display:none}
+@media (max-width:700px){
+  .bnav{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:0;right:0;bottom:0;z-index:28;background:var(--surface);box-shadow:0 -1px 0 var(--line)}
+  .bnav a{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--ink-3);padding:8px 0 10px}
+  .bnav a.on{color:var(--navy)}
+  .fab{bottom:70px}.drawer{bottom:118px}
+}
+.foot{margin-top:40px;padding:18px 0;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3);display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+
+/* evidence */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:8px 0 12px}
+.kpi{background:var(--surface);border-radius:12px;padding:12px 14px;box-shadow:var(--sh)}
+.kpi b{display:block;font:700 24px/1.1 var(--sans);color:var(--navy)}
+.kpi span{font-size:13px;color:var(--ink-2)}
+table.ev{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--surface);border-radius:10px;overflow:hidden}
+table.ev th,table.ev td{padding:7px 9px;border-bottom:1px solid var(--line-2);text-align:left}
+table.ev th{font-weight:500;color:var(--ink-3);font-size:12.5px}
+table.ev td.n{text-align:right;font-family:var(--mono)}
+.honest{background:var(--gold-tint);border-radius:10px;padding:10px 12px;font-size:13.5px;margin:10px 0}
+.evh{font:600 16px var(--sans);margin:16px 0 6px}
+
+/* ===================== v3: professional marketplace theme ===================== */
+:root{
+  --paper:#f3f4f6; --surface:#fff; --surface-2:#f7f8fa;
+  --ink:#0d1526; --ink-2:#4a5468; --ink-3:#7a8396;
+  --line:#e3e6eb; --line-2:#eef0f3;
+  --navy:#1f3b78; --navy-d:#172d5e; --navy-tint:#edf1f9; --navy-2:#6a82bd;
+  --teal:#0b7a5c; --teal-tint:#e5f4ee; --red:#c0362c; --red-tint:#fbeceb;
+  --r:10px; --sh:none; --sh2:0 10px 30px rgba(13,21,38,.12);
+}
+body{background:var(--paper);font-size:15px}
+.wrap{max-width:1680px;padding:0 32px}
+@media (max-width:860px){.wrap{padding:0 16px}}
+main.wrap{padding-top:24px}
+.card,.pc,.tn,.offer,.order,.intent,.how,.kpi{box-shadow:none;border:1px solid var(--line)}
+.btn{border-radius:8px}
+.btn.soft{background:var(--surface);color:var(--navy);box-shadow:inset 0 0 0 1px var(--line)}
+.btn.soft:hover{box-shadow:inset 0 0 0 1px var(--navy);background:var(--surface)}
+.stamp{border-radius:4px;font-weight:600;letter-spacing:.01em}
+.stamp.ai{color:var(--ink-2);background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line)}
+.stamp svg.i{display:none}
+.term{border-bottom-color:var(--line)}
+
+/* header */
+.hdr{box-shadow:none;border-bottom:1px solid var(--line)}
+.hdr .r1{min-height:72px;gap:28px}
+.brand2{display:flex;align-items:center;gap:14px;flex:none;color:var(--ink)}
+.brand2 img{height:32px;display:block}
+.brand2 .dv{width:1px;height:28px;background:var(--line)}
+.brand2 b{font:600 20px/1 var(--sans);letter-spacing:-.01em;color:var(--navy)}
+.search{border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:4px 4px 4px 14px;max-width:880px}
+.search:focus-within{border-color:var(--navy);background:var(--surface);box-shadow:0 0 0 3px rgba(31,59,120,.12)}
+.search svg.lead{width:18px;height:18px;color:var(--ink-3)}
+.search .go{border-radius:8px;padding:10px 20px}
+.hico a,.hico button{flex-direction:row;gap:8px;font-size:14px;color:var(--ink);padding:9px 12px;border-radius:8px}
+.hico .badge{position:static;margin-left:-2px;background:var(--navy);font-size:11px;padding:3px 6px}
+.hdr .r2{min-height:46px;border-top:1px solid var(--line-2)}
+.cat{font-size:14px;padding:12px 2px;margin-right:22px;border-radius:0;color:var(--ink-2);border-bottom:2px solid transparent}
+.cat:hover{background:none;color:var(--ink)}
+.cat.on{background:none;color:var(--navy);border-bottom-color:var(--navy);font-weight:600}
+.util{display:flex;align-items:center;gap:18px;font-size:13.5px;color:var(--ink-2)}
+.util a,.util button{border:0;background:none;color:var(--ink-2);padding:0;font-size:13.5px}
+.util a:hover,.util button:hover{color:var(--navy)}
+.seg{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:2px}
+.seg button{border-radius:6px;padding:4px 10px}
+.seg button.on{box-shadow:none;background:var(--surface);color:var(--navy);outline:1px solid var(--line)}
+.aichip{display:none}
+
+/* ticker */
+.ticker{background:var(--ink);color:#d7dce6;font:500 12.5px/1 var(--mono);overflow:hidden;white-space:nowrap}
+.ticker .in{display:inline-flex;gap:34px;padding:10px 0;animation:tk 60s linear infinite}
+.ticker:hover .in{animation-play-state:paused}
+.ticker a{color:#d7dce6;display:inline-flex;gap:8px}
+.ticker a b{color:#fff;font-weight:500;font-family:var(--sans)}
+.ticker .u{color:#ff8a80}.tick .d{color:#6ee7b7}
+@keyframes tk{to{transform:translateX(-50%)}}
+
+/* home */
+.hero3{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;min-height:340px}
+.hero3 .tx{padding:48px 48px 40px;display:flex;flex-direction:column;justify-content:center}
+.hero3 h1{font:700 40px/1.12 var(--sans);letter-spacing:-.02em;color:var(--ink)}
+.hero3 p{font-size:17px;color:var(--ink-2);margin:14px 0 26px;max-width:520px}
+.hero3 .acts{display:flex;gap:10px;flex-wrap:wrap}
+.hero3 .ph{background:#ddd center/cover no-repeat;position:relative}
+.hero3 .ph .cap{position:absolute;left:16px;bottom:16px;background:rgba(13,21,38,.78);color:#fff;border-radius:8px;padding:10px 14px;font-size:13px}
+.hero3 .ph .cap b{display:block;font:600 18px/1.2 var(--sans)}
+.quick{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px;align-items:center;font-size:13.5px;color:var(--ink-3)}
+.quick button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13.5px;color:var(--ink-2)}
+.quick button:hover{border-color:var(--navy);color:var(--navy)}
+@media (max-width:960px){.hero3{grid-template-columns:1fr}.hero3 .ph{min-height:220px;order:-1}.hero3 .tx{padding:26px 22px}.hero3 h1{font-size:28px}}
+.cats3{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-top:18px}
+.cat3{position:relative;border-radius:12px;overflow:hidden;height:132px;background:#ccc center/cover;display:flex;align-items:flex-end;padding:14px;color:#fff}
+.cat3::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,21,38,0) 30%,rgba(13,21,38,.78))}
+.cat3 span{position:relative;font-weight:600;font-size:16px}
+.cat3 small{position:relative;display:block;font-weight:400;font-size:12.5px;opacity:.85}
+@media (max-width:960px){.cats3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.sec-h{margin:34px 0 14px}
+.sec-h h2{font-size:22px;letter-spacing:-.01em}
+
+/* product card */
+.grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.pc{border-radius:12px;transition:border-color .12s,box-shadow .12s}
+.pc:hover{transform:none;box-shadow:var(--sh2);border-color:transparent}
+.pc .img{display:block;aspect-ratio:4/3;background:#e9ecf1 center/cover no-repeat;position:relative}
+.pc .img .chg{position:absolute;top:10px;right:10px;font:600 12px var(--mono);background:rgba(255,255,255,.95);padding:4px 7px;border-radius:5px}
+.pc .body{padding:14px 16px 16px;gap:2px}
+.pc .nm{font-size:15px;font-weight:600}
+.pc .pr{margin-top:4px;font-size:12.5px}
+.pc .pr b{font:700 19px/1.3 var(--sans);letter-spacing:-.01em}
+.pc .meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pc .sg{font-size:12.5px;font-weight:600}
+.pc .sg.buy{color:var(--teal)} .pc .sg.wait{color:#9a6700}
+.pc .add{margin-top:12px;padding:10px 12px}
+.up{color:var(--red)} .dn{color:var(--teal)}
+
+/* product page */
+.pp .head .ph{width:132px;height:100px;border-radius:10px;background:#e9ecf1 center/cover;flex:none}
+.pp .head h1{font-size:30px;letter-spacing:-.01em}
+.band .mid{background:var(--navy)}
+.nega{background:var(--surface-2);color:var(--navy);box-shadow:inset 0 0 0 1px var(--line)}
+.nega svg.i{display:none}
+.expl{background:var(--surface-2);border:1px solid var(--line)}
+.expl .src{color:var(--ink-3)}
+.sigbox{border:1px solid var(--line)}
+
+/* sheets, chat */
+.sheet .top>svg.i{display:none}
+.msg.ag .av{background:var(--navy);color:#fff}
+.msg.me .av{background:var(--surface-2);color:var(--ink-2)}
+.msg .av{font:700 11px var(--sans)}
+.dots i{background:var(--navy-2)}
+.draft{background:var(--surface-2);border:1px solid var(--line)}
+.feed li .ic.a{background:var(--navy-tint);color:var(--navy)}
+.tg .a{background:var(--navy-tint);color:var(--navy)}
+.foot{justify-content:space-between}
+.fab{box-shadow:0 2px 10px rgba(13,21,38,.12);border:1px solid var(--line)}
+
+/* ===================== modes + group buy ===================== */
+.modehint{font-size:12.5px;color:var(--ink-3);margin:-8px 0 14px}
+.thermo{margin:22px 4px 6px}
+.thermo .bar{display:flex;height:44px;border-radius:10px;overflow:hidden;font-weight:600;font-size:14px}
+.thermo .bar div{display:flex;align-items:center;justify-content:center;flex-direction:column;line-height:1.15}
+.thermo .bar small{font-weight:400;font-size:12px;opacity:.85}
+.thermo .z1{background:#e3f3ec;color:var(--teal);flex:1}
+.thermo .z2{background:#eef1f6;color:var(--ink);flex:2}
+.thermo .z3{background:#fbeceb;color:var(--red);flex:1}
+.thermo .mk{position:relative;height:28px}
+.thermo .mk span{position:absolute;top:4px;transform:translateX(-50%);font-size:12.5px;font-weight:600;white-space:nowrap}
+.thermo .mk span::before{content:"";position:absolute;left:50%;top:-10px;border:6px solid transparent;border-bottom-color:var(--ink);transform:translateX(-50%)}
+.big1{font:700 30px/1.15 var(--sans);letter-spacing:-.01em}
+.months{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-top:12px}
+.months div{border-radius:6px;padding:8px 2px;text-align:center;font-size:12px;background:#eef1f6;color:var(--ink-2)}
+.months div b{display:block;font-size:11px;font-weight:600;margin-top:2px}
+.months .ch{background:#e3f3ec;color:var(--teal)} .months .ex{background:#fbeceb;color:var(--red)} .months .now{outline:2px solid var(--ink)}
+.sel3{display:grid;gap:10px;margin-top:8px}
+.sel3 .s{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.sel3 .s b{display:block}
+.okb{font-size:12.5px;font-weight:600;padding:4px 8px;border-radius:6px;background:#e3f3ec;color:var(--teal);white-space:nowrap}
+.okb.no{background:#fbeceb;color:var(--red)}
+table.dense{width:100%;border-collapse:collapse;font:12.5px/1.35 var(--mono)}
+table.dense th{font:500 11.5px var(--sans);color:var(--ink-3);text-align:right;padding:6px 8px;border-bottom:1px solid var(--line)}
+table.dense th:first-child,table.dense td:first-child{text-align:left}
+table.dense td{text-align:right;padding:5px 8px;border-bottom:1px solid var(--line-2)}
+.pool3{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.poolc{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.poolc .img{height:120px;background:#e9ecf1 center/cover}
+.poolc .bd{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.poolc .bd b.t{font-size:16px}
+.pbar{height:10px;background:var(--line-2);border-radius:5px;overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--teal)}
+.poolc .row2{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-2)}
+.poolc .price{font:700 18px var(--sans)}
+.poolc .price small{font:500 12.5px var(--sans);color:var(--teal);margin-left:6px}
+.poolbox{margin-top:14px;border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--surface)}
+.pc .pool{font-size:12px;color:var(--teal);font-weight:600}
+.pc .pmeta{font:500 11.5px/1.5 var(--mono);color:var(--ink-3)}
+
+/* ===================== assistant panel ===================== */
+.aip{position:fixed;top:0;right:0;bottom:0;width:440px;max-width:100vw;background:var(--surface);border-left:1px solid var(--line);z-index:45;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .22s ease;box-shadow:-12px 0 32px rgba(13,21,38,.08)}
+.aip.on{transform:none}
+@media (min-width:1300px){body.aion{padding-right:440px}}
+.aip .hd{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.aip .hd .av{width:34px;height:34px;border-radius:10px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font:700 12px var(--sans)}
+.aip .hd b{font-size:16px;display:block}
+.aip .hd small{font-size:12px;color:var(--teal)}
+.aip .hd .x{border:0;background:var(--surface-2);width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-left:auto}
+.aip .tl{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--paper)}
+.aip .ft{border-top:1px solid var(--line);padding:12px;background:var(--surface)}
+.aip .in{display:flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:4px 4px 4px 12px;background:var(--surface-2)}
+.aip .in:focus-within{border-color:var(--navy);background:var(--surface)}
+.aip .in input{flex:1;border:0;outline:0;background:transparent;padding:10px 2px;font-size:15px;min-width:0}
+.aip .in .ib{border:0;background:transparent;width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--ink-2)}
+.aip .in .ib:hover{background:var(--navy-tint);color:var(--navy)}
+.aip .in .snd{border:0;background:var(--navy);color:#fff;border-radius:9px;height:38px;padding:0 14px;font-weight:600}
+.aip .hint{font-size:12px;color:var(--ink-3);margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
+.aip .hint button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 10px;font-size:12px;color:var(--ink-2)}
+.rec{display:flex;align-items:center;gap:12px;border:1px solid var(--red);background:var(--red-tint);border-radius:12px;padding:10px 12px}
+.rec .dot{width:10px;height:10px;border-radius:50%;background:var(--red);animation:pulse 1s infinite}
+.rec .lv{flex:1;height:26px;display:flex;align-items:center;gap:2px}
+.rec .lv i{flex:1;background:var(--red);border-radius:2px;opacity:.75;min-height:3px;transition:height .08s}
+.rec .tm{font:600 13px var(--mono);color:var(--red)}
+.rec button{border:0;background:var(--red);color:#fff;border-radius:8px;padding:8px 12px;font-weight:600}
+.rec button.c{background:transparent;color:var(--ink-2);padding:8px 6px}
+.m{max-width:92%;font-size:14.5px;line-height:1.5}
+.m.u{align-self:flex-end;background:var(--navy);color:#fff;border-radius:14px 14px 4px 14px;padding:10px 13px}
+.m.u .k{display:flex;gap:6px;align-items:center;font-size:12px;opacity:.8;margin-bottom:3px}
+.m.u .k svg.i{width:14px;height:14px}
+.m.u img{display:block;max-width:220px;border-radius:8px;margin-bottom:6px}
+.m.a{align-self:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:14px 14px 14px 4px;padding:11px 13px;width:92%}
+.m.a .who{font-size:11.5px;color:var(--ink-3);margin-bottom:4px;display:flex;gap:6px}
+.m.a .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.m.a .acts .btn{padding:8px 12px;font-size:13.5px}
+.m.a .chips{margin:10px 0 0;display:flex;gap:6px;flex-wrap:wrap}
+.m.a .chips button{border:1px solid var(--line);background:var(--surface-2);border-radius:999px;padding:6px 10px;font-size:12.5px;color:var(--navy);text-align:left}
+.think{align-self:flex-start;display:flex;gap:10px;align-items:center;font-size:13.5px;color:var(--ink-2);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 13px}
+.mini{border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:8px;background:var(--surface)}
+.mini .t{display:flex;gap:10px;align-items:center}
+.mini .t .ph{width:36px;height:36px;border-radius:8px;background:#e9ecf1 center/cover;flex:none}
+.mini .t b{font-size:14.5px}
+.mini .g{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.mini .g label{font-size:11px;color:var(--ink-3)}
+.mini .g input,.mini .g select{width:100%;border:1px solid var(--line);border-radius:7px;padding:6px 8px;font-size:13px;background:var(--surface)}
+.mini .r{font-size:12px;color:var(--ink-3);margin-top:6px}
+.fct{border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:10px;padding:10px 12px;margin-top:10px;background:var(--surface)}
+.fct .v{font:700 18px var(--sans)}
+.ok2{color:var(--teal);font-weight:600;font-size:13.5px}
+.pv{margin-top:8px;font-size:12.5px;color:var(--ink-2);background:var(--surface-2);border-radius:8px;padding:7px 9px}
+.pv b{color:var(--ink)}
+.grp{margin-top:8px;border:1px solid #bfe3d4;background:#f1faf6;border-radius:10px;padding:10px}
+.grp .h{display:flex;justify-content:space-between;align-items:center;font-size:13.5px}
+.grp .pbar{margin:7px 0 5px;height:8px}
+.grp p{margin:0;font-size:12.5px;color:var(--ink-2)}
+.grp .btn{margin-top:8px;padding:8px 12px;font-size:13px}
+.launch{position:fixed;right:24px;bottom:24px;z-index:30;border:0;background:var(--navy);color:#fff;border-radius:999px;padding:13px 20px 13px 16px;display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px;box-shadow:0 10px 28px rgba(31,59,120,.35)}
+.launch:hover{background:var(--navy-d)}
+.launch svg.i{width:20px;height:20px}
+.launch .nd{width:9px;height:9px;border-radius:50%;background:#ff6b5e;display:none}
+.launch.unread .nd{display:block}
+body.aion .launch{display:none}
+@media (max-width:700px){.launch{bottom:76px;right:16px}}
+</style>
+</head>
+<body data-mode="oddiy">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+ <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></symbol>
+ <symbol id="i-cam" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+ <symbol id="i-cart" viewBox="0 0 24 24"><path d="M3 4h2l2.4 11h10.2L20 8H6.2"/><circle cx="9" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/></symbol>
+ <symbol id="i-box" viewBox="0 0 24 24"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="m3 7.5 9 4.5 9-4.5M12 12v9"/></symbol>
+ <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></symbol>
+ <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></symbol>
+ <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3.5c.6 3.9 2.6 5.9 6.5 6.5-3.9.6-5.9 2.6-6.5 6.5-.6-3.9-2.6-5.9-6.5-6.5 3.9-.6 5.9-2.6 6.5-6.5zM18.5 15.5c.3 1.6 1 2.3 2.5 2.5-1.5.2-2.2.9-2.5 2.5-.3-1.6-1-2.3-2.5-2.5 1.5-.2 2.2-.9 2.5-2.5z"/></symbol>
+ <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+ <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13 7 4 4"/></symbol>
+ <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+ <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4.5 4.5L19 7"/></symbol>
+ <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+ <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.6"/><path d="M15.5 14.2c2.9.3 5.5 2.6 5.5 5.8"/></symbol>
+ <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 4v16M7 20h10M5 7h14"/><path d="m5 7-3 6h6zM19 7l-3 6h6z"/></symbol>
+ <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 14h6l-1 7 8-11h-6z"/></symbol>
+ <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V4M4 20h16"/><path d="m7 15 4-5 3 3 5-6"/></symbol>
+ <symbol id="f-cement" viewBox="0 0 24 24"><path d="M6 6c0-1.5 1-2.5 2.5-2.5h7C17 3.5 18 4.5 18 6l1 13c0 1-.8 1.5-1.8 1.5H6.8C5.8 20.5 5 20 5 19z"/><path d="M8 9h8M8 12.5h8"/></symbol>
+ <symbol id="f-rebar" viewBox="0 0 24 24"><path d="M4 18 18 4M7 20 20 7M3 14 14 3"/><path d="M6 15l1.5 1.5M10 11l1.5 1.5M14 7l1.5 1.5"/></symbol>
+ <symbol id="f-brick" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 9.7h18M3 14.3h18M9 5v4.7M15 5v4.7M6 9.7v4.6M12 9.7v4.6M18 9.7v4.6M9 14.3V19M15 14.3V19"/></symbol>
+ <symbol id="f-wood" viewBox="0 0 24 24"><ellipse cx="7" cy="12" rx="3" ry="6"/><path d="M7 6h12c1.7 0 3 2.7 3 6s-1.3 6-3 6H7"/><ellipse cx="7" cy="12" rx="1" ry="2"/></symbol>
+ <symbol id="f-glass" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="m8 9 4-4M8 14l7-7M12 17l4-4"/></symbol>
+ <symbol id="f-wheat" viewBox="0 0 24 24"><path d="M12 21V9"/><path d="M12 9c-2-1-3-3-3-5 2 0 3 1.5 3 3 0-1.5 1-3 3-3 0 2-1 4-3 5zM12 13c-2.5 0-4-1.5-4.5-3.5C10 9.5 11.5 11 12 13zm0 0c2.5 0 4-1.5 4.5-3.5C14 9.5 12.5 11 12 13zM12 17c-2.5 0-4-1.5-4.5-3.5 2.5 0 4 1.5 4.5 3.5zm0 0c2.5 0 4-1.5 4.5-3.5-2.5 0-4 1.5-4.5 3.5z"/></symbol>
+ <symbol id="f-cube" viewBox="0 0 24 24"><path d="M12 3 4 7v10l8 4 8-4V7z"/><path d="m4 7 8 4 8-4M12 11v10"/></symbol>
+ <symbol id="f-drop" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></symbol>
+ <symbol id="f-fuel" viewBox="0 0 24 24"><path d="M5 21V5c0-1 .8-2 2-2h6c1.2 0 2 1 2 2v16M3 21h14M7 7h6v4H7zM15 10h2c1 0 2 1 2 2v5c0 1 .5 1.5 1.2 1.5S21 18 21 17V8l-3-3"/></symbol>
+ <symbol id="f-leaf" viewBox="0 0 24 24"><path d="M5 19C5 10 10 5 20 4c0 10-5 15-14 15z"/><path d="M5 19 13 11"/></symbol>
+ <symbol id="f-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L4.5 18.5C4 19.6 4.7 21 6 21h12c1.3 0 2-1.4 1.5-2.5L14 9V3"/><path d="M7 15h10"/></symbol>
+ <symbol id="f-pipe" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M7 8v8M17 8v8"/></symbol>
+</svg>
+
+<header class="hdr"><div class="wrap">
+  <div class="r1">
+    <a class="brand2" href="#/"><img src="/static/uzex-logo.png" alt="UZEX"><span class="dv"></span><b>Talab</b></a>
+    <form class="search" id="sform" autocomplete="off">
+      <svg class="i lead"><use href="#i-search"/></svg>
+      <input id="q" placeholder="Nima kerak? Masalan: 8 tonna sement, Samarqand, dekabrgacha" aria-label="Nima kerak">
+      <button type="button" class="ib" id="micBtn" title="Ovoz bilan aytish"><svg class="i"><use href="#i-mic"/></svg></button>
+      <button type="button" class="ib" id="camBtn" title="Smeta rasmini yuklash"><svg class="i"><use href="#i-cam"/></svg></button>
+      <button class="go" type="submit">Izlash</button>
+      <input type="file" id="file" accept="image/*,application/pdf" hidden>
+    </form>
+    <nav class="hico">
+      <a href="#/savat" title="Savat"><svg class="i"><use href="#i-cart"/></svg><span>Savat</span><em class="badge" id="cartN" hidden>0</em></a>
+      <a href="#/buyurtmalar" title="Buyurtmalar"><svg class="i"><use href="#i-box"/></svg><span>Buyurtmalar</span><em class="badge" id="ordN" hidden>0</em></a>
+    </nav>
+  </div>
+  <div class="r2">
+    <span id="cats" class="row" style="flex-wrap:nowrap;gap:2px"></span>
+    <span class="sp"></span>
+    <span class="aichip" id="aichip"><i></i>AI</span>
+    <div class="util"><button id="fab">Audit izi <b id="auditN" class="mono">0</b></button><button id="evBtn">Isbot</button><a href="/tahlil" class="biz">Tahlil</a>
+    <div class="seg" id="modes" title="Ko'rinish"><button data-m="oddiy" class="on">Oddiy</button><button data-m="biznes">Biznes</button><button data-m="pro">Broker</button></div></div>
+  </div>
+</div><div class="ticker" id="tick"></div></header>
+
+<main class="wrap" id="view"></main>
+
+
+<div class="drawer" id="drawer"><div class="row"><b>Audit izi</b><span class="sp"></span><span class="note">har qadam xesh-zanjirga yoziladi</span></div><ol id="auditList"></ol></div>
+<nav class="bnav" id="bnav">
+  <a href="#/" data-r=""><svg class="i"><use href="#i-home"/></svg>Bosh</a>
+  <a href="#/katalog" data-r="katalog"><svg class="i"><use href="#i-grid"/></svg>Katalog</a>
+  <a href="#/savat" data-r="savat"><svg class="i"><use href="#i-cart"/></svg>Savat</a>
+  <a href="#/buyurtmalar" data-r="buyurtmalar"><svg class="i"><use href="#i-box"/></svg>Buyurtmalar</a>
+</nav>
+<aside class="aip" id="aip" aria-label="Yordamchi">
+  <div class="hd"><span class="av">UZ</span><div><b>Yordamchi</b><small id="aiState">Tayyor: yozing, ayting yoki rasm yuboring</small></div><button class="x" id="aiX" title="Yopish"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div class="tl" id="tl"></div>
+  <div class="ft" id="aft"></div>
+</aside>
+<button class="launch" id="launch"><svg class="i"><use href="#i-mic"/></svg>Yordamchi<span class="nd"></span></button>
+<div class="ov" id="aiov"><div class="sheet" id="aisheet"></div></div>
+<div class="ov" id="evov"><div class="sheet" id="evsheet"></div></div>
+
+<script src="/static/chart.umd.min.js"></script>
+<script>
+"use strict";
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const md=s=>String(s??"").replace(/\*\*|__|^#+\s*/gm,"");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ico=(id,cls="i")=>`<svg class="${cls}"><use href="#${id}"/></svg>`;
+const store={get(k,d){try{const v=localStorage.getItem("talab."+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("talab."+k,JSON.stringify(v))}catch(e){}}};
+const S={mode:store.get("mode","oddiy"),session:store.get("session","s"+Math.random().toString(36).slice(2,9)),meta:null,cat:null,cart:store.get("cart",[]),orders:store.get("orders",[]),ev:null,prod:{},run:null,arb:null,ai:null,convo:[],pools:[]};
+const poolOf=fk=>S.pools.find(p=>p.family_key===fk);
+const poolStatus=(p,u)=>p.status==="full"?`<b style="color:var(--teal)">To'ldi — lot shakllandi</b>`:`Yig'ilmoqda · yana <b>${qn(p.remaining)} ${u}</b> kerak${p.more_members?` (taxminan ${p.more_members} ishtirokchi)`:""}`;
+async function refreshPools(){try{S.pools=(await api("/api/talab/pools2?session_id="+S.session)).pools}catch(e){}}
+function setPool(v){const i=S.pools.findIndex(p=>p.family_key===v.family_key);if(i>=0)S.pools[i]=v;else S.pools.push(v)}
+async function joinPool(fk,qty,region){const v=await api("/api/talab/pool/join",{family_key:fk,qty,session_id:S.session,region_id:region||null});setPool(v);refreshAudit();
+  const u=v.unit_short;const msg=v.status==="full"?`${v.family_uz} guruhiga qo'shildingiz va guruh to'ldi! ${v.members_n} ishtirokchi, ${qn(v.target)} ${u}. Lot shakllandi — endi imzolash mumkin.`
+    :`${v.family_uz} guruhiga qo'shildingiz: siz ${v.you.position}-ishtirokchisiz (${qn(v.you.qty)} ${u}). Yig'ildi ${qn(v.filled)} / ${qn(v.target)} ${u} — yana ${qn(v.remaining)} ${u} kerak${v.more_members?`, taxminan ${v.more_members} ishtirokchi`:""}. To'lgach xabar beraman.`;
+  return {v,msg}}
+const MODE_HINT={oddiy:"Oddiy ko'rinish: faqat eng kerakli narsalar, oddiy so'zlar bilan.",biznes:"Biznes ko'rinishi: narx oralig'i, o'zgarishlar va grafiklar.",broker:"",pro:"Broker ko'rinishi: to'liq raqamlar, lot va STIR, haftalik jadval."};
+store.set("session",S.session);
+const MON=["yan","fev","mar","apr","may","iyun","iyul","avg","sen","okt","noy","dek"];
+const MONF=["yanvar","fevral","mart","aprel","may","iyun","iyul","avgust","sentabr","oktabr","noyabr","dekabr"];
+const FAMICON={cement:"f-cement",rebar:"f-rebar",brick:"f-brick",lumber:"f-wood",glass:"f-glass",gypsum:"f-cement",lime:"f-cement",bitumen:"f-drop",steel_sheet:"f-rebar",pe_pipe:"f-pipe",flour:"f-wheat",wheat:"f-wheat",rice:"f-wheat",sugar:"f-cube",salt:"f-cube",sunflower_oil:"f-drop",cottonseed_oil:"f-drop",diesel:"f-fuel",petrol:"f-fuel",lpg:"f-fuel",fuel_oil:"f-fuel",urea:"f-leaf",ammonium_nitrate:"f-leaf",feed:"f-leaf",cottonseed_meal:"f-leaf",polyethylene:"f-flask",polypropylene:"f-flask",pvc:"f-pipe",sulfuric_acid:"f-flask"};
+const catOf=fk=>(S.cat?.categories||[]).find(c=>c.families.includes(fk))?.id||"qurilish";
+const fico=fk=>ico(FAMICON[fk]||"i-box");
+const IMG=fk=>`/static/img/p/${fk}.jpg`;
+const CATIMG={qurilish:"brick",oziq:"wheat",yoqilgi:"diesel",qishloq:"feed",kimyo:"polyethylene"};
+function renderTicker(){const all=(S.cat?.categories||[]).flatMap(c=>c.items);const pick=["cement","rebar","brick","flour","sugar","wheat","rice","diesel","petrol","lpg","polyethylene","sunflower_oil"].map(k=>all.find(x=>x.key===k)).filter(Boolean);
+  const one=pick.map(x=>`<a href="#/p/${x.key}"><b>${esc(x.name_uz)}</b>${sh(x.p50)} / ${esc(x.unit_short)}${x.change_pct==null?"":`<span class="${x.change_pct>0?"u":"d"}">${x.change_pct>0?"▲":"▼"}${fmtN(Math.abs(x.change_pct),1)}%</span>`}</a>`).join("");
+  $("#tick").innerHTML=`<div class="in">${one}${one}</div>`}
+
+function fmtN(v,d=0){if(v==null||isNaN(v))return"—";return Number(v).toLocaleString("ru-RU",{minimumFractionDigits:d,maximumFractionDigits:d}).replace(/ /g," ")}
+function money(v){if(v==null||isNaN(v))return"—";const a=Math.abs(v);if(a>=1e12)return fmtN(v/1e12,2)+" trln so'm";if(a>=1e9)return fmtN(v/1e9,2)+" mlrd so'm";if(a>=1e7)return fmtN(v/1e6,1)+" mln so'm";return fmtN(v)+" so'm"}
+function sh(v){if(v==null||isNaN(v))return"—";const a=Math.abs(v);if(a>=1e6)return fmtN(v/1e6,a>=1e8?0:1)+" mln";if(a>=1e4)return fmtN(v/1e3,0)+" ming";return fmtN(v,v<100?1:0)}
+function dt(s){if(!s)return"—";const[y,m,d]=s.split("-");return`${d}.${m}.${y}`}
+function dtw(s){if(!s)return"—";const[y,m,d]=s.split("-");return`${+d}-${MONF[+m-1]}`}
+function pct(v,d=1){return v==null?"—":fmtN(v,d)+"%"}
+const qn=v=>fmtN(v,v%1?1:0);
+async function api(p,b){const r=await fetch(p,b?{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)}:{});if(!r.ok)throw new Error((await r.text()).slice(0,200));return r.json()}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* glossary: one fact, three languages ------------------------------------- */
+const TERMS={
+ talabnoma:{oddiy:"Talabnoma — nima kerakligingiz yozilgan buyurtma: qancha, qachongacha, qaysi narxdan oshmasin. Savatdagi har bir qator — bitta talabnoma. Siz tasdiqlaysiz, birja shu shartlar bilan sotuvchi qidiradi.",biznes:"Talabnoma: tovar, hajm, narx shifti, muddat, hudud va minimal ishonch darajasi bilan imzolanadigan buyurtma (mandat).",pro:"Talabnoma = tiplangan mandat {family, qty, price_max, deadline, region, min_trust}. Qo'riqchi faqat shu maydonlarni tekshiradi."},
+ zakalat:{oddiy:"Zakalat — savdoda qatnashish uchun vaqtincha qo'yiladigan pul. Bitim yaxshi tugasa, to'liq qaytadi.",biznes:"Zakalat: kontrakt summasining foizi (odatda 10%), kafolat sifatida bloklanadi; 170/171-bandlar bo'yicha jarima manbai.",pro:"Задаток, 94 va 165-bandlar; 299-band: reytingdagilar uchun umumiy garov fondi."},
+ kliring:{oddiy:"Kliring — pulni xavfsiz o'tkazuvchi birja kassasi.",biznes:"Hisob-kliring palatasi: to'lov va zakalatlar shu yerda; 0,05%.",pro:"RKP, 168–172-bandlar; tarif 0,05% har tomondan."},
+ diapazon:{oddiy:"Adolatli narx — so'nggi 8 haftada haqiqatda sotilgan narxlarning o'rtadagi yarmi. Bundan qimmat bo'lsa — qimmat.",biznes:"P25–P75: so'nggi 8 haftadagi bajarilgan bitimlar narxining kvartillari.",pro:"quantile_cont(unit_price,0.25/0.5/0.75), not is_annulled, 56 kun, family×region (n≥30)."},
+ ishonch:{oddiy:"Ishonch balli — sotuvchi oldin va'dasida turganmi: o'z vaqtida va to'liq yetkazganmi. Tarixni ko'rsatadi, kelajakni emas.",biznes:"0–100: qatnashish davri, 4 chorak aylanmasi, o'z vaqtida va to'liq yetkazish (XXI bo'lim, 298-band).",pro:"period 15 + turnover 15 + on-time 40 + delivered share 30; bashorat emas."},
+ pullot:{oddiy:"Birga olish — kichik xaridorlar birlashib, zavod narxida oladi. Yig'ilmasa, pul avtomatik qaytadi.",biznes:"Pul-lot: kichik talablar bitta lotga birlashadi, yagona narx, ulushga mutanosib zakalat.",pro:"target = P10(volume, 12 oy); yagona kliring narxi; 7 kunda to'lmasa refund."},
+ qoriqchi:{oddiy:"Qo'riqchi — shartingizni buzadigan lotni o'tkazmaydigan dastur. AI emas, aniq qoida.",biznes:"Deterministik tekshiruv: narx+yig'im ≤ shift, ishonch ≥ min, muddat, amal qilish, hudud.",pro:"guard(item, lot, trust) → checks[]; LLM yo'q; lot.spec parse qilinmaydi."},
+ broker:{oddiy:"Broker — birjadagi rasmiy vakilingiz. Bu yerda u talabnomangizni bir bosishda tasdiqlaydi.",biznes:"Pilotda broker tasdiqlovchi bo'lib qoladi; keyin kafil va maslahatchi.",pro:"Broker: accredited legal entity; ko'p mijoz paneli."}
+};
+const T=(k,t)=>`<button class="term" data-t="${k}">${esc(t||k)}</button>`;
+document.addEventListener("click",e=>{const o=$(".pop");if(o)o.remove();const b=e.target.closest(".term");if(!b)return;e.preventDefault();const p=document.createElement("div");p.className="pop";p.textContent=TERMS[b.dataset.t][S.mode];document.body.appendChild(p);const r=b.getBoundingClientRect();p.style.left=Math.max(8,Math.min(innerWidth-330,r.left+scrollX))+"px";p.style.top=(r.bottom+scrollY+6)+"px"});
+
+/* chrome ------------------------------------------------------------------ */
+function setMode(m){S.mode=m;store.set("mode",m);document.body.dataset.mode=m;$$("#modes button").forEach(x=>x.classList.toggle("on",x.dataset.m===m))}
+$("#modes").onclick=e=>{const b=e.target.closest("button");if(b){setMode(b.dataset.m);route()}};
+function saveCart(){store.set("cart",S.cart);const n=S.cart.length;$("#cartN").hidden=!n;$("#cartN").textContent=n}
+function saveOrders(){store.set("orders",S.orders);const n=S.orders.length;$("#ordN").hidden=!n;$("#ordN").textContent=n}
+async function refreshAudit(){try{const r=await api("/api/talab/audit/"+S.session);$("#auditN").textContent=r.chain.length;$("#auditList").innerHTML=r.chain.map(c=>`<li><b>${esc(c.ts)}</b> ${esc(c.summary)}<br><span class="hash">${c.prev} → ${c.hash}</span></li>`).join("")||"<li class='note'>Hali yozuv yo'q</li>"}catch(e){}}
+$("#fab").onclick=()=>{$("#drawer").classList.toggle("on");refreshAudit()};
+function renderCats(){const r=location.hash.replace(/^#\/?/,"").split("/");$("#cats").innerHTML=`<a class="cat ${r[0]==="katalog"&&!r[1]?"on":""}" href="#/katalog">Barcha tovarlar</a>`+(S.cat?.categories||[]).map(c=>`<a class="cat ${r[1]===c.id?"on":""}" href="#/katalog/${c.id}">${esc(c.title)}</a>`).join("")}
+function aiChip(){const m=S.cat?.ai_mode;const el=$("#aichip");el.className="aichip "+(m||"");el.innerHTML=`<i></i>${m==="live"?"AI: "+esc((S.cat.ai_chain||"").replace("claude-sonnet-5-5","Claude Sonnet 5.5").replace("gemini-3.1-flash-lite","Gemini (ovoz, zaxira)").replace(" → "," + ")):m==="fake"?"AI: demo rejim":"AI o'chiq · dastur rejimi"}`}
+
+/* router ------------------------------------------------------------------ */
+let charts=[];const kill=()=>{charts.forEach(c=>c.destroy());charts=[]};
+function route(){kill();const h=location.hash.replace(/^#\/?/,"").split("/");const v=$("#view");renderCats();$("#drawer").classList.remove("on");
+  $$("#bnav a").forEach(a=>a.classList.toggle("on",a.dataset.r===(h[0]||"")));
+  const fn={"":home,katalog:catalog,p:product,savat:cart,agent:agent,checkout:checkout,buyurtmalar:orders,nizo:dispute}[h[0]]||home;
+  Promise.resolve(fn(v,h)).catch(e=>v.innerHTML=`<div class="card err">Xato: ${esc(e.message)}</div>`);window.scrollTo(0,0)}
+addEventListener("hashchange",route);
+
+/* product card ------------------------------------------------------------ */
+function pcard(x){const md=S.mode;const pl=poolOf(x.key);
+  const sig=x.signal==="buy"?`<span class="sg buy">Hozir olish qulay</span>`:x.signal==="wait"?`<span class="sg wait">Kutish foydali</span>`:"";
+  const chg=x.change_pct==null||md==="oddiy"?"":`<span class="chg ${x.change_pct>0?"up":"dn"}" title="8 haftada o'zgarish">${x.change_pct>0?"▲":"▼"} ${fmtN(Math.abs(x.change_pct),1)}%</span>`;
+  const price=md==="oddiy"?`<div class="pr"><b>~${sh(x.p50)} so'm</b>1 ${esc(x.unit_short)} uchun odatiy narx</div>`
+    :md==="pro"?`<div class="pr"><b>${sh(x.p25)} – ${sh(x.p75)}</b></div><div class="pmeta">P50 ${fmtN(x.p50)} · n=${fmtN(x.n)} · ${x.lots} lot / ${x.sellers} sot.</div>`
+    :`<div class="pr"><b>${sh(x.p25)} – ${sh(x.p75)}</b>so'm / ${esc(x.unit_short)} · adolatli narx</div>`;
+  return`<div class="pc"><a href="#/p/${x.key}" class="img" style="background-image:url(${IMG(x.key)})">${chg}</a>
+   <div class="body"><a href="#/p/${x.key}" class="nm">${esc(x.name_uz)}</a>${price}
+    <div class="meta">${md==="biznes"?`<span class="muted" style="font-size:12.5px">${x.lots} lot · ${x.sellers} sotuvchi</span>`:""}${sig}</div>
+    ${pl?`<div class="pool">Birga olish ochiq · ${pl.fill_pct}% yig'ildi</div>`:""}
+    <button class="btn soft block add" data-add="${x.key}">Savatga qo'shish</button></div></div>`}
+function bindAdd(root){root.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>location.hash="#/p/"+b.dataset.add+"/buy")}
+
+/* home -------------------------------------------------------------------- */
+function home(v){refreshPools().then(()=>{const g=v.querySelector(".pool3");if(g){g.innerHTML=S.pools.slice(0,4).map(poolCard).join("");bindJoin(v)}});
+  const cats=S.cat?.categories||[];const all=cats.flatMap(c=>c.items);const cem=all.find(x=>x.key==="cement");
+  v.innerHTML=`<section class="hero3">
+    <div class="tx"><h1>Birjadan xarid —<br>bir gap bilan.</h1>
+     <p>Nima kerakligini yozing, ayting yoki smeta rasmini yuklang. Narxni, sotuvchini va qoidalarni birja o'zi tekshiradi.</p>
+     <div class="acts"><button class="btn lg" data-way="text">Yordamchiga yozish</button><button class="btn ghost lg" data-way="mic">${ico("i-mic")}Ovoz bilan</button><button class="btn ghost lg" data-way="cam">${ico("i-cam")}Smeta rasmi</button></div>
+     <div class="quick">Masalan:${(S.meta?.scenarios||[]).map(s=>`<button data-sc="${s.id}">${esc(s.title)}</button>`).join("")}<button data-way="sample">Namuna smeta</button></div></div>
+    <div class="ph" style="background-image:url(${IMG("cement")})">${cem?`<div class="cap">Sement, bugun<b>${sh(cem.p25)} – ${sh(cem.p75)} so'm / t</b>${cem.lots} faol lot · 8 haftada ${fmtN(cem.n)} bitim</div>`:""}</div>
+  </section>
+  <div class="cats3">${cats.map(c=>`<a class="cat3" href="#/katalog/${c.id}" style="background-image:url(${IMG(CATIMG[c.id]||c.items[0]?.key)})"><span>${esc(c.title)}<small>${c.items.length} ta tovar</small></span></a>`).join("")}</div>
+  ${S.pools.length?`<div class="sec-h"><h2>Birga olish</h2><span class="muted">kichik hajmni boshqalar bilan birga, zavod narxida oling</span></div>
+   <div class="pool3">${S.pools.slice(0,4).map(poolCard).join("")}</div>`:""}
+  ${cats.map(c=>c.items.length?`<div class="sec-h"><h2>${esc(c.title)}</h2><a href="#/katalog/${c.id}">Hammasi →</a></div><div class="grid">${c.items.slice(0,6).map(pcard).join("")}</div>`:"").join("")}
+  <div class="foot"><span>Narxlar: UZEX bitimlari, ${dt(S.cat?.today)} holatiga · bashorat emas</span><button class="lnk2" id="credBtn" style="border:0;background:none;color:var(--ink-3);font-size:12.5px;padding:0">Rasm mualliflari</button></div>`;
+  bindAdd(v);
+  v.querySelectorAll("[data-sc]").forEach(b=>b.onclick=()=>{const s=S.meta.scenarios.find(x=>x.id===b.dataset.sc);understand({text:s.text})});
+  v.querySelectorAll("[data-way]").forEach(b=>b.onclick=()=>{const w=b.dataset.way;if(w==="text")openAI();else if(w==="mic")startRec();else if(w==="sample")sampleSmeta();else{openAI();$("#file").click()}});
+  $("#credBtn").onclick=showCredits;
+  bindJoin(v);
+}
+function poolCard(p){const d=Math.max(0,Math.round((new Date(p.closes)-new Date(S.cat.today))/864e5));
+  return`<div class="poolc"><a class="img" href="#/p/${p.family_key}/pool" style="background-image:url(${IMG(p.family_key)})"></a><div class="bd">
+   <b class="t">${esc(p.family_uz)} · ${esc(p.region_uz.replace(" viloyati",""))}</b>
+   <div class="price">${sh(p.unit_price)} so'm / ${esc(p.unit_short)}${p.vs_median_pct!=null&&p.vs_median_pct<0?`<small>bozordan ${fmtN(-p.vs_median_pct,1)}% arzon</small>`:""}</div>
+   <div class="pbar"><i style="width:${p.fill_pct}%"></i></div>
+   <div class="row2"><span><b>${qn(p.filled)}</b> / ${qn(p.target)} ${esc(p.unit_short)}</span><span>${p.members_n} ishtirokchi · ${d} kun qoldi</span></div>
+   <div class="note" style="font-size:13px">${poolStatus(p,esc(p.unit_short))}</div>
+   ${p.you?`<div class="ok2">✓ Siz ${p.you.position}-ishtirokchisiz · ${qn(p.you.qty)} ${esc(p.unit_short)}</div>`:""}
+   <button class="btn block ${p.you||p.status==="full"?"soft":""}" data-join="${p.family_key}" style="margin-top:6px">${p.status==="full"?"Guruhni ko'rish":p.you?"Ulushni o'zgartirish":"Qo'shilish"}</button></div></div>`}
+function bindJoin(root){root.querySelectorAll("[data-join]").forEach(b=>b.onclick=()=>location.hash="#/p/"+b.dataset.join+"/pool")}
+async function showCredits(){const c=await (await fetch("/static/img/p/credits.json")).json();
+  $("#evov").classList.add("on");$("#evsheet").innerHTML=`<div class="top"><h2>Rasm mualliflari</h2><span class="sp"></span><button class="x" onclick="$('#evov').classList.remove('on')">${ico("i-x")}</button></div><div class="bd"><table class="ev"><tr><th>Tovar</th><th>Rasm</th><th>Muallif</th><th>Litsenziya</th></tr>${Object.entries(c).map(([k,x])=>`<tr><td>${esc(k)}</td><td><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}</a></td><td>${esc(x.author)}</td><td>${esc(x.license)} · ${esc(x.via)}</td></tr>`).join("")}</table></div>`}
+function catalog(v,h){const cats=S.cat.categories;const sel=cats.find(c=>c.id===h[1]);const list=sel?[sel]:cats;
+  v.innerHTML=`<div class="crumbs"><a href="#/">Bosh sahifa</a> / ${sel?esc(sel.title):"Katalog"}</div><div class="modehint">${MODE_HINT[S.mode]}</div>`+list.map((c,i)=>`<div class="sec-h" ${i?"":'style="margin-top:4px"'}><h2>${esc(c.title)}</h2><span class="muted">${c.items.length} ta tovar</span></div><div class="grid">${c.items.map(pcard).join("")}</div>`).join("");bindAdd(v)}
+
+/* product ----------------------------------------------------------------- */
+async function product(v,h){
+  const fk=h[1];v.innerHTML=`<div class="loading">Yuklanmoqda…</div>`;
+  const reg=store.get("region","SAM");const key=fk+"|"+reg;
+  if(!S.prod[key])S.prod[key]=await api(`/api/talab/product/${fk}?region_id=${reg}`);
+  const P=S.prod[key],c=P.card,m=P.market,b=m.band,sig=m.signal,cat=catOf(fk),md=S.mode,pl=poolOf(fk);
+  const dl=new Date(S.cat.today);dl.setDate(dl.getDate()+32);const dls=dl.toISOString().slice(0,10);
+  const regs=S.meta.regions.map(r=>`<option value="${r.id}" ${r.id===reg?"selected":""}>${esc(r.name_uz)}</option>`).join("");
+  const u=esc(b.unit_short),cur=new Date(S.cat.today).getMonth()+1,se=m.season,sr=m.series;
+  const sigTitle=sig.action==="buy"?"Hozir olish qulay":sig.action==="wait"?"Kutish foydali":"Aniq signal yo'q";
+  // ---- price block
+  const priceBlock=md==="oddiy"?`
+    <div style="margin-top:18px" class="muted">Bugun odatda shu narxda sotilmoqda</div>
+    <div class="big1">~${money(b.p50)} <span class="muted" style="font-size:16px;font-weight:400">/ 1 ${u}</span></div>
+    <div class="thermo"><div class="bar"><div class="z1">Arzon<small>${sh(b.p25)} dan past</small></div><div class="z2">Odatiy<small>${sh(b.p25)} – ${sh(b.p75)}</small></div><div class="z3">Qimmat<small>${sh(b.p75)} dan yuqori</small></div></div><div class="mk" id="mk"></div></div>
+    <div class="row"><span class="why">So'nggi 8 haftadagi ${fmtN(b.n)} ta haqiqiy bitimdan</span><span class="sp"></span><button class="nega" data-ex="band">Bu nima degani?</button></div>`
+   :md==="pro"?`
+    <table class="dense" style="margin-top:16px"><tr><th>Ko'rsatkich</th><th>P10</th><th>P25</th><th>P50</th><th>P75</th><th>P90</th><th>n</th><th>Davr</th></tr>
+     <tr><td>so'm / ${u}</td><td>${fmtN(b.p10)}</td><td>${fmtN(b.p25)}</td><td><b>${fmtN(b.p50)}</b></td><td>${fmtN(b.p75)}</td><td>${fmtN(b.p90)}</td><td>${fmtN(b.n)}</td><td>${dt(b.from)}–${dt(b.to)}</td></tr></table>
+    <div class="band" id="band"></div>
+    <div class="row"><span class="why">${esc(b.why)} · quantile_cont(unit_price), annulled chiqarilgan</span><span class="sp"></span><button class="nega" data-ex="band">Tushuntirish</button></div>`
+   :`
+    <div class="row" style="margin-top:18px"><b style="font-size:16px">${T("diapazon","Adolatli narx")}: ${money(b.p25)} – ${money(b.p75)} / ${u}</b><span class="sp"></span><span class="stamp code">Real bitimlardan · bashorat emas</span></div>
+    <div class="band" id="band"></div>
+    <div class="row"><span class="why">Manba: ${esc(b.why)}</span><span class="sp"></span><button class="nega" data-ex="band">Tushuntirish</button></div>`;
+  // ---- when to buy
+  const monthsStrip=`<div class="months">${se.map(x=>{const d=x.idx-100;const cl=d<=-1.5?"ch":d>=1.5?"ex":"";return`<div class="${cl} ${x.month===cur?"now":""}">${MON[x.month-1]}<b>${d<=-1.5?"arzon":d>=1.5?"qimmat":"·"}</b></div>`}).join("")}</div>`;
+  const whenBlock=md==="oddiy"?`<div class="card"><h3 style="margin-bottom:10px">Qachon olgan yaxshi?</h3>
+     <div class="sigbox ${sig.action}"><b>${sigTitle}</b>${esc(sig.text)}</div>
+     <p style="margin:14px 0 0;font-size:14px">Yil davomida narx (so'nggi yillar bo'yicha):</p>${monthsStrip}
+     <p class="note" style="margin-top:8px">Yashil — odatda arzon oylar, qizil — qimmat oylar. Ramkadagi — hozirgi oy.</p></div>`
+   :md==="pro"?`<div class="card"><h3 style="margin-bottom:10px">Signal va mavsumiylik</h3>
+     <div class="sigbox ${sig.action}"><b>${sigTitle}</b>${esc(sig.text)}</div>
+     ${sig.track?`<p class="why" style="margin-top:8px">Backtest: ${sig.track.wait_signals} ta "kuting" signali, ${sig.track.wait_right} tasi to'g'ri (${sig.track.hit_pct}%), o'rtacha tejam ${fmtN(sig.track.avg_saving_pct,1)}%. Indeks faqat oldingi yillardan.</p>`:""}
+     <table class="dense" style="margin-top:10px"><tr><th>Oy</th>${se.map(x=>`<th>${MON[x.month-1]}</th>`).join("")}</tr><tr><td>indeks</td>${se.map(x=>`<td style="${x.month===cur?"font-weight:700;color:var(--ink)":""}">${fmtN(x.idx,1)}</td>`).join("")}</tr></table></div>`
+   :`<div class="card"><h3 style="margin-bottom:10px">Qachon olish kerak?</h3>
+     <div class="sigbox ${sig.action}"><b>${sigTitle}</b>${esc(sig.text)}</div>
+     ${sig.track?`<p class="why" style="margin-top:8px">${esc(sig.track.text)}</p>`:""}
+     <div class="row" style="margin-top:6px"><span class="sp"></span><button class="nega" data-ex="sig">Tushuntirish</button></div><div class="expl" id="ex-sig" hidden></div>
+     <div class="chartbox sm" style="margin-top:10px"><canvas id="cS"></canvas></div><p class="why">Oylik narx indeksi, 2022–2025 (100 = yil o'rtachasi)</p></div>`;
+  // ---- history
+  const half=sr.slice(-26),first=half[0]?.p50,last=half[half.length-1]?.p50,ch=first?(last/first-1)*100:null;
+  const histBlock=md==="oddiy"?`<div class="card"><h3 style="margin-bottom:4px">Narx yarim yilda</h3>
+     <p style="font-size:14px;margin:0 0 8px">${first?`6 oy oldin ~${sh(first)}, hozir ~${sh(last)} so'm: <b class="${ch>0?"up":"dn"}">${ch>0?"qimmatlashgan":"arzonlashgan"} ${fmtN(Math.abs(ch),1)}%</b>`:""}</p>
+     <div class="chartbox"><canvas id="cL"></canvas></div></div>`
+   :md==="pro"?`<div class="card"><h3 style="margin-bottom:10px">Haftalik narx va bitimlar soni, 52 hafta</h3><div class="chartbox"><canvas id="cL"></canvas></div>
+     <div style="overflow-x:auto;margin-top:10px"><table class="dense"><tr><th>Hafta</th><th>P25</th><th>P50</th><th>P75</th><th>n</th></tr>${sr.slice(-10).reverse().map(x=>`<tr><td>${dt(x.week)}</td><td>${fmtN(x.p25)}</td><td>${fmtN(x.p50)}</td><td>${fmtN(x.p75)}</td><td>${x.n}</td></tr>`).join("")}</table></div></div>`
+   :`<div class="card"><h3 style="margin-bottom:10px">Narx, 52 hafta</h3><div class="chartbox"><canvas id="cL"></canvas></div><p class="why">Haftalik mediana va odatiy oraliq, respublika bo'yicha</p></div>`;
+  // ---- sellers
+  const good=P.lots.filter(l=>(l.trust.score??0)>=60);
+  const sellBlock=md==="oddiy"?`<div class="card" style="margin-top:14px"><h3>Kimdan olish mumkin</h3>
+     <div class="sel3">${P.lots.slice(0,4).map(l=>`<div class="s"><span class="ic sq" style="background:#e9ecf1 url(${IMG(fk)}) center/cover"></span><div style="flex:1"><b>${esc(l.seller_name)}</b><span class="note">${esc(l.region_uz)} · ${l.delivery_term_days} kunda yetkazadi</span></div><b>~${sh(l.expected_price)}</b>${(l.trust.score??0)>=60?`<span class="okb">Ishonchli</span>`:`<span class="okb no">Ehtiyot bo'ling</span>`}</div>`).join("")}</div>
+     <p class="note" style="margin-top:8px">“Ehtiyot bo'ling” — sotuvchi oldin ko'p kechikkan. Bunday sotuvchini birja sizga taklif qilmaydi.</p></div>`
+   :`<div class="card" style="margin-top:14px"><div class="row"><h3>Sotuvchilar va lotlar</h3><span class="sp"></span><span class="note">${esc(S.meta.regions.find(r=>r.id===reg)?.name_uz||"")} birinchi</span></div>
+     <div style="overflow-x:auto"><table class="${md==="pro"?"dense":"lots"}" style="margin-top:8px"><tr><th>Sotuvchi</th>${md==="pro"?"<th>STIR</th><th>Lot</th>":""}<th>Ombor</th>${md==="pro"?"<th>Bazis</th><th>Zakalat</th><th>To'lov</th>":""}<th class="n">Narx / ${u}</th><th class="n">Yetkazish</th><th>${T("ishonch","Ishonch")}</th></tr>
+     ${P.lots.map(l=>`<tr><td><b>${esc(l.seller_name)}</b></td>${md==="pro"?`<td>${esc(l.seller_inn)}</td><td>${esc(l.contract_no)}</td>`:""}<td class="ink2">${esc(l.region_uz)}</td>${md==="pro"?`<td>${fmtN(l.basis_price)}</td><td>${l.deposit_pct}%</td><td>${l.pay_term_days} kun</td>`:""}<td class="n">${md==="pro"?fmtN(l.expected_price):sh(l.expected_price)}</td><td class="n">${l.delivery_term_days} kun</td><td>${l.trust.score!=null?`<span class="trust ${l.trust.score<60?"low":""}"><span class="bar"><i style="width:${l.trust.score}%"></i></span><b>${l.trust.score}</b></span>`:""}</td></tr>`).join("")}</table></div>
+     <p class="note" style="margin-top:8px">Narx = lot bazis narxi + so'nggi auksionlardagi o'rtacha o'zgarish${md==="pro"?` (${fmtN(P.lots[0]?.uplift_pct,2)}%)`:""}. Ishonch balli 60 dan past sotuvchini Qo'riqchi o'tkazmaydi.</p></div>`;
+  const rh=m.rhythm||[];
+  const rhythmBlock=md==="oddiy"?(rh[0]?`<div class="card" style="margin-top:14px"><h3>Yangi partiya qachon chiqadi?</h3><p style="margin:8px 0 0;font-size:15px">Taxminan <b>${dtw(rh[0].next_expected)}</b> — ${esc(rh[0].name)} odatda har ${rh[0].median_gap_days} kunda sotuvga chiqaradi.</p></div>`:"")
+   :`<div class="card" style="margin-top:14px"><h3>Zavodlar qachon lot chiqaradi?</h3>
+    <ul class="list" style="margin-top:6px">${rh.map(r=>`<li><span style="flex:1"><b>${esc(r.name)}</b><br><span class="why">odatda har ${r.median_gap_days} kunda · oxirgisi ${dt(r.last_listing)}${md==="pro"?` · ${r.n_lots} lot · STIR ${esc(r.seller_inn)}`:""}</span></span><span style="text-align:right" class="ink2">keyingisi<br><b style="color:var(--ink)">~${dtw(r.next_expected)}</b></span></li>`).join("")||"<li>Ma'lumot yetarli emas</li>"}</ul></div>`;
+  // ---- pool box
+  const poolBox=pl?`<div class="poolbox" id="poolbox"><div class="row"><b style="font-size:16px">Birga olish</b><span class="sp"></span><span class="okb">${pl.members_n} ishtirokchi</span></div>
+     <p class="note" style="margin:4px 0 10px">${esc(pl.region_uz)} bo'yicha kichik xaridorlar bitta lotga yig'ilmoqda. Hamma bitta narxda oladi.</p>
+     <div class="price" style="font:700 20px var(--sans)">${sh(pl.unit_price)} so'm / ${u}${pl.vs_median_pct<0?` <small style="font:500 12.5px var(--sans);color:var(--teal)">bozordan ${fmtN(-pl.vs_median_pct,1)}% arzon</small>`:""}</div>
+     <div class="pbar" style="margin:10px 0 6px"><i style="width:${pl.fill_pct}%"></i></div>
+     <div class="row2" style="display:flex;justify-content:space-between;font-size:13px"><span><b>${qn(pl.filled)}</b> / ${qn(pl.target)} ${u}</span><span>${dt(pl.closes)} gacha</span></div>
+     <div style="font-size:13px;margin-top:6px">${poolStatus(pl,u)}</div>
+     <div class="mem" style="margin-top:8px">${pl.members.map(x=>`<span class="${x.you?"me":""}">${esc(x.name)} · ${qn(x.qty)}</span>`).join("")}</div>
+     ${pl.status==="full"?"":`<div class="fld" style="margin-top:10px"><label class="l">Mening ulushim (${u})</label><input class="f" id="pQty" type="number" min="${pl.min_join}" step="any" value="${pl.you?pl.you.qty:pl.min_join}"></div>
+     <button class="btn block teal" id="pJoin" style="margin-top:10px">${pl.you?"Ulushni yangilash":"Qo'shilish"}</button>`}
+     ${md==="pro"?`<div class="row" style="margin-top:8px;gap:6px"><button class="btn soft" id="pSim" style="padding:6px 10px;font-size:12.5px">Yana bir xaridor qo'shilsin (demo)</button><button class="btn soft" id="pReset" style="padding:6px 10px;font-size:12.5px">Guruhlarni tiklash</button></div>`:""}
+     <p class="note" style="margin-top:8px">${md==="pro"?"lot "+esc(pl.contract_no)+" · "+esc(pl.seller_name)+" · ":""}Yig'ilmasa, zakalat avtomatik qaytadi.${md!=="oddiy"?" "+esc(pl.note):""}</p></div>`:"";
+  v.innerHTML=`<div class="crumbs"><a href="#/">Bosh sahifa</a> / <a href="#/katalog/${cat}">${esc((S.cat.categories.find(x=>x.id===cat)||{}).title)}</a> / ${esc(c.name_uz)}</div>
+  <div class="modehint">${MODE_HINT[md]}</div>
+  <div class="pp"><div>
+   <div class="card"><div class="head"><div class="ph" style="background-image:url(${IMG(fk)})"></div><div><h1>${esc(c.name_uz)}</h1><div class="muted">${md==="oddiy"?`${c.sellers} ta sotuvchi taklif qilmoqda`:`${c.lots} ta faol lot · ${c.sellers} sotuvchi · 8 haftada ${fmtN(b.n)} bitim${b.scope==="region"?" ("+esc(b.region_uz)+")":""}`}</div></div></div>
+    ${priceBlock}<div class="expl" id="ex-band" hidden></div></div>
+   <div class="g2" style="margin-top:14px">${whenBlock}${histBlock}</div>
+   ${sellBlock}${rhythmBlock}
+  </div>
+  <aside class="buybox"><div class="card" id="buy">
+   <div class="note">${md==="oddiy"?"Odatiy narx":"Bugungi odatiy narx (mediana)"}</div><div class="big">${money(b.p50)}</div><div class="muted" style="font-size:13px">1 ${u} uchun</div>
+   <div class="fld"><label class="l">Qancha kerak (${u})</label><input class="f" id="bQty" type="number" min="0" step="any" placeholder="masalan, ${fk==="brick"?"12000":"8"}"></div>
+   <div class="two fld"><div><label class="l">Qayerga</label><select class="f" id="bReg">${regs}</select></div><div><label class="l">Qachongacha</label><input class="f" id="bDl" type="date" value="${dls}"></div></div>
+   <div class="fld"><label class="l">${md==="oddiy"?"Ko'pi bilan qancha to'laysiz (1 "+u+")":"Narx shifti, so'm / "+u}</label><input class="f" id="bCap" type="number" value="${Math.round(b.p75)}"><div class="note">${md==="oddiy"?"Bundan qimmat taklif sizga kelmaydi.":"Taklif: P75 (odatiy narxning yuqori chegarasi). Bundan qimmat lot o'tkazilmaydi."}</div></div>
+   <div id="bInfo" class="note" style="margin-top:8px"></div>
+   <button class="btn block lg" id="bAdd" style="margin-top:12px">Savatga qo'shish</button>
+  </div>${poolBox}</aside></div>`;
+  // ---- markers / band
+  const lo=b.p10,hi=b.p90,span=hi-lo||1,X=x=>Math.max(0,Math.min(100,(x-lo)/span*100));
+  const zonePos=cap=>cap<b.p25?Math.max(2,(cap-lo)/(b.p25-lo||1)*25):cap>b.p75?75+Math.min(23,(cap-b.p75)/(hi-b.p75||1)*25):25+(cap-b.p25)/(b.p75-b.p25||1)*50;
+  const drawBand=cap=>{if($("#band"))$("#band").innerHTML=`<div class="rail"></div><div class="mid" style="left:${X(b.p25)}%;width:${X(b.p75)-X(b.p25)}%"></div><div class="tick" style="left:0;transform:none">${sh(lo)}</div><div class="tick" style="left:${X(b.p50)}%;color:var(--ink);font-weight:600">${sh(b.p50)}</div><div class="tick" style="left:100%;transform:translateX(-100%)">${sh(hi)}</div>${cap?`<div class="you" style="left:${X(cap)}%"><span>Shiftingiz ${sh(cap)}</span></div>`:""}`;
+    if($("#mk"))$("#mk").innerHTML=cap?`<span style="left:${zonePos(cap)}%">Sizning chegarangiz: ${sh(cap)}</span>`:""};
+  drawBand(+$("#bCap").value);
+  const info=()=>{const q=+$("#bQty").value,cap=+$("#bCap").value;let t="";if(q&&cap)t=`Ko'pi bilan <b>${money(q*cap)}</b>.`;if(q&&P.pool_target&&q<P.pool_target)t+=` Bu hajm uchun ${T("pullot","birga olish")} taklif qilinadi.`;$("#bInfo").innerHTML=t;drawBand(cap)};
+  ["#bQty","#bCap"].forEach(x=>$(x).oninput=info);
+  $("#bReg").onchange=e=>store.set("region",e.target.value);
+  const add=(q,r,cap,pool)=>{addToCart({family_key:fk,family_uz:c.name_uz,unit:c.unit,unit_short:c.unit_short,qty:q,price_max:cap,price_source:"user",deadline:$("#bDl").value,region_id:r,region_uz:S.meta.regions.find(x=>x.id===r)?.name_uz,min_trust:60,grades:[],text:"katalogdan",by:"user",pool});location.hash="#/savat"};
+  $("#bAdd").onclick=()=>{const q=+$("#bQty").value;if(!q){$("#bQty").focus();$("#bQty").style.outline="2px solid var(--red)";return}add(q,$("#bReg").value,+$("#bCap").value,false)};
+  if(pl&&$("#pJoin"))$("#pJoin").onclick=async()=>{const q=+$("#pQty").value;if(!q||q<pl.min_join){$("#pQty").style.outline="2px solid var(--red)";return}
+    const {msg}=await joinPool(fk,q,pl.region_id);S.cart=S.cart.filter(x=>!(x.family_key===fk&&x.pool));saveCart();
+    addToCart({family_key:fk,family_uz:c.name_uz,unit:c.unit,unit_short:c.unit_short,qty:q,price_max:Math.max(Math.round(pl.unit_price*1.01),+$("#bCap").value),price_source:"user",deadline:$("#bDl").value,region_id:pl.region_id,region_uz:pl.region_uz,min_trust:60,grades:[],text:"birga olish",by:"user",pool:true,pool_contract:pl.contract_no});
+    say(msg);openAI();product(v,h)};
+  if($("#pSim"))$("#pSim").onclick=async()=>{const r=await api("/api/talab/pool/simulate",{family_key:fk,session_id:S.session});setPool(r);if(r.event==="full"&&r.you)say(`${r.family_uz} guruhi to'ldi! ${r.members_n} ishtirokchi, ${qn(r.target)} ${r.unit_short}. Lot shakllandi — imzolashingiz mumkin.`);product(v,h)};
+  if($("#pReset"))$("#pReset").onclick=async()=>{await api("/api/talab/pools/reset",{});await refreshPools();product(v,h)};
+  if(h[2]==="buy")setTimeout(()=>{$("#buy").scrollIntoView({block:"center"});$("#bQty").focus()},60);
+  if(h[2]==="pool"&&pl)setTimeout(()=>{$("#poolbox")?.scrollIntoView({block:"center"});$("#pQty")?.focus()},60);
+  // ---- explanations
+  const facts={band:[`Tovar: ${c.name_uz}`,`P25 ${fmtN(b.p25)} so'm, mediana ${fmtN(b.p50)} so'm, P75 ${fmtN(b.p75)} so'm, 1 ${b.unit_short} uchun`,`Manba: ${b.why}`].join("\n"),
+    sig:[`Tovar: ${c.name_uz}`,`Signal: ${sig.text}`,sig.track?sig.track.text:"",`Oylik indeks: `+se.map(x=>x.name+" "+fmtN(x.idx,1)).join(", ")].join("\n")};
+  const fb={band:`So'nggi 8 haftada ${c.name_uz.toLowerCase()} asosan ${money(b.p25)} va ${money(b.p75)} oralig'ida sotilgan. Bundan qimmat taklif — qimmat.`,sig:sig.text+(sig.track?" "+sig.track.text:"")};
+  v.querySelectorAll("[data-ex]").forEach(btn=>btn.onclick=async()=>{const k=btn.dataset.ex,box=$("#ex-"+k);box.hidden=false;box.innerHTML=`<span class="dots"><i></i><i></i><i></i></span>`;
+    try{const r=await api("/api/talab/ai/explain",{topic:k,facts:facts[k],fallback:fb[k],mode:md==="pro"?"pro":md});box.innerHTML=`${esc(md2(r.text))}<div class="src">${r.source==="ai"?"Yordamchi izohi · raqamlar real bitimlardan":"Standart izoh"}</div>`}catch(e){box.textContent=fb[k]}});
+  // ---- charts
+  const grid={color:"#eef1f5"},tk={font:{size:10}};
+  if($("#cS"))charts.push(new Chart($("#cS"),{type:"bar",data:{labels:se.map(x=>MON[x.month-1]),datasets:[{data:se.map(x=>x.idx-100),backgroundColor:se.map(x=>x.month===cur?"#1f3b78":"#a9b8e2"),borderRadius:3}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:x=>"indeks "+fmtN(se[x.dataIndex].idx,1)}}},scales:{y:{ticks:{...tk,callback:x=>(x>0?"+":"")+x+"%"},grid},x:{grid:{display:false},ticks:tk}}}}));
+  if(md==="oddiy")charts.push(new Chart($("#cL"),{type:"line",data:{labels:half.map(x=>{const[y,mm,d]=x.week.split("-");return MON[+mm-1]}),datasets:[{data:half.map(x=>x.p50),borderColor:"#1f3b78",borderWidth:3,pointRadius:0,tension:.35,fill:true,backgroundColor:"rgba(31,59,120,.07)"}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:x=>"~"+sh(x.raw)+" so'm"}}},scales:{y:{ticks:{...tk,callback:x=>sh(x),maxTicksLimit:4},grid},x:{ticks:{...tk,maxTicksLimit:6,autoSkip:true},grid:{display:false}}}}}));
+  else if(md==="pro")charts.push(new Chart($("#cL"),{data:{labels:sr.map(x=>x.week.slice(5)),datasets:[{type:"line",data:sr.map(x=>x.p75),borderWidth:0,pointRadius:0,fill:"+1",backgroundColor:"rgba(106,130,189,.2)",yAxisID:"y"},{type:"line",data:sr.map(x=>x.p25),borderWidth:0,pointRadius:0,yAxisID:"y"},{type:"line",data:sr.map(x=>x.p50),borderColor:"#1f3b78",borderWidth:1.6,pointRadius:1.5,yAxisID:"y"},{type:"bar",data:sr.map(x=>x.n),backgroundColor:"rgba(13,21,38,.12)",yAxisID:"n"}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:"index",intersect:false,callbacks:{label:x=>["P75","P25","P50","n"][x.datasetIndex]+": "+fmtN(x.raw)}}},scales:{y:{position:"left",ticks:{...tk,callback:x=>fmtN(x)},grid},n:{position:"right",ticks:tk,grid:{display:false}},x:{ticks:{...tk,maxTicksLimit:10},grid:{display:false}}}}}));
+  else charts.push(new Chart($("#cL"),{type:"line",data:{labels:sr.map(x=>x.week.slice(5)),datasets:[{data:sr.map(x=>x.p75),borderWidth:0,pointRadius:0,fill:"+1",backgroundColor:"rgba(106,130,189,.2)"},{data:sr.map(x=>x.p25),borderWidth:0,pointRadius:0},{data:sr.map(x=>x.p50),borderColor:"#1f3b78",borderWidth:2,pointRadius:0,tension:.25}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:"index",intersect:false,callbacks:{label:x=>["P75","P25","mediana"][x.datasetIndex]+": "+fmtN(x.raw)}}},scales:{y:{ticks:{...tk,callback:x=>sh(x)},grid},x:{ticks:{...tk,maxTicksLimit:7},grid:{display:false}}}}}));
+}
+const md2=x=>md(x);
+
+/* Assistant panel: one persistent conversation across all pages ------------------------ */
+S.thread=store.get("thread",[]);
+const saveThread=()=>store.set("thread",S.thread.slice(-40).map(m=>{const x={...m};delete x.thumb;delete x.fresh;return x}));
+function openAI(){document.body.classList.add("aion");$("#aip").classList.add("on");$("#launch").classList.remove("unread");renderThread();renderFoot();setTimeout(()=>$("#aiq")&&$("#aiq").focus(),60)}
+function closeAI(){$("#aip").classList.remove("on");document.body.classList.remove("aion")}
+$("#aiX").onclick=closeAI;$("#launch").onclick=openAI;
+function setState(t){$("#aiState").textContent=t}
+function ctxHint(){const h=location.hash.replace(/^#\/?/,"").split("/");const all=(S.cat?.categories||[]).flatMap(c=>c.items);
+  if(h[0]==="p"&&h[1]){const f=all.find(x=>x.key===h[1]);return f?`Foydalanuvchi hozir "${f.name_uz}" mahsulot sahifasida turibdi.`:""}
+  if(h[0]==="savat"&&S.cart.length)return"Foydalanuvchi savatda: "+S.cart.map(i=>i.family_uz+" "+i.qty+" "+i.unit_short).join(", ");return""}
+function aiHistory(){const out=[];const c=ctxHint();if(c)out.push({role:"context",text:c});
+  S.thread.filter(m=>m.text).slice(-8).forEach(m=>out.push({role:m.role==="u"?"user":"agent",text:m.text}));return out}
+const KIND_IC={audio:"i-mic",image:"i-cam",text:null};
+function msgHtml(m,i,last){
+  if(m.role==="u")return`<div class="m u">${m.kind&&m.kind!=="text"?`<div class="k">${ico(KIND_IC[m.kind])}${m.kind==="audio"?"Ovozli xabar":"Smeta rasmi"}</div>`:""}${m.thumb?`<img src="${m.thumb}" alt="">`:""}${esc(m.text||"…")}</div>`;
+  const who=`<div class="who"><b>Yordamchi</b><span class="pro">${esc(m.model||"")}</span></div>`;
+  let body=`<div class="tx" data-i="${i}">${esc(m.text||"")}</div>`;
+  if(m.type==="chat"&&m.facts){const f=m.facts;body+=`<div class="fct"><div class="note">${esc(f.family_uz)} · bugungi adolatli narx (real bitimlar)</div><div class="v">${sh(f.p25)} – ${sh(f.p75)} so'm / ${esc(f.unit_short)}</div><div class="note">${esc(f.signal)}</div>
+     <div class="acts"><a class="btn soft" href="#/p/${f.family_key}">Batafsil</a><a class="btn" href="#/p/${f.family_key}/buy">Sotib olish</a>${poolOf(f.family_key)?`<a class="btn ghost" href="#/p/${f.family_key}/pool">Birga olish</a>`:""}</div></div>`}
+  if(m.type==="need"){const regs=S.meta.regions.map(x=>`<option value="${x.id}">${esc(x.name_uz)}</option>`).join("");
+    body+=m.items.map((it,j)=>`<div class="mini" data-m="${i}" data-j="${j}"><div class="t"><span class="ph" style="background-image:url(${IMG(it.family_key)})"></span><b>${esc(it.family_uz)}</b>${it.position?.label?`<span class="sp"></span><span class="okb ${it.position.label==="yuqori"?"no":""}">narx: ${esc(it.position.label)}</span>`:""}</div>
+      <div class="g"><div><label>Hajm (${esc(it.unit_short)})</label><input type="number" step="any" data-k="qty" value="${it.qty??""}" ${m.state==="added"?"disabled":""}></div><div><label>Narx shifti</label><input type="number" data-k="price_max" value="${it.price_max??""}" ${m.state==="added"?"disabled":""}></div>
+      <div><label>Qachongacha</label><input type="date" data-k="deadline" value="${it.deadline??""}" ${m.state==="added"?"disabled":""}></div><div><label>Qayerga</label><select data-k="region_id" ${m.state==="added"?"disabled":""}><option value="">—</option>${regs}</select></div></div>
+      <div class="r">Odatiy narx: ${sh(it.band?.p25)} – ${sh(it.band?.p75)} so'm${it.price_source!=="user"?" · shift shu oraliqning yuqorisidan":""}</div>${previewHtml(it,i,j,m.state)}</div>`).join("");
+    if(m.checks?.length)body+=`<details class="biz" style="margin-top:6px"><summary>Tekshiruv (${m.checks.length})</summary><ul class="chk">${m.checks.map(c=>`<li class="${c.status}"><i>${c.status==="ok"?"✓":c.status==="warn"?"!":"✕"}</i>${esc(c.text)}</li>`).join("")}</ul></details>`;
+    if(m.unmatched?.length)body+=`<div class="note" style="margin-top:6px">Birjada yo'q: ${m.unmatched.map(esc).join(", ")}</div>`;
+    if(m.questions?.length)body+=`<div class="qs" style="margin-top:8px">${m.questions.map(q=>esc(q.q)).join(" · ")}</div>`;
+    body+=m.state==="added"?`<div class="ok2" style="margin-top:8px">✓ Savatga qo'shildi</div>`:`<div class="acts"><button class="btn" data-run="${i}">Agentga topshirish</button><button class="btn soft" data-add="${i}">Faqat savatga</button></div><div class="note" style="margin-top:6px">Ko'pi bilan ${money(m.est_total)} · imzolamaguningizcha hech narsa sotib olinmaydi</div>`}
+  if(m.type==="run")body+=`<ul class="chk" style="margin-top:6px">${m.lines.map(l=>`<li class="${l.ok?"ok":"warn"}"><i>${l.ok?"✓":"!"}</i>${esc(l.t)}</li>`).join("")}</ul><div class="acts"><a class="btn" href="#/checkout">Rasmiylashtirish</a><a class="btn soft" href="#/agent">Batafsil</a></div>`;
+  if(last&&m.suggestions?.length)body+=`<div class="chips">${m.suggestions.map(x=>`<button data-s="${esc(x)}">${esc(x)}</button>`).join("")}</div>`;
+  return`<div class="m a">${who}${body}</div>`}
+function previewHtml(it,i,j,state){const p=it.preview;if(!p)return"";const u=esc(it.unit_short);
+  let h=`<div class="pv">${p.n_fit?`Hozir <b>${p.n_fit} ta mos lot</b> bor${p.best?` · eng arzoni <b>~${sh(p.best.price)} so'm/${u}</b>, ${esc(p.best.region_uz)}, ${p.best.delivery_days} kunda`:""}`:`Hozir narx shiftingizga mos lot yo'q — talabnoma faol turadi, mos lot chiqqanda agent xabar beradi`}<span class="pro"> · jami ${p.n_lots} lot, ${p.n_reliable} tasi ishonchli</span></div>`;
+  if(p.small||p.want_group){const pl=p.pool;
+    h+=`<div class="grp"><div class="h"><b>Birga olish</b>${pl?`<span class="okb">${pl.members_n} ishtirokchi</span>`:""}</div>
+      ${pl?`<div class="pbar"><i style="width:${pl.fill_pct}%"></i></div><p><b>${qn(pl.filled)}</b> / ${qn(pl.target)} ${u} · ${esc(pl.region_uz.replace(" viloyati",""))} · ${sh(pl.unit_price)} so'm/${u}${pl.vs_median_pct<0?`, bozordan ${fmtN(-pl.vs_median_pct,1)}% arzon`:""}</p><p>${poolStatus(pl,u)}</p>`:""}
+      <p style="margin-top:4px">${p.small?`Bu tovar odatda ${qn(p.typical_min)} ${u} dan katta hajmda sotiladi. `:""}Agent sizni boshqa kichik xaridorlar bilan bitta lotga birlashtiradi — hamma bitta narxda oladi, yig'ilmasa pul qaytadi.</p>
+      ${state==="added"?"":`<button class="btn teal" data-grp="${i}">Birga olishga qo'shilish</button>`}</div>`}
+  return h}
+function welcome(){return`<div class="m a"><div class="who"><b>Yordamchi</b></div><div>Assalomu alaykum! Nima kerakligini oddiy so'z bilan yozing yoki mikrofonni bosib ayting. Qurilish smetasining rasmini ham yuborishingiz mumkin. Men talabnoma tuzaman, mos sotuvchini topaman va xavfli lotlarni to'xtataman.</div>
+  <div class="chips">${(S.meta?.scenarios||[]).map(x=>`<button data-s="${esc(x.text)}">${esc(x.title)}</button>`).join("")}<button data-sample="1">Namuna smeta rasmi</button><button data-s="Zakalat nima?">Zakalat nima?</button></div></div>`}
+function renderThread(thinking){const tl=$("#tl");if(!tl)return;
+  tl.innerHTML=welcome()+S.thread.map((m,i)=>msgHtml(m,i,i===S.thread.length-1)).join("")+(thinking?`<div class="think"><span class="dots"><i></i><i></i><i></i></span><span id="thinkT">${esc(thinking)}</span></div>`:"");
+  tl.querySelectorAll(".mini").forEach(el=>{const m=S.thread[+el.dataset.m],it=m.items[+el.dataset.j];const sel=el.querySelector("select");sel.value=it.region_id||"";
+    el.querySelectorAll("[data-k]").forEach(inp=>inp.onchange=()=>{let v=inp.value;if(inp.type==="number")v=v===""?null:+v;it[inp.dataset.k]=v||null;if(inp.dataset.k==="region_id")it.region_uz=S.meta.regions.find(x=>x.id===v)?.name_uz;if(inp.dataset.k==="price_max")it.price_source="user";saveThread()})});
+  tl.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>understand({text:b.dataset.s}));
+  tl.querySelectorAll("[data-sample]").forEach(b=>b.onclick=()=>sampleSmeta());
+  tl.querySelectorAll("[data-grp]").forEach(b=>b.onclick=()=>{const m=S.thread[+b.dataset.grp];const bad=m.items.find(it=>!it.qty||!it.region_id||!it.deadline);
+    if(bad){say(`${bad.family_uz}: hajm, hudud va muddatni to'ldiring — shunda guruhga qo'shaman.`);return}
+    b.disabled=true;(async()=>{for(const it of m.items){const pl=it.preview?.pool;let msg=null;
+        try{msg=(await joinPool(it.family_key,it.qty,it.region_id)).msg}catch(e){}
+        addToCart({...it,pool:true,pool_contract:pl?.contract_no,price_max:pl?Math.max(it.price_max||0,Math.round(pl.unit_price*1.01)):it.price_max});if(msg)say(msg)}
+      m.state="added";saveThread();say("Endi agent sotuvchini Qo'riqchi orqali tekshiradi va guruh holatini ko'rsatadi.");S.run=null;location.hash="#/agent"})()});
+  tl.querySelectorAll("[data-add],[data-run]").forEach(b=>b.onclick=()=>{const i=+(b.dataset.add??b.dataset.run);const m=S.thread[i];const bad=m.items.find(it=>!it.qty||!it.region_id||!it.deadline);
+    if(bad){say(`${bad.family_uz}: hajm, hudud va muddatni to'ldiring — shunda davom etaman.`);return}
+    m.items.forEach(addToCart);m.state="added";saveThread();
+    if(b.dataset.run!==undefined){say(`Savatga qo'shdim. Endi ${m.items.length} ta talabnoma bo'yicha lotlarni qidiraman va har birini Qo'riqchi orqali tekshiraman.`);S.run=null;location.hash="#/agent"}
+    else{say("Savatga qo'shdim. Tayyor bo'lsangiz, “Agentni ishga tushirish”ni bosing yoki menga “boshla” deng.");renderThread()}});
+  const lastTx=tl.querySelector(".m.a:last-child .tx");const lm=S.thread[S.thread.length-1];
+  if(lastTx&&lm&&lm.fresh){delete lm.fresh;const full=lm.text||"";lastTx.textContent="";let k=0;const step=Math.max(2,Math.ceil(full.length/45));const t=setInterval(()=>{k+=step;lastTx.textContent=full.slice(0,k);tl.scrollTop=tl.scrollHeight;if(k>=full.length)clearInterval(t)},18)}
+  tl.scrollTop=tl.scrollHeight}
+function say(text,extra={}){S.thread.push({role:"a",type:"chat",text,fresh:true,...extra});saveThread();renderThread()}
+function renderFoot(){const f=$("#aft");if(!f)return;
+  if(REC){f.innerHTML=`<div class="rec"><span class="dot"></span><span class="tm" id="recT">0:00</span><div class="lv" id="recL">${"<i></i>".repeat(28)}</div><button class="c" id="recC">Bekor</button><button id="recS">Yuborish</button></div><div class="hint">Gapiring… o'zbek yoki rus tilida</div>`;
+    $("#recS").onclick=()=>stopRec(true);$("#recC").onclick=()=>stopRec(false);return}
+  f.innerHTML=`<form class="in" id="aiF" autocomplete="off"><input id="aiq" placeholder="${esc(ctxHint()?"Shu tovar haqida so'rang yoki nima kerakligini yozing…":"Nima kerak? Yozing yoki ayting…")}"><button type="button" class="ib" id="aiMic" title="Ovoz">${ico("i-mic")}</button><button type="button" class="ib" id="aiCam" title="Smeta rasmi">${ico("i-cam")}</button><button class="snd">Yuborish</button></form>
+   <div class="hint"><span>Masalan:</span><button data-h="Sement narxi qancha?">Sement narxi qancha?</button><button data-h="Boshla">Boshla</button><button data-h="Birga olish nima?">Birga olish nima?</button></div>`;
+  $("#aiF").onsubmit=e=>{e.preventDefault();const t=$("#aiq").value.trim();if(t)understand({text:t})};
+  $("#aiMic").onclick=startRec;$("#aiCam").onclick=()=>$("#file").click();
+  f.querySelectorAll("[data-h]").forEach(b=>b.onclick=()=>understand({text:b.dataset.h}))}
+// header + hero entry points all open the panel
+$("#sform").onsubmit=e=>{e.preventDefault();const t=$("#q").value.trim();if(t){$("#q").value="";understand({text:t})}};
+$("#micBtn").onclick=()=>{openAI();startRec()};
+$("#camBtn").onclick=()=>{openAI();$("#file").click()};
+const STEPS={audio:["Tinglanmoqda","Matnga aylantirilmoqda","Talab ajratilmoqda","Kod tekshirmoqda"],image:["Rasm o'qilmoqda","Jadval ajratilmoqda","Katalog bilan solishtirilmoqda","Kod tekshirmoqda"],text:["Tushunilmoqda","Katalog va narxlar bilan solishtirilmoqda"]};
+const START_RE=/^(boshla|davom|ishga tushir|start|ha,? boshla)/i;
+async function understand(inp){
+  openAI();const kind=inp.file_b64?(inp.mime.startsWith("audio/")?"audio":"image"):"text";
+  if(kind==="text"&&START_RE.test(inp.text||"")){S.thread.push({role:"u",kind,text:inp.text});if(S.cart.length){say("Boshladim: agent lotlarni qidirmoqda.");S.run=null;location.hash="#/agent"}else say("Savat hozircha bo'sh. Avval nima kerakligini ayting.");return}
+  const prev=[...S.thread].reverse().find(m=>m.role==="a");
+  const send=kind==="text"&&prev&&prev.type==="need"&&prev.state!=="added"&&prev.questions?.length?prev.transcript+". "+inp.text:(inp.send||inp.text);
+  const um={role:"u",kind,text:kind==="text"?inp.text:"",thumb:inp.thumb};S.thread.push(um);
+  let si=0;const steps=STEPS[kind];renderThread(steps[0]);setState("Ishlayapti…");const tk=setInterval(()=>{si=Math.min(si+1,steps.length-1);const t=$("#thinkT");if(t)t.textContent=steps[si]},1100);
+  try{const r=await api("/api/talab/ai/understand",{text:send||null,file_b64:inp.file_b64||null,mime:inp.mime||null,session_id:S.session,history:aiHistory()});
+    clearInterval(tk);if(kind!=="text")um.text=r.transcript||"";
+    let facts=r.facts;const hh=location.hash.replace(/^#\/?/,"").split("/");
+    if(r.mode==="chat"&&!facts&&hh[0]==="p"){const x=(S.cat.categories.flatMap(c=>c.items)).find(y=>y.key===hh[1]);if(x)facts={family_key:x.key,family_uz:x.name_uz,unit_short:x.unit_short,p25:x.p25,p50:x.p50,p75:x.p75,signal:x.signal_text}}
+    if(r.mode==="chat")S.thread.push({role:"a",type:"chat",text:md(r.reply),facts,suggestions:r.suggestions,model:r.model,fresh:true});
+    else{const grp=r.items.some(it=>it.preview?.want_group),small=r.items.some(it=>it.preview?.small);
+      S.thread.push({role:"a",type:"need",text:r.items.length?`${r.items.length} ta talabnoma tuzdim${kind==="image"?" (smetadan)":kind==="audio"?" (ovozdan)":""}.${grp?" Jamoaviy xarid so'radingiz — pastda birga olish varianti bor.":small?" Hajmingiz kichik, shuning uchun birga olishni ham taklif qilaman.":""} Tekshiring — kerak bo'lsa o'zgartiring:`:"Tushunmadim. Tovar, hajm, muddat va hududni ayting.",
+      items:r.items,checks:r.checks,unmatched:r.unmatched,questions:r.questions,est_total:r.est_total,transcript:r.transcript,model:r.model,fresh:true})}
+    saveThread();renderThread();setState("Tayyor");refreshAudit();if(!$("#aip").classList.contains("on"))$("#launch").classList.add("unread")}
+  catch(e){clearInterval(tk);say("Xatolik: "+e.message);setState("Xato")}
+}
+function addToCart(it){const x={...it,uid:Math.random().toString(36).slice(2,8)};delete x.band;delete x.position;delete x.missing;S.cart.push(x);S.run=null;saveCart()}
+// keep the old modal helpers harmless for any leftover callers
+function openSheet(html){$("#aisheet").innerHTML=html;$("#aiov").classList.add("on")}
+function closeSheet(){$("#aiov").classList.remove("on")}
+$("#aiov").addEventListener("click",e=>{if(e.target.id==="aiov")closeSheet()});
+
+/* camera / file ------------------------------------------------------------ */
+async function sampleSmeta(){const blob=await (await fetch("/static/demo/smeta-namuna.jpg")).blob();const url=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(blob)});understand({file_b64:url.split(",")[1],mime:"image/jpeg",thumb:url})}
+$("#file").onchange=async e=>{const f=e.target.files[0];if(!f)return;e.target.value="";
+  if(f.type==="application/pdf"){const b64=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result.split(",")[1]);fr.readAsDataURL(f)});return understand({file_b64:b64,mime:"application/pdf"})}
+  const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=URL.createObjectURL(f)});
+  const k=Math.min(1,1600/Math.max(img.width,img.height)),c=document.createElement("canvas");c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+  const url=c.toDataURL("image/jpeg",.85);understand({file_b64:url.split(",")[1],mime:"image/jpeg",thumb:url})};
+
+/* voice: recorded inside the panel as 16 kHz mono WAV ---------------------- */
+let REC=null;
+async function startRec(){if(REC)return;openAI();
+  try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});const ctx=new (window.AudioContext||window.webkitAudioContext)();const src=ctx.createMediaStreamSource(stream);const proc=ctx.createScriptProcessor(4096,1,1);const chunks=[];
+    REC={stream,ctx,proc,chunks,t0:Date.now(),lv:[]};
+    proc.onaudioprocess=e=>{const d=e.inputBuffer.getChannelData(0);chunks.push(new Float32Array(d));let s2=0;for(let i=0;i<d.length;i+=16)s2+=d[i]*d[i];const v=Math.min(1,Math.sqrt(s2/(d.length/16))*6);REC&&REC.lv.push(v)};
+    src.connect(proc);proc.connect(ctx.destination);renderFoot();setState("Tinglayapman…");
+    REC.iv=setInterval(()=>{if(!REC)return;const s=Math.floor((Date.now()-REC.t0)/1000);const t=$("#recT");if(t)t.textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;const bars=$$("#recL i"),lv=REC.lv.slice(-bars.length);bars.forEach((b,i)=>b.style.height=Math.max(3,(lv[i]||0)*26)+"px");if(s>=30)stopRec(true)},90)}
+  catch(e){say("Mikrofonga ruxsat berilmadi. Brauzer sozlamalarida mikrofonni yoqing yoki yozib yuboring.")}}
+function stopRec(send){const R=REC;REC=null;if(!R)return;clearInterval(R.iv);R.proc.disconnect();R.stream.getTracks().forEach(t=>t.stop());const sr=R.ctx.sampleRate;R.ctx.close();renderFoot();setState("Tayyor");
+  if(!send)return;
+  const len=R.chunks.reduce((a,c)=>a+c.length,0),all=new Float32Array(len);let o=0;R.chunks.forEach(c=>{all.set(c,o);o+=c.length});
+  const ratio=sr/16000,n=Math.floor(len/ratio);if(n<16000*0.6){say("Yozuv juda qisqa bo'ldi — yana bir bor ayting.");return}
+  const pcm=new Int16Array(n);for(let i=0;i<n;i++){const s=Math.max(-1,Math.min(1,all[Math.floor(i*ratio)]));pcm[i]=s<0?s*0x8000:s*0x7fff}
+  const buf=new ArrayBuffer(44+pcm.length*2),dv=new DataView(buf),w=(p,s)=>[...s].forEach((ch,i)=>dv.setUint8(p+i,ch.charCodeAt(0)));
+  w(0,"RIFF");dv.setUint32(4,36+pcm.length*2,true);w(8,"WAVE");w(12,"fmt ");dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);dv.setUint32(24,16000,true);dv.setUint32(28,32000,true);dv.setUint16(32,2,true);dv.setUint16(34,16,true);w(36,"data");dv.setUint32(40,pcm.length*2,true);
+  new Int16Array(buf,44).set(pcm);let bin="";const u8=new Uint8Array(buf);for(let i=0;i<u8.length;i+=0x8000)bin+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));
+  understand({file_b64:btoa(bin),mime:"audio/wav"})}
+
+/* cart -------------------------------------------------------------------- */
+function cart(v){
+  if(!S.cart.length){v.innerHTML=`<div class="card empty">${ico("i-cart")}<h2 style="margin:12px 0 6px">Savat bo'sh</h2><p>Nima kerakligini yuqoridagi qatorga yozing, ayting yoki smeta rasmini yuklang.</p><a class="btn" href="#/katalog" style="margin-top:10px">Katalogni ochish</a></div>`;return}
+  const tot=S.cart.reduce((a,it)=>a+(it.qty||0)*(it.price_max||0),0);
+  const poolTag=it=>it.pool?`<span class="okb">Birga olish</span>`:"";
+  const by=b=>b==="ai+code"?`<span class="stamp ai">AI + kod</span>`:b==="ai"?`<span class="stamp ai">AI</span>`:b==="code"?`<span class="stamp code">dastur</span>`:"";
+  v.innerHTML=`<div class="crumbs"><a href="#/">Bosh sahifa</a> / Savat</div><div class="sec-h" style="margin-top:0"><h2>Savat: ${S.cart.length} ta ${T("talabnoma","talabnoma")}</h2></div>
+  <div class="cartg"><div>${S.cart.map((it,i)=>`<div class="tn" style="margin-top:${i?10:0}px"><div class="h"><span class="ic sq" style="background:#e9ecf1 url(${IMG(it.family_key)}) center/cover"></span><div><b>${esc(it.family_uz)}</b><div class="note">${esc(it.region_uz||"")}</div></div>${poolTag(it)}${by(it.by)}<span class="sp"></span><button class="rm" data-rm="${i}" title="O'chirish">${ico("i-trash")}</button></div>
+    <div class="ff"><div><label class="l">Hajm (${esc(it.unit_short)})</label><input class="f" type="number" step="any" data-i="${i}" data-k="qty" value="${it.qty}"></div><div><label class="l">Narx shifti / ${esc(it.unit_short)}</label><input class="f" type="number" data-i="${i}" data-k="price_max" value="${it.price_max}"></div><div><label class="l">Qachongacha</label><input class="f" type="date" data-i="${i}" data-k="deadline" value="${it.deadline}"></div><div><label class="l">Ko'pi bilan</label><div style="padding:9px 0;font-weight:600" class="mono">${money(it.qty*it.price_max)}</div></div></div></div>`).join("")}</div>
+   <aside class="card sum"><h3>Buyurtma</h3>
+    <div class="ln" style="margin-top:8px"><span>Talabnomalar</span><b>${S.cart.length}</b></div>
+    <div class="ln"><span>Narx shiftlari bo'yicha, ko'pi bilan</span><b>${money(tot)}</b></div>
+    <p class="note">Haqiqiy narx odatda shiftdan past bo'ladi: agent eng arzon mos lotni tanlaydi.</p>
+    <button class="btn block lg teal" id="run" style="margin-top:12px">${ico("i-bolt")}Agentni ishga tushirish</button>
+    <p class="note" style="margin-top:8px">Agent lotlarni qidiradi, ${T("qoriqchi","Qo'riqchi")} tekshiradi. Imzolamaguningizcha hech narsa sotib olinmaydi.</p></aside></div>`;
+  v.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{S.cart.splice(+b.dataset.rm,1);S.run=null;saveCart();cart(v)});
+  v.querySelectorAll("input[data-k]").forEach(inp=>inp.onchange=()=>{const it=S.cart[+inp.dataset.i];it[inp.dataset.k]=inp.type==="number"?+inp.value:inp.value;S.run=null;saveCart();cart(v)});
+  $("#run").onclick=()=>{S.run=null;location.hash="#/agent"};
+}
+
+/* agent ------------------------------------------------------------------- */
+async function agent(v){
+  if(!S.cart.length){location.hash="#/savat";return}
+  v.innerHTML=`<div class="crumbs"><a href="#/savat">Savat</a> / Agent</div><div class="agentg"><div class="card" style="position:sticky;top:130px"><div class="row"><h3>Agentingiz ishlayapti</h3><span class="sp"></span><span class="stamp code">${ico("i-shield")}Qoidalar kodda</span></div><ul class="feed" id="feed" style="margin-top:8px"></ul></div><div id="offers"></div></div>`;
+  const feed=$("#feed"),offers=$("#offers");
+  const log=(cls,ic,t,s)=>feed.insertAdjacentHTML("beforeend",`<li><span class="ic ${cls}">${ico(ic)}</span><span>${t}${s?`<small>${s}</small>`:""}</span></li>`);
+  const fresh=!S.run;if(fresh)S.run={items:[]};else log("c","i-check","Agent natijalari tayyor");
+  for(let i=0;i<S.cart.length;i++){const it=S.cart[i];let R=S.run.items[i];
+    if(!R){log("n","i-search",`<b>${esc(it.family_uz)}</b>: ${qn(it.qty)} ${esc(it.unit_short)} uchun lotlar qidirilmoqda`);await wait(450);
+      const m=await api("/api/talab/match",{item:it,session_id:S.session});const best=m.results.find(x=>x.lot.contract_no===m.best);
+      const d=best?await api("/api/talab/deal",{item:it,contract_no:m.best,session_id:"preview-"+S.session}):null;R={m,d};S.run.items[i]=R;
+      log("c","i-shield",`${m.results.length} ta lot topildi va tekshirildi`,`${m.n_accept} tasi talabnomangizga mos`);await wait(400);
+      const rj=m.results.filter(x=>x.guard.verdict!=="accept");
+      if(i===0){for(const x of rj){log("r","i-x",`Rad etildi: ${esc(x.lot.seller_name)}`,esc(x.guard.summary.replace("Rad etildi: ",""))+(x.lot.is_test?" · lot matnidagi buyruq e'tiborsiz qoldirildi":""));await wait(380)}}
+      else if(rj.length){log("r","i-x",`${rj.length} ta lot rad etildi`,rj.map(x=>esc(x.lot.is_test?"sinov loti":x.lot.seller_name)+" — "+esc(x.guard.summary.replace("Rad etildi: ",""))).join("; "));await wait(380)}
+      if(best){log("c","i-check",`Eng yaxshi taklif: ${esc(best.lot.seller_name)}`,`${money(best.lot.expected_price)} / ${esc(it.unit_short)} · ishonch ${best.trust?.score??"—"}`);await wait(350);
+        if(d.pool.needed){const pp=d.pool;log("a","i-users",pp.status==="full"?`Birga olish: guruh to'ldi (${qn(pp.target)} ${esc(it.unit_short)}, ${pp.members_n} ishtirokchi)`:pp.joined?`Birga olish: siz ${pp.you.position}-ishtirokchisiz · yana ${qn(pp.remaining)} ${esc(it.unit_short)} kerak`:`Birga olish: guruhda ${qn(pp.filled)} / ${qn(pp.target)} ${esc(it.unit_short)} — siz hali qo'shilmagansiz`,`${pp.members_n} ishtirokchi · ${esc(pp.region_uz)}`);await wait(350)}}
+      else log("r","i-x","Mos lot topilmadi","talabnoma faol qoladi: mos lot chiqqanda agent xabar beradi");
+    }
+    offers.insertAdjacentHTML("beforeend",offerCard(it,R));
+    setTimeout(()=>$$(".prog i").forEach(x=>x.style.width=x.dataset.w+"%"),80);
+  }
+  if(fresh){log("n","i-pen","Tayyor. Imzolash sizda","hech narsa sizning imzongizsiz sotib olinmaydi");refreshAudit();
+    const lines=S.cart.map((it,i)=>{const R=S.run.items[i];const best=R?.m.results.find(x=>x.lot.contract_no===R.m.best);const rj=R?R.m.n_reject:0;
+      return best?{ok:true,t:`${it.family_uz} ${qn(it.qty)} ${it.unit_short}: ${best.lot.seller_name}, ${sh(best.lot.expected_price)} so'm/${it.unit_short}; ${rj} ta lot rad etildi${R.d.pool.needed?(R.d.pool.status==="full"?"; guruh to'ldi":R.d.pool.joined?`; guruhda siz ${R.d.pool.you.position}-ishtirokchi, yana ${qn(R.d.pool.remaining)} ${it.unit_short} kerak`:"; birga olish taklif qilinadi"):""}`}:{ok:false,t:`${it.family_uz}: mos lot topilmadi, talabnoma faol qoladi`}});
+    const total=S.run.items.reduce((a,R)=>a+(R?.d?.total||0),0);
+    S.thread.push({role:"a",type:"run",text:`Agent ishini tugatdi. ${S.cart.length} ta talabnoma bo'yicha eng yaxshi takliflar tayyor, jami ${money(total)}. Xavfli lotlarni to'xtatdim — sababini “Batafsil”da ko'rasiz.`,lines,fresh:true});
+    saveThread();if($("#aip").classList.contains("on"))renderThread();else $("#launch").classList.add("unread")}
+  const ok=S.run.items.some(R=>R?.d);
+  offers.querySelectorAll("[data-pjoin]").forEach(b=>b.onclick=async()=>{b.disabled=true;const {msg}=await joinPool(b.dataset.pjoin,+b.dataset.q,b.dataset.r);say(msg);
+    const i=S.cart.findIndex(x=>x.family_key===b.dataset.pjoin);const pv=poolOf(b.dataset.pjoin);if(i>=0){S.cart[i].pool=true;if(pv){S.cart[i].pool_contract=pv.contract_no;S.cart[i].price_max=Math.max(S.cart[i].price_max||0,Math.round(pv.unit_price*1.01))}saveCart()}S.run=null;agent(v)});
+  offers.insertAdjacentHTML("beforeend",`<div class="row" style="margin-top:4px"><a class="btn ghost" href="#/savat">← Savat</a><span class="sp"></span>${ok?`<a class="btn lg" href="#/checkout">${ico("i-pen")}Rasmiylashtirish</a>`:""}</div>`);
+}
+function offerCard(it,R){
+  const m=R.m,d=R.d;const best=m.results.find(x=>x.lot.contract_no===m.best);const rej=m.results.filter(x=>x.guard.verdict!=="accept");
+  if(!best)return`<div class="offer" style="border-top-color:var(--red)"><b>${esc(it.family_uz)}</b>: mos lot yo'q. Talabnoma faol qoladi.</div>`;
+  const L=best.lot,p=d.pool;
+  return`<div class="offer"><div class="h"><span class="ic sq" style="background:#e9ecf1 url(${IMG(it.family_key)}) center/cover"></span><div><b style="font-size:16px">${esc(it.family_uz)} · ${qn(it.qty)} ${esc(it.unit_short)}</b><div class="note">${esc(L.seller_name)} · ${esc(L.region_uz)}<span class="pro"> · lot ${esc(L.contract_no)}</span></div></div><span class="sp"></span><span class="stamp code">${ico("i-check")}Qo'riqchidan o'tdi</span></div>
+   <div class="kv"><div><span>Narx / ${esc(it.unit_short)}</span><b>${sh(L.expected_price)}</b></div><div><span>Jami</span><b>${money(d.amount)}</b></div><div><span>Yetkazish</span><b>${L.delivery_term_days} kun</b></div><div><span>${T("ishonch","Ishonch")}</span><b>${best.trust?.score??"—"}</b></div></div>
+   ${p.needed?`<div class="pool"><div class="row"><b>${T("pullot","Birga olish")}</b><span class="okb" style="margin-left:6px">${p.members_n} ishtirokchi</span><span class="sp"></span><span class="mono">${qn(p.filled)} / ${qn(p.target)} ${esc(it.unit_short)}</span></div><div class="prog"><i data-w="${p.fill_pct}"></i></div>
+     <div style="font-size:13.5px;margin-bottom:8px">${poolStatus(p,esc(it.unit_short))}</div>
+     <div class="mem">${p.members.map(x=>`<span class="${x.you?"me":""}">${esc(x.name)} · ${qn(x.qty)}</span>`).join("")}</div>
+     ${!p.joined&&p.status!=="full"?`<button class="btn teal" style="margin-top:10px;padding:8px 14px" data-pjoin="${esc(it.family_key)}" data-q="${it.qty}" data-r="${esc(it.region_id||"")}">Guruhga qo'shilish (${qn(it.qty)} ${esc(it.unit_short)})</button>`:""}
+     <p class="note" style="margin-top:6px">Hammasi bitta narxda: ${sh(p.unit_price)} so'm/${esc(it.unit_short)}. ${esc(p.refund)}<span class="biz"> ${esc(p.note)}</span></p></div>`:""}
+   ${rej.length?`<details><summary>Qo'riqchi ${rej.length} ta lotni to'xtatdi — nega?</summary>${rej.map(x=>`<div class="rej"><b>${esc(x.lot.seller_name)}</b>: ${esc(x.guard.summary.replace("Rad etildi: ",""))}${x.lot.is_test?`<div class="inj">Lot matni: “${esc(x.lot.spec)}”</div>`:""}<ul class="checks">${x.guard.checks.map(c=>`<li class="${c.status}"><span class="x">${c.status==="ok"?"✓":c.status==="fail"?"✕":"!"}</span><span>${esc(c.title)}: ${esc(c.detail)}<span class="biz ref"> · ${esc(/^\d+$/.test(c.ref.clause)?c.ref.clause+"-band":c.ref.uz)}</span></span></li>`).join("")}</ul></div>`).join("")}</details>`:""}
+   ${m.n_accept>1?`<details class="biz"><summary>Boshqa mos lotlar (${m.n_accept-1})</summary><ul class="list">${m.results.filter(x=>x.guard.verdict==="accept"&&x!==best).map(x=>`<li><span style="flex:1">${esc(x.lot.seller_name)} <span class="muted">${esc(x.lot.region_uz)}</span></span><span class="mono">${sh(x.lot.expected_price)}</span><span class="muted">${x.lot.delivery_term_days} kun</span></li>`).join("")}</ul></details>`:""}
+  </div>`}
+
+/* checkout ---------------------------------------------------------------- */
+function checkout(v){
+  const R=S.run?.items||[];if(!R.length){location.hash="#/agent";return}
+  const rows=S.cart.map((it,i)=>({it,R:R[i]})).filter(x=>x.R?.d);
+  const sum=k=>rows.reduce((a,x)=>a+x.R.d[k],0);const dep=rows.reduce((a,x)=>a+x.R.d.deposit_amount,0);const ev=S.ev?.deposit_effect;
+  v.innerHTML=`<div class="crumbs"><a href="#/agent">Agent</a> / Rasmiylashtirish</div><div class="sec-h" style="margin-top:0"><h2>Rasmiylashtirish</h2></div>
+  <div class="cartg"><div>
+   <div class="card"><h3>Nimani imzolaysiz</h3><table class="cost" style="margin-top:6px">${rows.map(x=>`<tr><td><b>${esc(x.it.family_uz)}</b> · ${qn(x.it.qty)} ${esc(x.it.unit_short)}<small>${esc(x.R.d.lot.seller_name)} · ${sh(x.R.d.unit_price)} / ${esc(x.it.unit_short)} · ${dt(x.it.deadline)} gacha${x.R.d.pool.needed?" · birga olish":""}</small></td><td>${money(x.R.d.amount)}</td></tr>`).join("")}</table></div>
+   <div class="card" style="margin-top:14px"><h3>Halollik pul tejaydi</h3>
+    <p class="ink2" style="margin-top:6px">Siz yangi ishtirokchisiz, shuning uchun ${T("zakalat","zakalat")} standart: <b>10%</b>. Bitimlarni o'z vaqtida bajarsangiz, ishonch ballingiz oshadi va keyingi safar zakalat <b>7%</b> gacha tushadi. Asos: UZEX qoidalari, 94 va 299-bandlar.</p>
+    ${ev?`<p class="why">Nega bu ishlaydi: datasetda zakalat ${ev.by_deposit.map(x=>x.deposit_pct+"% bo'lgan bitimlarda bekor qilish "+pct(x.annul_pct)).join(", ")}. Zakalat — intizom dastagi.</p>`:""}</div>
+   <div class="card" style="margin-top:14px"><h3>Keyin nima bo'ladi</h3><ul class="list" style="margin-top:4px">${(rows[0]?.R.d.schedule||[]).map(s=>`<li><b class="mono" style="min-width:96px">${dt(s.date)}</b><span>${esc(s.event)}</span></li>`).join("")}</ul></div>
+  </div>
+  <aside class="card sum"><h3>To'lov</h3>
+   <div class="ln" style="margin-top:8px"><span>Tovarlar</span><b>${money(sum("amount"))}</b></div>
+   <div class="ln"><span>Birja yig'imi 0,13%</span><b>${money(sum("fee_exchange"))}</b></div>
+   <div class="ln"><span>${T("kliring","Kliring")} 0,05%</span><b>${money(sum("fee_clearing"))}</b></div>
+   <div class="ln tot"><span>Jami</span><b>${money(sum("total"))}</b></div>
+   <div class="ln"><span class="muted">Hozir bloklanadi (zakalat, qaytadi)</span><b>${money(dep)}</b></div>
+   <label class="row" style="gap:8px;margin-top:12px;font-size:14px;flex-wrap:nowrap"><input type="checkbox" id="agree"> Shartlarni o'qidim, tasdiqlayman</label>
+   <div id="signBox" style="margin-top:10px"><button class="btn block lg" id="sign" disabled>${ico("i-pen")}ERI bilan imzolash</button></div>
+   <p class="note" style="margin-top:8px">Pilot bosqichida ${T("broker","broker")} ham tasdiqlaydi. Qonunchilik o'zgarishi shart emas.</p></aside></div>`;
+  $("#agree").onchange=e=>$("#sign").disabled=!e.target.checked;
+  $("#sign").onclick=async()=>{$("#signBox").innerHTML=`<div class="okm">${ico("i-check")}ERI imzosi qo'yildi</div><div class="note">Broker tasdig'i kutilmoqda…</div>`;
+    for(const x of rows)await api("/api/talab/deal",{item:x.it,contract_no:x.R.d.lot.contract_no,session_id:S.session});refreshAudit();await wait(900);
+    const id="B-"+String(Date.now()).slice(-6);S.orders.unshift({id,created:S.cat.today,lines:rows.map(x=>({family_uz:x.it.family_uz,family_key:x.it.family_key,qty:x.it.qty,unit_short:x.it.unit_short,seller:x.R.d.lot.seller_name,amount:x.R.d.amount,schedule:x.R.d.schedule,pool:x.R.d.pool.needed})),total:sum("total")});
+    saveOrders();S.cart=[];saveCart();S.run=null;location.hash="#/buyurtmalar"};
+}
+
+/* orders + dispute -------------------------------------------------------- */
+function orders(v){
+  if(!S.orders.length){v.innerHTML=`<div class="card empty">${ico("i-box")}<h2 style="margin:12px 0 6px">Buyurtmalar yo'q</h2><p>Imzolangan talabnomalar shu yerda kuzatiladi.</p><a class="btn ghost" href="#/nizo" style="margin-top:10px">${ico("i-scale")}Nizo namunasini ko'rish</a></div>`;return}
+  v.innerHTML=`<div class="sec-h" style="margin-top:0"><h2>Buyurtmalarim</h2></div>`+S.orders.map(o=>`<div class="order"><div class="row"><b style="font-size:16px">Buyurtma ${esc(o.id)}</b><span class="stamp human">${ico("i-pen")}Imzolangan · broker tasdiqlagan</span><span class="sp"></span><b class="mono">${money(o.total)}</b></div>
+   ${o.lines.map(l=>{const s=l.schedule;return`<div style="margin-top:14px"><div class="row"><span class="ic sq" style="width:36px;height:36px;background:#e9ecf1 url(${IMG(l.family_key)}) center/cover"></span><b>${esc(l.family_uz)} · ${qn(l.qty)} ${esc(l.unit_short)}</b><span class="muted">${esc(l.seller)}${l.pool?" · birga olish":""}</span></div>
+    <div class="track"><div class="done">Talabnoma<b>${dt(o.created)}</b></div><div class="done">Bitim<b>${dt(s[0].date)}</b></div><div>To'lov<b>${dt(s[1].date)}</b></div><div>Yetkazish<b>${dt(s[2].date)}</b></div></div></div>`}).join("")}
+   <div class="row" style="margin-top:10px"><span class="note">Muddatlarni tizim kuzatadi. Kechikish bo'lsa, xabar olasiz.</span><span class="sp"></span><a class="btn ghost" href="#/nizo">${ico("i-scale")}Muammo bormi? Nizo ochish</a></div></div>`).join("");
+}
+async function dispute(v){
+  v.innerHTML=`<div class="loading"><span class="dots"><i></i><i></i><i></i></span><br>AI-hakam dalillarni o'qimoqda…</div>`;
+  if(!S.arb){S.arb=await api("/api/talab/arbiter_ai?session_id="+S.session);refreshAudit()}
+  const a=S.arb;
+  v.innerHTML=`<div class="crumbs"><a href="#/buyurtmalar">Buyurtmalar</a> / Nizo</div>
+  <div class="cartg"><div>
+   <div class="card"><div class="row"><h2 style="font-size:20px">Yetkazish kechikdi: real holat</h2><span class="sp"></span><span class="stamp ai">Qaror loyihasi · imzolanmagan</span></div>
+    <p class="ink2" style="margin-top:6px"><span class="odd">Tizim dalillarni o'zi yig'di. AI qoidaga asoslangan loyiha yozdi. Yakuniy qarorni har doim inson qabul qiladi.</span><span class="biz">Datasetdagi real kechikkan bitim. Faktlar bazadan, qoida matni UZEX qoidalaridan.</span></p>
+    <table class="facts" style="margin-top:8px">${a.facts.map(f=>`<tr><td>${esc(f.k)}</td><td>${esc(f.v)}</td></tr>`).join("")}</table>
+    <div class="row" style="margin-top:14px"><span class="stamp ai">${a.ai.source==="ai"?"Yordamchi tayyorlagan loyiha":"Standart loyiha"}</span>${a.ai.reason?`<span class="note">${esc(a.ai.reason)}</span>`:""}</div>
+    <div class="draft">${esc(md(a.ai.text))}</div>
+    ${a.options.map(o=>`<div class="opt"><b>Variant ${esc(o.id)}.</b> ${esc(o.text)}${o.note?`<div class="why">${esc(o.note)}</div>`:""}</div>`).join("")}
+    <details style="margin-top:10px"><summary>Qoidalar matni (${a.rules.map(r=>r.clause).join(", ")}-bandlar)</summary>${a.rules.map(r=>`<div class="quote"><b>${r.clause}-band.</b> ${esc(r.uz)}<div class="pro" style="margin-top:4px">${esc(r.ru)}</div></div>`).join("")}</details>
+   </div></div>
+   <aside class="card sum who"><h3>Kim nima qiladi</h3>
+    <div class="tg"><i class="a">${ico("i-pen")}</i><span><b>Yordamchi</b> loyiha yozdi</span></div>
+    <div class="tg"><i class="c">${ico("i-shield")}</i><span><b>Kod</b> faktlarni bazadan oldi, raqamlarni tekshirdi</span></div>
+    <div class="tg"><i class="h">${ico("i-pen")}</i><span><b>Inson</b> imzolaydi</span></div>
+    <p style="font-size:14px;margin-top:10px"><b>Tomonlardan kerak:</b> ${a.need_from_parties.map(esc).join("; ")}</p>
+    <div id="hBox"><button class="btn block" id="hBtn">${ico("i-pen")}Komissiya a'zosi sifatida ko'rib chiqish</button></div>
+    <p class="note" style="margin-top:8px">${esc(a.human)}</p><p class="note pro">bitim №${a.deal_no}</p></aside></div>`;
+  $("#hBtn").onclick=()=>$("#hBox").innerHTML=`<div class="okm">${ico("i-check")}Ko'rib chiqishga olindi</div><div class="note">Qaror faqat inson imzosi bilan kuchga kiradi.</div>`;
+}
+
+/* evidence ---------------------------------------------------------------- */
+async function openEv(){
+  $("#evov").classList.add("on");$("#evsheet").innerHTML=`<div class="bd loading">Yuklanmoqda…</div>`;
+  if(!S.ev)S.ev=await api("/api/talab/evidence");
+  const e=S.ev,b=e.baseline,de=e.deposit_effect,bs=e.band_savings,sb=e.signal_backtest.by_family,ps=e.parser||{};
+  const fam={cement:"Sement",rebar:"Armatura",brick:"G'isht",flour:"Un",sugar:"Shakar",diesel:"Dizel",petrol:"Benzin",polyethylene:"Polietilen"};
+  $("#evsheet").innerHTML=`<div class="top">${ico("i-chart")}<h2>Isbot: real data ustida</h2><span class="sp"></span><button class="x" onclick="$('#evov').classList.remove('on')">${ico("i-x")}</button></div><div class="bd">
+   <p class="note">${esc(e.dataset)} · hisoblangan ${esc(e.generated_at)} · faqat SQL · tests/talab_evidence.py</p>
+   <div class="evh">1. Muammo</div><div class="kpis"><div class="kpi"><b>${fmtN(b.annul_trln,1)} trln</b><span>so'mlik bekor bitim (${pct(b.annul_pct,2)})</span></div><div class="kpi"><b>${pct(b.spread_median_pct)}</b><span>bir tovar, bir haftadagi narx farqi</span></div><div class="kpi"><b>${pct(b.at_start_price_pct)}</b><span>bitim boshlang'ich narxda — raqobatsiz</span></div><div class="kpi"><b>${pct(b.cement_lt10t_pct)}</b><span>sement bitimlari 10 t dan kichik</span></div></div>
+   <div class="evh">2. Adolatli narx</div><p>2025–26-yillarda bitimlarning <b>${pct(bs.above_pct)}</b> i o'sha paytdagi oraliqdan qimmatga yopilgan; ortiqcha to'lov <b>${fmtN(bs.overpay_mlrd)} mlrd so'm</b> (aylanma ${fmtN(bs.total_trln,1)} trln).</p><p class="note">${esc(bs.caveat)}</p>
+   <div class="evh">3. Zakalat — intizom dastagi</div><table class="ev"><tr><th>Zakalat</th><th>Bitimlar</th><th>Bekor qilish</th></tr>${de.by_deposit.map(x=>`<tr><td>${x.deposit_pct}%</td><td class="n">${fmtN(x.n)}</td><td class="n">${pct(x.annul_pct,2)}</td></tr>`).join("")}</table>
+   <div class="honest"><b>Halol cheklov.</b> ${esc(e.history_predicts.conclusion)}</div>
+   <div class="evh">4. "Qachon olish" signali, orqaga qarab sinov</div><table class="ev"><tr><th>Tovar</th><th>"Kuting"</th><th>To'g'ri</th><th>Tejam</th><th>Holati</th></tr>${Object.entries(sb).map(([k,x])=>{const on=x.wait_hit_pct>=55&&x.avg_saving_when_wait_pct>0;return`<tr><td>${fam[k]||k}</td><td class="n">${x.wait_signals}</td><td class="n">${x.wait_right} (${pct(x.wait_hit_pct,0)})</td><td class="n">${pct(x.avg_saving_when_wait_pct)}</td><td>${on?`<span class="stamp code">yoqilgan</span>`:`<span class="stamp no">o'chirilgan</span>`}</td></tr>`}).join("")}</table>
+   ${ps.dev?`<div class="evh">5. Talabnoma aniqligi (dastur tahlilchisi)</div><table class="ev"><tr><th>To'plam</th><th>To'liq to'g'ri</th><th>Tovar</th><th>Hajm</th><th>Hudud</th><th>Muddat</th><th>Narx</th></tr>${["dev","holdout"].filter(k=>ps[k]).map(k=>{const x=ps[k];return`<tr><td>${k==="dev"?"dev":"holdout (bir marta)"}</td><td class="n">${x.exact}/${x.n}</td>${["family","qty","region","deadline","price"].map(f=>`<td class="n">${x.fields_pct[f]}%</td>`).join("")}</tr>`}).join("")}</table><p class="note">AI javobi shu tahlilchi bilan solishtiriladi: kelishmovchilikda matndagi qiymat olinadi.</p>`:""}
+  </div>`;
+}
+$("#evBtn").onclick=openEv;$("#evov").addEventListener("click",e=>{if(e.target.id==="evov")$("#evov").classList.remove("on")});
+
+/* boot -------------------------------------------------------------------- */
+(async()=>{setMode(S.mode);saveCart();saveOrders();
+  try{[S.meta,S.cat]=await Promise.all([api("/api/talab/meta"),api("/api/talab/catalog")]);S.pools=(await api("/api/talab/pools2?session_id="+S.session)).pools;api("/api/talab/evidence").then(e=>S.ev=e).catch(()=>{})}
+  catch(e){$("#view").innerHTML=`<div class="card err">Server bilan aloqa yo'q: ${esc(e.message)}</div>`;return}
+  aiChip();renderTicker();route();refreshAudit()})();
+</script>
+</body>
+</html>

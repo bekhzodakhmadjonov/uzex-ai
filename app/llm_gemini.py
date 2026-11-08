@@ -48,6 +48,7 @@ class GeminiPlanner:
         self.last_usage = {"provider": "gemini", "model": model or self.model, "in": getattr(u, "prompt_token_count", None),
                            "out": getattr(u, "candidates_token_count", None), "thoughts": getattr(u, "thoughts_token_count", None),
                            "cached": getattr(u, "cached_content_token_count", None)}
+        self.last_finish = str(getattr(resp.candidates[0], "finish_reason", "") if resp.candidates else "")
         text = resp.text or ""
         if not text and resp.candidates:
             parts = resp.candidates[0].content.parts or []
@@ -74,7 +75,10 @@ class GeminiPlanner:
         system = _COMPOSE_RULES.replace("{lang}", LANG_NAME.get(lang, lang))
         user = (f"QUESTION: {question}\n\nSQL RUN:\n{sql}\n\nASSUMPTIONS: {json.dumps(assumptions, ensure_ascii=False)}\n\n"
                 f"RESULT ROWS ({n_rows} rows, showing up to 30):\n{rows_json}\n{extra}")
-        return self._gen(system, user, None, max_tokens=1200, model=self.compose_model, thinking=COMPOSE_THINKING).strip()
+        text = self._gen(system, user, None, max_tokens=4000, model=self.compose_model, thinking=COMPOSE_THINKING).strip()
+        if "MAX_TOKENS" in self.last_finish:  # a cut-off template would print a sentence that stops mid-word
+            return ""
+        return text
 
     def adjudicate(self, question: str, a: dict, b: dict) -> str:
         text = self._gen(_ADJUDICATE_RULES, adjudicate_prompt(question, a, b), ADJUDICATE_SCHEMA, max_tokens=1500, thinking=PLAN_THINKING)

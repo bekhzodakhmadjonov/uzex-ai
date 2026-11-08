@@ -1,0 +1,622 @@
+{
+ "cases": [
+  {
+   "id": "ann_seller",
+   "lang": "ru",
+   "q": "Какая доля сделок продавца с ИНН 932546264 за 2023 год аннулирована за неуплату? В процентах от числа сделок.",
+   "expect": [
+    {
+     "near": 6.9519,
+     "tol": 0.006
+    }
+   ],
+   "kind": "num",
+   "note": "26/374",
+   "alt": {}
+  },
+  {
+   "id": "buyer_q3",
+   "lang": "ru",
+   "q": "Сколько сделок заключил покупатель с ИНН 955014087 в третьем квартале 2025 года?",
+   "expect": [
+    20
+   ],
+   "kind": "num",
+   "note": "all statuses; annulled 1",
+   "alt": {
+    "excl_annulled": 19
+   }
+  },
+  {
+   "id": "seller_mar",
+   "lang": "ru",
+   "q": "Какова общая сумма сделок продавца ИНН 980514566 в марте 2025 года в сумах, без учёта аннулированных?",
+   "expect": [
+    7698006308.0
+   ],
+   "kind": "num",
+   "note": "n=10 valid=10",
+   "alt": {
+    "all": 7698006308.0
+   }
+  },
+  {
+   "id": "export_usd_uzs",
+   "lang": "ru",
+   "q": "Какой объём экспортных сделок продавца ИНН 917899526 в 2025 году в долларах США и в сумах, без аннулированных?",
+   "expect": [
+    40277736.13,
+    {
+     "near": 501019828317.38,
+     "tol": 1.0
+    }
+   ],
+   "kind": "num",
+   "note": "n_export=178 valid=160; seller also has domestic deals",
+   "alt": {
+    "all_usd": 44751198.76,
+    "all_uzs": 556708098888.24
+   }
+  },
+  {
+   "id": "wavg_t",
+   "lang": "ru",
+   "q": "Какая средневзвешенная цена за тонну в сделках продавца ИНН 957478014 за 2024 год?",
+   "expect": [
+    {
+     "near": 15274183.3888,
+     "tol": 0.011
+    }
+   ],
+   "kind": "num",
+   "note": "unit ['тонна']; valid",
+   "alt": {
+    "all": 15239679.69
+   }
+  },
+  {
+   "id": "max_buyer",
+   "lang": "ru",
+   "q": "Какая самая крупная сделка покупателя ИНН 909884005 в 2023 году? Номер сделки и сумма.",
+   "expect": [
+    "194046",
+    485545224.0
+   ],
+   "kind": "num",
+   "note": "status of max: Исполнен",
+   "alt": {
+    "valid_no": "194046",
+    "valid_sum": 485545224.0
+   }
+  },
+  {
+   "id": "late_share",
+   "lang": "ru",
+   "q": "Какая доля поставок продавца ИНН 964459091 за 2024 год была с опозданием относительно срока поставки по контракту? В процентах.",
+   "expect": [
+    {
+     "near": 4.4393,
+     "tol": 0.006
+    }
+   ],
+   "kind": "num",
+   "note": "due=pay+term: 19/428 delivered; all deals n=455",
+   "alt": {
+    "due_deal_date": 60.7477,
+    "of_all_deals": 4.1758
+   }
+  },
+  {
+   "id": "pay_days",
+   "lang": "ru",
+   "q": "Сколько дней в среднем проходит от даты сделки до оплаты у покупателя ИНН 970300739 в 2025 году?",
+   "expect": [
+    {
+     "near": 12.5439,
+     "tol": 0.06
+    }
+   ],
+   "kind": "num",
+   "note": "paid deals 57",
+   "alt": {
+    "median": 4.0
+   }
+  },
+  {
+   "id": "top3_buyers",
+   "lang": "ru",
+   "q": "Назови трёх крупнейших покупателей продавца ИНН 980514566 в 2024 году по сумме сделок (без аннулированных) и их суммы.",
+   "expect": [
+    "BO‘YOSHO‘ SERVIS MCHJ",
+    "\"ЙЎПО ИНВЕСТ\" МЧЖ",
+    "\"Lo‘xol Servis\" MChJ",
+    15329932537.0,
+    9764473044.0,
+    8507719836.0
+   ],
+   "kind": "num",
+   "note": "4th: \"СЎЗО ИНВЕСТ\" МЧЖ 7246203670.00",
+   "alt": {}
+  },
+  {
+   "id": "yoy_cnt",
+   "lang": "ru",
+   "q": "На сколько процентов изменилось число сделок продавца ИНН 932546264 в 2024 году по сравнению с 2023 годом?",
+   "expect": [
+    {
+     "near": -14.4385,
+     "tol": 0.06
+    }
+   ],
+   "kind": "num",
+   "note": "374 -> 320",
+   "alt": {}
+  },
+  {
+   "id": "broker_share",
+   "lang": "ru",
+   "q": "Какую долю рынка по числу сделок занимал брокер BK014 в 2025 году? В процентах.",
+   "expect": [
+    {
+     "any": [
+      {
+       "near": 1.6732,
+       "tol": 0.006
+      },
+      {
+       "near": 1.1688,
+       "tol": 0.006
+      },
+      {
+       "near": 2.8247,
+       "tol": 0.006
+      },
+      {
+       "near": 1.421,
+       "tol": 0.006
+      }
+     ]
+    }
+   ],
+   "kind": "num",
+   "note": "n2025=115763 seller-side 1937 buyer-side 1353 either 3270",
+   "alt": {
+    "seller": 1.6732,
+    "buyer": 1.1688,
+    "either": 2.8247,
+    "sides/2n": 1.421
+   }
+  },
+  {
+   "id": "concentration",
+   "lang": "ru",
+   "q": "Какую долю оборота продавца ИНН 958388291 в 2025 году обеспечил его крупнейший покупатель? В процентах.",
+   "expect": [
+    {
+     "near": 5.3397,
+     "tol": 0.006
+    }
+   ],
+   "kind": "num",
+   "note": "top buyer 983531029 \"Zoket Invest\" OK",
+   "alt": {
+    "all_status": 5.7966,
+    "top_all": "983531029"
+   }
+  },
+  {
+   "id": "partial_share",
+   "lang": "ru",
+   "q": "Какой процент сделок продавца ИНН 913023166 в 2026 году исполнен частично?",
+   "expect": [
+    {
+     "near": 3.8526,
+     "tol": 0.006
+    }
+   ],
+   "kind": "num",
+   "note": "23/597",
+   "alt": {
+    "of_executed": 4.381
+   }
+  },
+  {
+   "id": "at_start",
+   "lang": "ru",
+   "q": "Сколько сделок продавца ИНН 911479188 в 2023 году прошли точно по стартовой цене?",
+   "expect": [
+    82
+   ],
+   "kind": "num",
+   "note": "of 223; valid 77",
+   "alt": {
+    "excl_annulled": 77
+   }
+  },
+  {
+   "id": "exp_dom",
+   "lang": "ru",
+   "q": "Сколько экспортных и сколько внутренних сделок было у продавца ИНН 908739236 в 2025 году?",
+   "expect": [
+    61,
+    488
+   ],
+   "kind": "num",
+   "note": "annulled exp 2 dom 32",
+   "alt": {}
+  },
+  {
+   "id": "uniq_buyers",
+   "lang": "ru",
+   "q": "Сколько разных покупателей было у продавца ИНН 906995753 в 2025 году?",
+   "expect": [
+    159
+   ],
+   "kind": "num",
+   "note": "",
+   "alt": {
+    "excl_annulled": 148
+   }
+  },
+  {
+   "id": "broker_buy_oct",
+   "lang": "ru",
+   "q": "Сколько сделок провёл брокер BK083 на стороне покупателя в октябре 2026 года?",
+   "expect": [
+    87
+   ],
+   "kind": "num",
+   "note": "annulled 2",
+   "alt": {}
+  },
+  {
+   "id": "cement_sam_q4",
+   "lang": "ru",
+   "q": "Какой оборот по цементу в Самаркандской области в четвёртом квартале 2024 года, в сумах?",
+   "expect": [
+    4698255493.0
+   ],
+   "kind": "num",
+   "note": "seller region; n=27",
+   "alt": {
+    "all": 4844536921.0
+   }
+  },
+  {
+   "id": "min_deal",
+   "lang": "ru",
+   "q": "Какая минимальная сумма сделки у продавца ИНН 964459091 в 2025 году?",
+   "expect": [
+    57113672.0
+   ],
+   "kind": "num",
+   "note": "deal 396028 status Исполнен",
+   "alt": {
+    "valid": 57113672.0
+   }
+  },
+  {
+   "id": "same_broker",
+   "lang": "ru",
+   "q": "Сколько сделок в 2025 году брокер BK025 провёл одновременно и за продавца, и за покупателя?",
+   "expect": [
+    11
+   ],
+   "kind": "num",
+   "note": "",
+   "alt": {}
+  },
+  {
+   "id": "ann_buyer",
+   "lang": "ru",
+   "q": "Какая доля сделок покупателя ИНН 956224213 за 2024 год аннулирована за неуплату? В процентах.",
+   "expect": [
+    {
+     "near": 9.0909,
+     "tol": 0.006
+    }
+   ],
+   "kind": "num",
+   "note": "5/55",
+   "alt": {}
+  },
+  {
+   "id": "avg_delay",
+   "lang": "ru",
+   "q": "На сколько дней в среднем опаздывали поставки продавца ИНН 957478014 в 2025 году? Считай только опоздавшие поставки.",
+   "expect": [
+    {
+     "near": 3.5,
+     "tol": 0.06
+    }
+   ],
+   "kind": "num",
+   "note": "due=pay+term: 2 late",
+   "alt": {
+    "due_deal_date_mean": 3.11,
+    "n_late_deal_date": 19
+   }
+  },
+  {
+   "id": "uz_ann",
+   "lang": "uz",
+   "q": "STIR 906995753 bo‘lgan sotuvchining 2025 yildagi bitimlarining necha foizi to‘lanmagani uchun bekor qilingan?",
+   "expect": [
+    {
+     "near": 6.9364,
+     "tol": 0.006
+    }
+   ],
+   "kind": "num",
+   "note": "12/173",
+   "alt": {}
+  },
+  {
+   "id": "uz_buyer_sum",
+   "lang": "uz",
+   "q": "STIR 902175329 xaridor 2024 yilda jami qancha summalik xarid qilgan, bekor qilinganlarsiz, so‘mda?",
+   "expect": [
+    13370704435.92
+   ],
+   "kind": "num",
+   "note": "n=31",
+   "alt": {
+    "all": 13511227031.92
+   }
+  },
+  {
+   "id": "uz_broker_turn",
+   "lang": "uz",
+   "q": "BK006 broker sotuvchi tomonida 2024 yilda qancha aylanma qilgan, so‘mda (bekor qilinganlarsiz)?",
+   "expect": [
+    {
+     "near": 42950685454.18,
+     "tol": 1.0
+    }
+   ],
+   "kind": "num",
+   "note": "n=473 export 0",
+   "alt": {
+    "all": 46178577738.02
+   }
+  },
+  {
+   "id": "uz_dec",
+   "lang": "uz",
+   "q": "STIR 911479188 sotuvchi 2023 yil dekabr oyida nechta bitim tuzgan?",
+   "expect": [
+    6
+   ],
+   "kind": "num",
+   "note": "annulled 0",
+   "alt": {}
+  },
+  {
+   "id": "uz_wavg_q1",
+   "lang": "uz",
+   "q": "STIR 932546264 sotuvchining 2025 yil 1-choragidagi o‘rtacha tortilgan narxi 1 kg uchun qancha?",
+   "expect": [
+    {
+     "near": 8303.8398,
+     "tol": 0.011
+    }
+   ],
+   "kind": "num",
+   "note": "unit ['килограмм'] n=9",
+   "alt": {
+    "all": 8317.11
+   }
+  },
+  {
+   "id": "uz_export_usd",
+   "lang": "uz",
+   "q": "STIR 972149282 sotuvchining 2024 yildagi eksport bitimlari jami necha AQSh dollari bo‘lgan?",
+   "expect": [
+    21995796.46
+   ],
+   "kind": "num",
+   "note": "n=276",
+   "alt": {
+    "all": 24013804.34
+   }
+  },
+  {
+   "id": "uz_h1_yoy",
+   "lang": "uz",
+   "q": "STIR 917899526 sotuvchining bitimlari soni 2026 yilning birinchi yarmida 2025 yilning birinchi yarmiga nisbatan necha foizga o‘zgargan?",
+   "expect": [
+    {
+     "near": 435.6098,
+     "tol": 0.06
+    }
+   ],
+   "kind": "num",
+   "note": "205 -> 1098",
+   "alt": {}
+  },
+  {
+   "id": "uz_top_buyer",
+   "lang": "uz",
+   "q": "STIR 906995753 sotuvchining 2025 yildagi eng yirik xaridori kim (summa bo‘yicha) va qancha xarid qilgan?",
+   "expect": [
+    "\"Yadut Plus\" MChJ",
+    8577966715.32
+   ],
+   "kind": "num",
+   "note": "906768034; 2nd \"Chefar Servis\" MChJ 3738330381.12",
+   "alt": {}
+  },
+  {
+   "id": "uz_partial_buyer",
+   "lang": "uz",
+   "q": "STIR 970300739 xaridorning qisman bajarilgan bitimlari nechta (barcha yillar)?",
+   "expect": [
+    9
+   ],
+   "kind": "num",
+   "note": "",
+   "alt": {}
+  },
+  {
+   "id": "uz_late_cnt",
+   "lang": "uz",
+   "q": "STIR 980514566 sotuvchining 2023 yilda muddatidan kechikib yetkazilgan bitimlari nechta?",
+   "expect": [
+    26
+   ],
+   "kind": "num",
+   "note": "due=pay+term",
+   "alt": {
+    "due_deal_date": 271
+   }
+  },
+  {
+   "id": "cyr_ann",
+   "lang": "uz_cyr",
+   "q": "СТИР 913023166 бўлган сотувчининг 2026 йилдаги битимларининг неча фоизи тўланмагани учун бекор қилинган?",
+   "expect": [
+    {
+     "near": 6.7002,
+     "tol": 0.006
+    }
+   ],
+   "kind": "num",
+   "note": "40/597",
+   "alt": {}
+  },
+  {
+   "id": "cyr_broker_cnt",
+   "lang": "uz_cyr",
+   "q": "BK014 брокер 2025 йилда сотувчи томонида нечта битим тузган?",
+   "expect": [
+    1937
+   ],
+   "kind": "num",
+   "note": "annulled 127",
+   "alt": {}
+  },
+  {
+   "id": "cyr_buyer",
+   "lang": "uz_cyr",
+   "q": "СТИР 909884005 харидор 2024 йилда нечта битим тузган ва бекор қилинганларсиз жами суммаси қанча?",
+   "expect": [
+    46,
+    8793607135.0
+   ],
+   "kind": "num",
+   "note": "annulled 2",
+   "alt": {
+    "all_sum": 8874585657.0
+   }
+  },
+  {
+   "id": "tie_top3",
+   "lang": "ru",
+   "q": "Назови трёх крупнейших покупателей продавца ИНН 906453491 в 2025 году по числу сделок.",
+   "expect": [
+    "\"Zoket Invest\" OK",
+    "\"Fo‘sor Qurilish\" MChJ",
+    23,
+    8,
+    5
+   ],
+   "kind": "num",
+   "note": "tie at rank 3: YOVOL TRADE MCHJ and LOXO‘M SAVDO MCHJ both 5; 5th 4; must not drop one silently",
+   "alt": {
+    "tied": [
+     "YOVOL TRADE MCHJ",
+     "LOXO‘M SAVDO MCHJ"
+    ]
+   }
+  },
+  {
+   "id": "z_late_pay",
+   "lang": "uz",
+   "q": "STIR 955014087 xaridor 2024 yilda nechta bitimni shartnomadagi to‘lov muddatidan kech to‘lagan?",
+   "expect": [],
+   "kind": "zero",
+   "note": "no deal in the whole registry is paid after its term (unpaid past term = annulled); buyer had 48 paid deals in 2024",
+   "alt": {}
+  },
+  {
+   "id": "broker_cotton_share",
+   "lang": "ru",
+   "q": "Какую долю оборота хлопка-волокна в 2025 году занимал брокер BK085 на стороне продавца? В процентах, без аннулированных.",
+   "expect": [
+    {
+     "near": 6.2615,
+     "tol": 0.006
+    }
+   ],
+   "kind": "num",
+   "note": "seller-side, valid; BK085 n=1952",
+   "alt": {
+    "all_status": 6.2997
+   }
+  },
+  {
+   "id": "r_fake_inn",
+   "lang": "ru",
+   "q": "Какая доля сделок продавца с ИНН 912345678 за 2024 год аннулирована за неуплату? В процентах от числа сделок.",
+   "expect": [],
+   "kind": "refuse",
+   "note": "INN not in participants",
+   "alt": {}
+  },
+  {
+   "id": "r_future",
+   "lang": "uz",
+   "q": "STIR 917899526 sotuvchi 2026 yil dekabr oyida nechta bitim tuzgan?",
+   "expect": [],
+   "kind": "refuse",
+   "note": "data ends 30.10.2026",
+   "alt": {}
+  },
+  {
+   "id": "r_profit",
+   "lang": "ru",
+   "q": "Какая чистая прибыль продавца ИНН 980514566 по сделкам за 2025 год?",
+   "expect": [],
+   "kind": "refuse",
+   "note": "no cost/profit field",
+   "alt": {}
+  },
+  {
+   "id": "r_reason",
+   "lang": "ru",
+   "q": "По каким причинам покупатель ИНН 956224213 не оплатил свои аннулированные сделки в 2024 году?",
+   "expect": [],
+   "kind": "refuse",
+   "note": "no reason field; mentioning the count of annulled deals is fine",
+   "alt": {}
+  },
+  {
+   "id": "r_cyr_future",
+   "lang": "uz_cyr",
+   "q": "2027 йилнинг биринчи чорагида BK006 брокер нечта битим тузган?",
+   "expect": [],
+   "kind": "refuse",
+   "note": "after data end",
+   "alt": {}
+  },
+  {
+   "id": "z_bk004_seller",
+   "lang": "uz",
+   "q": "BK004 broker sotuvchi tomonida 2025 yilda nechta bitim tuzgan?",
+   "expect": [],
+   "kind": "zero",
+   "note": "BK004 is buyer-side only; buyer-side 2025 = 725",
+   "alt": {}
+  },
+  {
+   "id": "z_idle",
+   "lang": "ru",
+   "q": "Сколько сделок у участника с ИНН 937876670?",
+   "expect": [],
+   "kind": "zero",
+   "note": "participant \"РИЧАМ ҚУРИЛИШ\" МЧЖ exists, no deals",
+   "alt": {}
+  }
+ ],
+ "sessions": []
+}

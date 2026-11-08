@@ -9,6 +9,8 @@ COPY catalog ./catalog
 COPY docs ./docs
 COPY static ./static
 COPY data/uzex.duckdb ./data/uzex.duckdb
+COPY data/rules.json data/talab_evidence.json data/talab_cache.json ./data/
 # data/uzex.duckdb is mounted as a volume (built locally with pipeline/build_db.py)
 EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+# Render passes PORT; docker-compose uses the default 8000
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1"]

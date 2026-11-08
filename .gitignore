@@ -5,3 +5,5 @@ data/logs/
 __pycache__/
 *.pyc
 analysis/*.pkl
+data/talab_pools.json
+data/uzex.duckdb.tmp/
