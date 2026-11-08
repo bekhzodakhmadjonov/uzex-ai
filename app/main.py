@@ -27,6 +27,7 @@ load_dotenv()
 from . import db  # noqa: E402
 from .agent import answer_question  # noqa: E402
 from .dash import dashboard, ticker  # noqa: E402
+from .talab.api import router as talab_router  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC = os.path.join(ROOT, "static")
@@ -163,8 +164,16 @@ async def ticker_api():
     return await loop.run_in_executor(_pool, ticker)
 
 
+app.include_router(talab_router)
+
+
 @app.get("/")
 def index():
+    return FileResponse(os.path.join(STATIC, "talab.html"))
+
+
+@app.get("/tahlil")
+def tahlil():
     return FileResponse(os.path.join(STATIC, "index.html"))
 
 

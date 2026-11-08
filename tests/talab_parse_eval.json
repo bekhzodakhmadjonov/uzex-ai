@@ -1,0 +1,87 @@
+{
+ "dev": {
+  "split": "dev",
+  "n": 20,
+  "exact": 20,
+  "exact_pct": 100,
+  "fields_pct": {
+   "family": 100,
+   "qty": 100,
+   "region": 100,
+   "deadline": 100,
+   "price": 100
+  },
+  "fails": []
+ },
+ "holdout": {
+  "split": "holdout",
+  "n": 20,
+  "exact": 16,
+  "exact_pct": 80,
+  "fields_pct": {
+   "family": 95,
+   "qty": 90,
+   "region": 90,
+   "deadline": 95,
+   "price": 90
+  },
+  "fails": [
+   {
+    "t": "Нужно 15 тысяч кирпича в Андижан до января",
+    "wrong": [
+     "qty",
+     "price"
+    ],
+    "got": [
+     {
+      "family_key": "brick",
+      "qty": null,
+      "region_id": "AND",
+      "deadline": "2027-01-01",
+      "price_max": 15000.0
+     }
+    ]
+   },
+   {
+    "t": "Toshkentga 25 tonna dizel, tonnasi 14 mln so'mdan oshmasin",
+    "wrong": [
+     "price"
+    ],
+    "got": [
+     {
+      "family_key": "diesel",
+      "qty": 25000.0,
+      "region_id": "TAS",
+      "deadline": null,
+      "price_max": 560.0
+     }
+    ]
+   },
+   {
+    "t": "Сырдарья, 30 тонн муки, до 20.11",
+    "wrong": [
+     "family",
+     "qty",
+     "region",
+     "deadline"
+    ],
+    "got": []
+   },
+   {
+    "t": "нужно 8 тонн сахара в Бухару срочно",
+    "wrong": [
+     "region"
+    ],
+    "got": [
+     {
+      "family_key": "sugar",
+      "qty": 8.0,
+      "region_id": null,
+      "deadline": "2026-11-06",
+      "price_max": null
+     }
+    ]
+   }
+  ]
+ }
+}

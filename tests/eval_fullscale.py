@@ -21,7 +21,7 @@ import uuid
 from concurrent.futures import ThreadPoolExecutor
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-NUM = re.compile(r"(?<![\d.,])\d[\d  ]*(?:[.,]\d+)?")
+NUM = re.compile(r"(?<![\d.,])[-−–]?\d[\d  ]*(?:[.,]\d+)?")
 BASIS = re.compile(r"\n\n(?:Asos|Основание|Асос|Basis):.*$", flags=re.S)
 NO_DATA = {"unanswerable", "no_rows", "clarify"}
 INFRA = {"llm_error", "rate_limited", "http_error"}
@@ -49,7 +49,7 @@ def numbers(text: str) -> list[float]:
     out = []
     for m in NUM.finditer(text):
         try:
-            out.append(float(re.sub(r"[\s ]", "", m.group()).replace(",", ".")))
+            out.append(float(re.sub(r"[\s ]", "", m.group()).replace(",", ".").replace("−", "-").replace("–", "-")))
         except ValueError:
             pass
     return out

@@ -71,6 +71,8 @@ LABELS = {
     "avg_price_valid": ("o‘rtacha narx, bekor qilinganlarsiz", "ўртача нарх, бекор қилинганларсиз", "средняя цена без аннулированных"),
     "avg_price_all": ("o‘rtacha narx, hammasi", "ўртача нарх, ҳаммаси", "средняя цена, все сделки"),
     "total_uzs": ("jami summa, so‘m", "жами сумма, сўм", "сумма, сум"), "total_usd": ("jami summa, USD", "жами сумма, USD", "сумма, USD"),
+    "total_usd_valid": ("summa, dollar, bekor qilinganlarsiz", "сумма, доллар, бекор қилинганларсиз", "сумма в долларах без аннулированных"),
+    "total_usd_all": ("summa, dollar, hammasi", "сумма, доллар, ҳаммаси", "сумма в долларах, все сделки"),
     "amount_uzs": ("summa, so‘m", "сумма, сўм", "сумма, сум"), "amount_usd": ("summa, USD", "сумма, USD", "сумма, USD"),
     "total_amount": ("jami summa", "жами сумма", "сумма"), "amount": ("summa", "сумма", "сумма"),
     "tonnes": ("hajm, tonna", "ҳажм, тонна", "объём, тонн"), "volume_t": ("hajm, tonna", "ҳажм, тонна", "объём, тонн"),
@@ -193,10 +195,12 @@ def fmt_value(col: str, v: Any, lang: str = "uz") -> str:
     if isinstance(v, (int, float, decimal.Decimal)):
         if col.lower() == "month" and 1 <= float(v) <= 12:
             return MONTHS.get(lang, MONTHS["uz"])[int(v) - 1]
-        if _IDENT.match(col):
+        if _IDENT.match(col) and not re.search(r"deals|count|^n_|^num_|total|sum|amount", col, re.I):
             return str(int(v)) if float(v).is_integer() else str(v)
         x = float(v)
         s = _num(x, lang, 0 if x.is_integer() else 2)
+        if _PCT_COL.search(col):
+            return f"{_num(x, lang, 2)}%"
         for div, name in ((1e12, "trln"), (1e9, "mlrd")):
             if abs(x) >= div:
                 return f"{s} ({_num(x / div, lang, 2)} {t[name]})"
@@ -226,9 +230,32 @@ def rows_for_llm(res: db.QueryResult, lang: str) -> str:
     return json.dumps(out, ensure_ascii=False)
 
 
+_PCT_COL = re.compile(r"(^|_)(pct|percent)$|^pct_|_pct_|_pct$", re.I)
+_PCT_LABELS = {
+    "annulled": ("bekor qilinganlar ulushi, %", "бекор қилинганлар улуши, %", "доля аннулированных, %"),
+    "late": ("kechikkanlar ulushi, %", "кечикканлар улуши, %", "доля с опозданием, %"),
+    "export": ("eksport ulushi, %", "экспорт улуши, %", "доля экспорта, %"),
+    "executed": ("ijro etilganlar ulushi, %", "ижро этилганлар улуши, %", "доля исполненных, %"),
+    "partial": ("qisman ijro ulushi, %", "қисман ижро улуши, %", "доля частично исполненных, %"),
+}
+
+
 def label(col: str, lang: str) -> str:
     if col in LABELS and lang in _LANG_INDEX:
         return LABELS[col][_LANG_INDEX[lang]]
+    if lang in _LANG_INDEX and re.search(r"(^|_)(pct|percent)$|^pct_|_pct_", col, re.I):
+        for k, v in _PCT_LABELS.items():
+            if k in col.lower():
+                return v[_LANG_INDEX[lang]]
+        return LABELS["share_pct"][_LANG_INDEX[lang]]
+    m = re.match(r"(.+?)_(all|valid)$", col, re.I)
+    if lang in _LANG_INDEX and m and re.search(r"deals|count|^n_", m.group(1), re.I):
+        stem = m.group(1).lower()
+        roles = {"broker": ("broker", "брокер", "брокер"), "seller": ("sotuvchi", "сотувчи", "продавец"), "buyer": ("xaridor", "харидор", "покупатель")}
+        who = [v[_LANG_INDEX[lang]] for k, v in roles.items() if k in stem] + re.findall(r"20[12]\d", stem)
+        base = LABELS["n_deals"][_LANG_INDEX[lang]] + (f" ({', '.join(who)})" if who else "")
+        tail = {"all": ("hammasi", "ҳаммаси", "все сделки"), "valid": ("bekor qilinganlarsiz", "бекор қилинганларсиз", "без аннулированных")}[m.group(2).lower()]
+        return f"{base}, {tail[_LANG_INDEX[lang]]}"
     return col.replace("_", " ")
 
 
@@ -259,8 +286,14 @@ def render_template(template: str, res: db.QueryResult, question: str, lang: str
         order = [int(i) for i in re.findall(r"\{\{\s*(\d+)\s*\.", line)]
         if order != sorted(order):
             problems.append(f"this line mixes rows {order}: every value about one item must come from that item's row")
+    if 1 < len(res.rows) <= 10:  # a list answer that drops rows hides a tie or a whole item
+        used = {int(i) for i in re.findall(r"\{\{\s*(\d+)\s*\.", template)}
+        missing = sorted(set(range(len(res.rows))) - used)
+        if missing:
+            problems.append(f"rows {missing} are not in the text: give every one of the {len(res.rows)} rows its own line")
     for m in _COUNT_AS_VALID.finditer(template):
-        if re.search(r"deals|count|^n_", m.group(1), flags=re.I) and "valid" not in m.group(1).lower():
+        named_as_all = re.match(r"\s*\(?\s*(включая|bekor qilinganlar bilan|бекор қилинганлар билан|including)", template[m.end():m.end() + 40], re.I)
+        if re.search(r"deals|count|^n_", m.group(1), flags=re.I) and "valid" not in m.group(1).lower() and not named_as_all:
             problems.append(f"{m.group(1)} includes annulled deals, do not call it excluding them")
     q_low = question.lower()
     q_digits = set(_DIGITS.findall(question)) | _DATA_RANGE_NUMBERS | set(re.findall(r"\b20[12]\d\b", sql))
@@ -315,8 +348,8 @@ def basis_info(res: db.QueryResult) -> dict[str, Any]:
     period = None
     if len(res.rows) == 1:
         row = dict(zip(res.columns, res.rows[0]))
-        for c, v in row.items():
-            if _DEAL_COUNT.match(c) and isinstance(v, int):
+        for c, v in sorted(row.items(), key=lambda kv: kv[0].lower() != "n_deals"):
+            if _DEAL_COUNT.match(c) and not re.search(r"buyer|seller|compan|unique|distinct|product|region|participant|broker", c, re.I) and isinstance(v, int):
                 n = v
                 break
         # only a range the query reports: a deal date next to its due date is not a period

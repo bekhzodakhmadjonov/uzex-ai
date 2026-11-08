@@ -22,6 +22,8 @@ _STOP = {
     "и", "в", "на", "по", "за", "для", "с", "со", "от", "до", "из", "какой", "какая", "какие", "сколько", "самый", "самая", "самые",
     "год", "году", "года", "месяц", "месяце", "сделок", "сделки", "сделка", "сумма", "объем", "объём", "цена", "средняя", "средний",
     "продано", "куплено", "всего", "общая", "общий", "топ", "кто", "что", "когда", "где",
+    "назови", "назовите", "покажи", "покажите", "перечисли", "перечислите", "выведи", "найди", "найдите", "дай", "дайте", "укажи", "укажите", "посчитай", "определи",
+    "ayting", "ayt", "aytib", "bering", "ber", "korsat", "ko‘rsat", "ko‘rsating", "sanab", "toping", "hisobla", "hisoblang", "айтинг", "кўрсатинг", "беринг",
     # en
     "the", "a", "an", "of", "in", "for", "and", "by", "how", "many", "much", "what", "which", "who", "total", "average", "price",
     # uz cyrillic ('битим' otherwise matches 'битум' as a typo)
@@ -260,7 +262,12 @@ def hints_to_text(h: dict[str, Any]) -> str:
     if h["statuses"]:
         lines.append("statuses: " + "; ".join(f"'{x['text']}' → status_code='{x['key']}'" for x in h["statuses"]))
     if h["inns"]:
-        lines.append("inn mentioned: " + ", ".join(h["inns"]))
+        parts = []
+        for inn in h["inns"]:
+            m = R.resolve_company(inn)
+            parts.append(f"{inn} ({m[0].label}, role={m[0].extra.get('role')}, region={m[0].extra.get('region')})" if m
+                         else f"{inn} (NOT a registered participant: the registry has no company with this inn)")
+        lines.append("inn mentioned: " + "; ".join(parts))
     if h["companies"]:
         for c in h["companies"]:
             kind = "company" if c["candidates"][0]["score"] >= R.EXACT_NAME else "NOT an exact match, only similar names, do not answer for them"

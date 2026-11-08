@@ -1,0 +1,281 @@
+{
+ "generated_at": "2026-11-08 04:37",
+ "dataset": "UZEX hakaton dataseti (500 000 bitim, 03.01.2022–30.10.2026, fiktiv)",
+ "baseline": {
+  "annul_pct": 6.7438,
+  "annul_trln": 14.73841867473771,
+  "annul_by_year": [
+   {
+    "year": 2022,
+    "trln": 1.9686898746778798,
+    "n": 5732
+   },
+   {
+    "year": 2023,
+    "trln": 2.42916783854518,
+    "n": 6313
+   },
+   {
+    "year": 2024,
+    "trln": 3.17676892100862,
+    "n": 7323
+   },
+   {
+    "year": 2025,
+    "trln": 3.91574112020994,
+    "n": 8085
+   },
+   {
+    "year": 2026,
+    "trln": 3.2480509202960897,
+    "n": 6266
+   }
+  ],
+  "spread_median_pct": 25.819962533463247,
+  "spread_p75_pct": 37.662708935209885,
+  "spread_n_product_weeks": 3225,
+  "at_start_price_pct": 17.985536985160092,
+  "cement_lt10t_pct": 0.9887869520897044,
+  "cement_p10_volume_t": 27.0,
+  "late_delivery_pct": 3.924321536491451,
+  "note": "Bir xil mahsulot, bir xil hafta (>=10 bitim, 2025-2026); farq qisman hudud va yetkazish shartlaridan."
+ },
+ "history_predicts": {
+  "buckets": [
+   {
+    "bucket": "5-15%",
+    "buyers": 4433,
+    "deals_2025": 71302,
+    "annul_2025_pct": 7.033463296962217
+   },
+   {
+    "bucket": "<5%",
+    "buyers": 737,
+    "deals_2025": 13644,
+    "annul_2025_pct": 6.706244503078277
+   },
+   {
+    "bucket": ">=15%",
+    "buyers": 1464,
+    "deals_2025": 6473,
+    "annul_2025_pct": 7.152788506102271
+   },
+   {
+    "bucket": "toza tarix",
+    "buyers": 4484,
+    "deals_2025": 19350,
+    "annul_2025_pct": 6.930232558139535
+   },
+   {
+    "bucket": "yangi/kam tarix",
+    "buyers": 2091,
+    "deals_2025": 4994,
+    "annul_2025_pct": 7.028434120945135
+   }
+  ],
+  "dispersion": {
+   "sd_obs": 2.6412783066002263,
+   "sd_binomial": 2.5858713149990624
+  },
+  "conclusion": "Datasetda xaridorning o'tmishi kelajakdagi bekor qilishni bashorat qilmaydi (hamma guruhda ~7%). Shuning uchun ishonch balli tarix sifatida ko'rsatiladi, bashorat sifatida emas."
+ },
+ "deposit_effect": {
+  "by_deposit": [
+   {
+    "deposit_pct": 10,
+    "n": 456724,
+    "annul_pct": 6.967227472171376
+   },
+   {
+    "deposit_pct": 15,
+    "n": 36431,
+    "annul_pct": 4.454997117839203
+   },
+   {
+    "deposit_pct": 20,
+    "n": 6845,
+    "annul_pct": 4.017531044558072
+   }
+  ],
+  "within_family": {
+   "families": 4,
+   "diff_pp": 2.2810927610698926,
+   "n_high": 43276
+  },
+  "conclusion": "Zakalat yuqori bo'lgan bitimlarda bekor qilish kamroq. Riskka qarab zakalat iqtisodiy rag'bat beradi."
+ },
+ "band_savings": {
+  "n_deals": 198185,
+  "n_above": 55389,
+  "overpay_mlrd": 1097.350183001385,
+  "total_trln": 95.28738938838661,
+  "above_pct": 27.94812927315387,
+  "cement": {
+   "n_above": 4095,
+   "n": 16219,
+   "overpay_mlrd": 30.867520525
+  },
+  "seconds": 0.1,
+  "period": "2025-01-01 .. 2026-10-30, faqat so'mdagi bitimlar",
+  "method": "Har bitim narxi shu tovar+hudud bo'yicha oldingi 8 haftadagi bitimlarning P75 (yuqori chegara) bilan solishtirildi (o'sha paytda ma'lum bo'lgan ma'lumot). Ortiqcha to'lov = (narx − P75) × hajm.",
+  "caveat": "Ortiqcha to'lovning bir qismi sifat, yetkazish bazisi va hajm farqidan bo'lishi mumkin; bu yuqori baho, aniq tejam emas."
+ },
+ "signal_backtest": {
+  "by_family": {
+   "cement": {
+    "decisions": 44,
+    "wait_signals": 15,
+    "wait_right": 9,
+    "wait_hit_pct": 60.0,
+    "avg_saving_when_wait_pct": 0.8581068914709392,
+    "avg_saving_all_pct": 0.29253644027418385
+   },
+   "rebar": {
+    "decisions": 44,
+    "wait_signals": 21,
+    "wait_right": 14,
+    "wait_hit_pct": 66.66666666666666,
+    "avg_saving_when_wait_pct": 0.34235996073132596,
+    "avg_saving_all_pct": 0.16339907216722374
+   },
+   "brick": {
+    "decisions": 44,
+    "wait_signals": 9,
+    "wait_right": 7,
+    "wait_hit_pct": 77.77777777777779,
+    "avg_saving_when_wait_pct": 3.472982334769206,
+    "avg_saving_all_pct": 0.7103827502937013
+   },
+   "flour": {
+    "decisions": 44,
+    "wait_signals": 10,
+    "wait_right": 7,
+    "wait_hit_pct": 70.0,
+    "avg_saving_when_wait_pct": 0.1152010682735878,
+    "avg_saving_all_pct": 0.02618206097126995
+   },
+   "sugar": {
+    "decisions": 44,
+    "wait_signals": 7,
+    "wait_right": 1,
+    "wait_hit_pct": 14.285714285714285,
+    "avg_saving_when_wait_pct": -3.238491077618258,
+    "avg_saving_all_pct": -0.5152144896210865
+   },
+   "diesel": {
+    "decisions": 44,
+    "wait_signals": 10,
+    "wait_right": 7,
+    "wait_hit_pct": 70.0,
+    "avg_saving_when_wait_pct": 0.6311966095524417,
+    "avg_saving_all_pct": 0.1434537748982822
+   },
+   "petrol": {
+    "decisions": 44,
+    "wait_signals": 13,
+    "wait_right": 5,
+    "wait_hit_pct": 38.46153846153847,
+    "avg_saving_when_wait_pct": -1.7719337721538453,
+    "avg_saving_all_pct": -0.5235258872272724
+   },
+   "polyethylene": {
+    "decisions": 44,
+    "wait_signals": 11,
+    "wait_right": 10,
+    "wait_hit_pct": 90.9090909090909,
+    "avg_saving_when_wait_pct": 2.7869095256612817,
+    "avg_saving_all_pct": 0.6967273814153204
+   }
+  },
+  "rule": "Keyingi 2 oy ichida mavsumiy indeks hozirgidan kamida 2 punkt past bo'lsa 'kuting', aks holda 'hozir oling'. Indeks faqat qaror yilidan oldingi yillardan.",
+  "baseline": "Har doim darhol sotib olish"
+ },
+ "parser": {
+  "dev": {
+   "split": "dev",
+   "n": 20,
+   "exact": 20,
+   "exact_pct": 100,
+   "fields_pct": {
+    "family": 100,
+    "qty": 100,
+    "region": 100,
+    "deadline": 100,
+    "price": 100
+   },
+   "fails": []
+  },
+  "holdout": {
+   "split": "holdout",
+   "n": 20,
+   "exact": 16,
+   "exact_pct": 80,
+   "fields_pct": {
+    "family": 95,
+    "qty": 90,
+    "region": 90,
+    "deadline": 95,
+    "price": 90
+   },
+   "fails": [
+    {
+     "t": "Нужно 15 тысяч кирпича в Андижан до января",
+     "wrong": [
+      "qty",
+      "price"
+     ],
+     "got": [
+      {
+       "family_key": "brick",
+       "qty": null,
+       "region_id": "AND",
+       "deadline": "2027-01-01",
+       "price_max": 15000.0
+      }
+     ]
+    },
+    {
+     "t": "Toshkentga 25 tonna dizel, tonnasi 14 mln so'mdan oshmasin",
+     "wrong": [
+      "price"
+     ],
+     "got": [
+      {
+       "family_key": "diesel",
+       "qty": 25000.0,
+       "region_id": "TAS",
+       "deadline": null,
+       "price_max": 560.0
+      }
+     ]
+    },
+    {
+     "t": "Сырдарья, 30 тонн муки, до 20.11",
+     "wrong": [
+      "family",
+      "qty",
+      "region",
+      "deadline"
+     ],
+     "got": []
+    },
+    {
+     "t": "нужно 8 тонн сахара в Бухару срочно",
+     "wrong": [
+      "region"
+     ],
+     "got": [
+      {
+       "family_key": "sugar",
+       "qty": 8.0,
+       "region_id": null,
+       "deadline": "2026-11-06",
+       "price_max": null
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "seconds": 0.2
+}
